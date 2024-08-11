@@ -61,15 +61,15 @@ public class ApplicationDbContext : DbContext
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<WalletTransaction>()
-            .HasOne(wt => wt.SenderWallet)
-            .WithMany(w => w.WalletTransactions)
-            .HasForeignKey(wt => wt.SenderWalletId)
+            .HasOne(wt => wt.Sender)
+            .WithMany(u => u.WalletTransactions)
+            .HasForeignKey(wt => wt.SenderId)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<WalletTransaction>()
-            .HasOne(wt => wt.RecipientWallet)
+            .HasOne(wt => wt.Recipient)
             .WithMany()
-            .HasForeignKey(wt => wt.RecipientWalletId)
+            .HasForeignKey(wt => wt.RecipientId)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<User>()
@@ -106,7 +106,7 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(uw => uw.WalletId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // precision
+        // Configure precision and scale for decimal properties
         modelBuilder.Entity<CardTransaction>()
             .Property(ct => ct.Amount)
             .HasColumnType("decimal(18,2)");
@@ -129,4 +129,5 @@ public class ApplicationDbContext : DbContext
 
         base.OnModelCreating(modelBuilder);
     }
+
 }

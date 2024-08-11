@@ -28,43 +28,6 @@ namespace VirtualWallet.DATA.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    VerificationStatus = table.Column<int>(type: "int", nullable: false),
-                    PhotoIdUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FaceIdUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Role = table.Column<int>(type: "int", nullable: false),
-                    GoogleId = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Users", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Wallets",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    WalletType = table.Column<int>(type: "int", nullable: false),
-                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Currency = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Wallets", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "BlockedRecords",
                 columns: table => new
                 {
@@ -78,12 +41,6 @@ namespace VirtualWallet.DATA.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_BlockedRecords", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_BlockedRecords_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -104,12 +61,6 @@ namespace VirtualWallet.DATA.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Cards", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Cards_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -123,18 +74,6 @@ namespace VirtualWallet.DATA.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UserContacts", x => new { x.UserId, x.ContactId });
-                    table.ForeignKey(
-                        name: "FK_UserContacts_Users_ContactId",
-                        column: x => x.ContactId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_UserContacts_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -158,12 +97,90 @@ namespace VirtualWallet.DATA.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UserProfiles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    VerificationStatus = table.Column<int>(type: "int", nullable: false),
+                    PhotoIdUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FaceIdUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Role = table.Column<int>(type: "int", nullable: false),
+                    GoogleId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DefaultWalletId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Wallets",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    WalletType = table.Column<int>(type: "int", nullable: false),
+                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Currency = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Wallets", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UserProfiles_Users_UserId",
+                        name: "FK_Wallets_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CardTransactions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Currency = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    Origin = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Destination = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    WalletId = table.Column<int>(type: "int", nullable: false),
+                    CardId = table.Column<int>(type: "int", nullable: false),
+                    TransactionType = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CardTransactions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CardTransactions_Cards_CardId",
+                        column: x => x.CardId,
+                        principalTable: "Cards",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CardTransactions_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CardTransactions_Wallets_WalletId",
+                        column: x => x.WalletId,
+                        principalTable: "Wallets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -243,78 +260,31 @@ namespace VirtualWallet.DATA.Migrations
                     Status = table.Column<int>(type: "int", nullable: false),
                     Origin = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Destination = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    WalletId = table.Column<int>(type: "int", nullable: false),
+                    SenderId = table.Column<int>(type: "int", nullable: false),
+                    RecipientId = table.Column<int>(type: "int", nullable: false),
                     Category = table.Column<int>(type: "int", nullable: false),
-                    SenderWalletId = table.Column<int>(type: "int", nullable: false),
-                    RecipientWalletId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true)
+                    WalletId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_WalletTransactions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_WalletTransactions_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_WalletTransactions_Users_RecipientId",
+                        column: x => x.RecipientId,
                         principalTable: "Users",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_WalletTransactions_Wallets_RecipientWalletId",
-                        column: x => x.RecipientWalletId,
-                        principalTable: "Wallets",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_WalletTransactions_Wallets_SenderWalletId",
-                        column: x => x.SenderWalletId,
-                        principalTable: "Wallets",
+                        name: "FK_WalletTransactions_Users_SenderId",
+                        column: x => x.SenderId,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_WalletTransactions_Wallets_WalletId",
                         column: x => x.WalletId,
                         principalTable: "Wallets",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CardTransactions",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Currency = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    Origin = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Destination = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    WalletId = table.Column<int>(type: "int", nullable: false),
-                    CardId = table.Column<int>(type: "int", nullable: false),
-                    TransactionType = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CardTransactions", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CardTransactions_Cards_CardId",
-                        column: x => x.CardId,
-                        principalTable: "Cards",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_CardTransactions_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_CardTransactions_Wallets_WalletId",
-                        column: x => x.WalletId,
-                        principalTable: "Wallets",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -369,33 +339,89 @@ namespace VirtualWallet.DATA.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_DefaultWalletId",
+                table: "Users",
+                column: "DefaultWalletId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserWallets_WalletId",
                 table: "UserWallets",
                 column: "WalletId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WalletTransactions_RecipientWalletId",
-                table: "WalletTransactions",
-                column: "RecipientWalletId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WalletTransactions_SenderWalletId",
-                table: "WalletTransactions",
-                column: "SenderWalletId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WalletTransactions_UserId",
-                table: "WalletTransactions",
+                name: "IX_Wallets_UserId",
+                table: "Wallets",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WalletTransactions_RecipientId",
+                table: "WalletTransactions",
+                column: "RecipientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WalletTransactions_SenderId",
+                table: "WalletTransactions",
+                column: "SenderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WalletTransactions_WalletId",
                 table: "WalletTransactions",
                 column: "WalletId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_BlockedRecords_Users_UserId",
+                table: "BlockedRecords",
+                column: "UserId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Cards_Users_UserId",
+                table: "Cards",
+                column: "UserId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_UserContacts_Users_ContactId",
+                table: "UserContacts",
+                column: "ContactId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_UserContacts_Users_UserId",
+                table: "UserContacts",
+                column: "UserId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_UserProfiles_Users_UserId",
+                table: "UserProfiles",
+                column: "UserId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Users_Wallets_DefaultWalletId",
+                table: "Users",
+                column: "DefaultWalletId",
+                principalTable: "Wallets",
+                principalColumn: "Id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Wallets_Users_UserId",
+                table: "Wallets");
+
             migrationBuilder.DropTable(
                 name: "BlockedRecords");
 
@@ -424,10 +450,10 @@ namespace VirtualWallet.DATA.Migrations
                 name: "Cards");
 
             migrationBuilder.DropTable(
-                name: "Wallets");
+                name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "Wallets");
         }
     }
 }
