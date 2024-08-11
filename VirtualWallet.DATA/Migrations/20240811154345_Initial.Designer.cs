@@ -5,14 +5,13 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using VirtualWallet.DATA.Context;
 
 #nullable disable
 
 namespace VirtualWallet.DATA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240811112451_Initial")]
+    [Migration("20240811154345_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -47,8 +46,7 @@ namespace VirtualWallet.DATA.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("BlockedRecords");
                 });
@@ -130,12 +128,17 @@ namespace VirtualWallet.DATA.Migrations
                     b.Property<int>("TransactionType")
                         .HasColumnType("int");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
                     b.Property<int>("WalletId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CardId");
+
+                    b.HasIndex("UserId");
 
                     b.HasIndex("WalletId");
 
@@ -202,11 +205,7 @@ namespace VirtualWallet.DATA.Migrations
                     b.Property<DateTime>("NextPaymentDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("RecipientId")
-                        .IsRequired()
-                        .HasColumnType("int");
-
-                    b.Property<int?>("SenderId")
+                    b.Property<int>("RecipientId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartDate")
@@ -215,14 +214,12 @@ namespace VirtualWallet.DATA.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<int>("WalletId")
+                    b.Property<int?>("WalletId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RecipientId");
-
-                    b.HasIndex("SenderId");
 
                     b.HasIndex("UserId");
 
@@ -238,9 +235,6 @@ namespace VirtualWallet.DATA.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int?>("BlockedRecordId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
@@ -395,15 +389,10 @@ namespace VirtualWallet.DATA.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("OwnerId")
-                        .HasColumnType("int");
-
                     b.Property<int>("WalletType")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OwnerId");
 
                     b.ToTable("Wallets");
                 });
@@ -436,23 +425,28 @@ namespace VirtualWallet.DATA.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RecipientId")
+                    b.Property<int>("RecipientWalletId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SenderId")
+                    b.Property<int>("SenderWalletId")
                         .HasColumnType("int");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
-                    b.Property<int?>("WalletId")
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("WalletId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RecipientId");
+                    b.HasIndex("RecipientWalletId");
 
-                    b.HasIndex("SenderId");
+                    b.HasIndex("SenderWalletId");
+
+                    b.HasIndex("UserId");
 
                     b.HasIndex("WalletId");
 
@@ -462,8 +456,8 @@ namespace VirtualWallet.DATA.Migrations
             modelBuilder.Entity("VirtualWallet.DATA.Models.BlockedRecord", b =>
                 {
                     b.HasOne("VirtualWallet.DATA.Models.User", "User")
-                        .WithOne("BlockedRecord")
-                        .HasForeignKey("VirtualWallet.DATA.Models.BlockedRecord", "UserId")
+                        .WithMany("BlockedRecords")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -489,6 +483,12 @@ namespace VirtualWallet.DATA.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("VirtualWallet.DATA.Models.User", "User")
+                        .WithMany("CardTransactions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("VirtualWallet.DATA.Models.Wallet", "Wallet")
                         .WithMany("CardTransactions")
                         .HasForeignKey("WalletId")
@@ -496,6 +496,8 @@ namespace VirtualWallet.DATA.Migrations
                         .IsRequired();
 
                     b.Navigation("Card");
+
+                    b.Navigation("User");
 
                     b.Navigation("Wallet");
                 });
@@ -508,10 +510,6 @@ namespace VirtualWallet.DATA.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("VirtualWallet.DATA.Models.User", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderId");
-
                     b.HasOne("VirtualWallet.DATA.Models.User", "User")
                         .WithMany("RecurringPayments")
                         .HasForeignKey("UserId")
@@ -520,13 +518,9 @@ namespace VirtualWallet.DATA.Migrations
 
                     b.HasOne("VirtualWallet.DATA.Models.Wallet", "Wallet")
                         .WithMany()
-                        .HasForeignKey("WalletId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("WalletId");
 
                     b.Navigation("Recipient");
-
-                    b.Navigation("Sender");
 
                     b.Navigation("User");
 
@@ -582,38 +576,35 @@ namespace VirtualWallet.DATA.Migrations
                     b.Navigation("Wallet");
                 });
 
-            modelBuilder.Entity("VirtualWallet.DATA.Models.Wallet", b =>
+            modelBuilder.Entity("VirtualWallet.DATA.Models.WalletTransaction", b =>
                 {
-                    b.HasOne("VirtualWallet.DATA.Models.User", "Owner")
-                        .WithMany("Wallets")
-                        .HasForeignKey("OwnerId")
+                    b.HasOne("VirtualWallet.DATA.Models.Wallet", "RecipientWallet")
+                        .WithMany()
+                        .HasForeignKey("RecipientWalletId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("VirtualWallet.DATA.Models.Wallet", "SenderWallet")
+                        .WithMany("WalletTransactions")
+                        .HasForeignKey("SenderWalletId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("VirtualWallet.DATA.Models.User", null)
+                        .WithMany("WalletTransactions")
+                        .HasForeignKey("UserId");
+
+                    b.HasOne("VirtualWallet.DATA.Models.Wallet", "Wallet")
+                        .WithMany()
+                        .HasForeignKey("WalletId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Owner");
-                });
+                    b.Navigation("RecipientWallet");
 
-            modelBuilder.Entity("VirtualWallet.DATA.Models.WalletTransaction", b =>
-                {
-                    b.HasOne("VirtualWallet.DATA.Models.User", "Recipient")
-                        .WithMany()
-                        .HasForeignKey("RecipientId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Navigation("SenderWallet");
 
-                    b.HasOne("VirtualWallet.DATA.Models.User", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("VirtualWallet.DATA.Models.Wallet", null)
-                        .WithMany("Transactions")
-                        .HasForeignKey("WalletId");
-
-                    b.Navigation("Recipient");
-
-                    b.Navigation("Sender");
+                    b.Navigation("Wallet");
                 });
 
             modelBuilder.Entity("VirtualWallet.DATA.Models.Card", b =>
@@ -623,8 +614,9 @@ namespace VirtualWallet.DATA.Migrations
 
             modelBuilder.Entity("VirtualWallet.DATA.Models.User", b =>
                 {
-                    b.Navigation("BlockedRecord")
-                        .IsRequired();
+                    b.Navigation("BlockedRecords");
+
+                    b.Navigation("CardTransactions");
 
                     b.Navigation("Cards");
 
@@ -637,16 +629,16 @@ namespace VirtualWallet.DATA.Migrations
 
                     b.Navigation("UserWallets");
 
-                    b.Navigation("Wallets");
+                    b.Navigation("WalletTransactions");
                 });
 
             modelBuilder.Entity("VirtualWallet.DATA.Models.Wallet", b =>
                 {
                     b.Navigation("CardTransactions");
 
-                    b.Navigation("Transactions");
-
                     b.Navigation("UserWallets");
+
+                    b.Navigation("WalletTransactions");
                 });
 #pragma warning restore 612, 618
         }

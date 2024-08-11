@@ -22,15 +22,16 @@ namespace VirtualWallet.DATA.Models
         public UserRole Role { get; set; }
         public string GoogleId { get; set; }
         public ICollection<Card> Cards { get; set; }
-        public ICollection<Wallet> Wallets { get; set; }
-
-        public ICollection<UserContact> Contacts { get; set; }
-        public ICollection<RecurringPayment> RecurringPayments { get; set; }
         public ICollection<UserWallet> UserWallets { get; set; }
-
-        public int? BlockedRecordId { get; set; }
-        public BlockedRecord BlockedRecord { get; set; }
+        public ICollection<UserContact> Contacts { get; set; }
+        public ICollection<CardTransaction> CardTransactions { get; set; }
+        public ICollection<WalletTransaction> WalletTransactions { get; set; }
+        public ICollection<RecurringPayment> RecurringPayments { get; set; }
+        public ICollection<BlockedRecord> BlockedRecords { get; set; }
     }
+
+
+
 
 
 

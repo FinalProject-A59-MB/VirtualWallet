@@ -2,7 +2,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
-using VirtualWallet.DATA.Context;
+using VirtualWallet.DATA;
 
 var builder = WebApplication.CreateBuilder(args);
 

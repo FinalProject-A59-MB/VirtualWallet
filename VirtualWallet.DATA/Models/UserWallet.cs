@@ -19,4 +19,5 @@ namespace VirtualWallet.DATA.Models
         public DateTime JoinedDate { get; set; }
     }
 
+
 }
