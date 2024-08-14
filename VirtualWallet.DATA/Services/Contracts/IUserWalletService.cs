@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using VirtualWallet.DATA.Models;
 
 namespace VirtualWallet.DATA.Services.Contracts
 {
-    internal class IUserWalletService
+    public interface IUserWalletService
     {
+        IEnumerable<UserWallet> GetUserWalletsByUserId(int userId);
+        IEnumerable<UserWallet> GetUserWalletsByWalletId(int walletId);
+        void AddUserWallet(UserWallet userWallet);
+        void RemoveUserWallet(int walletId);
     }
 }

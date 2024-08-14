@@ -12,6 +12,6 @@ namespace VirtualWallet.DATA.Repositories.Contracts
         IEnumerable<WalletTransaction> GetTransactionsBySenderId(int senderId);
         IEnumerable<WalletTransaction> GetTransactionsByRecipientId(int recipientId);
         WalletTransaction GetTransactionById(int id);
-        void AddWalletTransaction(WalletTransaction walletTransaction)
+        void AddWalletTransaction(WalletTransaction walletTransaction);
     }
 }
