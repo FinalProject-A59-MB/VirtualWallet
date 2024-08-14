@@ -12,6 +12,6 @@ namespace VirtualWallet.DATA.Repositories.Contracts
         IEnumerable<UserWallet> GetUserWalletsByUserId(int userId);
         IEnumerable<UserWallet> GetUserWalletsByWalletId(int walletId);
         void AddUserWallet(UserWallet userWallet);
-        void RemoveUserWallet(UserWallet userWallet);
+        void RemoveUserWallet(int walletId);
     }
 }
