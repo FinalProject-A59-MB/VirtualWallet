@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,9 +10,10 @@ namespace VirtualWallet.DATA.Repositories.Contracts
 {
     public interface IRealCardRepository
     {
-        RealCard GetRealCardById(int id);
-        IEnumerable<RealCard> GetAllRealCards();
-        void AddRealCard(RealCard realCard);
-        void UpdateRealCard(RealCard realCard);
+        Task<RealCard?> GetByPaymentProcessorTokenAsync(string paymentProcessorToken);
+
+        Task<RealCard?> GetByCardNumberAsync(string cardNumber);
+
+        Task UpdateRealCardAsync(RealCard realCard);
     }
 }

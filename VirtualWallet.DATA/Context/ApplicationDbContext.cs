@@ -8,6 +8,7 @@ public class ApplicationDbContext : DbContext
     }
 
     public DbSet<User> Users { get; set; }
+    public DbSet<UserProfile> UserProfiles { get; set; }
     public DbSet<Card> Cards { get; set; }
     public DbSet<BlockedRecord> BlockedRecords { get; set; }
     public DbSet<CardTransaction> CardTransactions { get; set; }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,18 +10,26 @@ namespace VirtualWallet.DATA.Repositories.Contracts
 {
     public interface IUserRepository
     {
-        User GetUserById(int id);
-        User GetUserByEmail(string email);
-        User GetUserByUsername(string username);
-        IEnumerable<User> GetAllUsers();
-        void AddUser(User user);
-        void UpdateUser(User user);
-        void DeleteUser(int userId);
+        public IQueryable<User> GetAllUsers();
 
-        UserProfile GetUserProfile(int userId);
-        void UpdateUserProfile(UserProfile userProfile);
+        public Task<User?> GetUserByIdAsync(int id);
 
-        void AddBlockedRecord(BlockedRecord blockedRecord);
-        IEnumerable<BlockedRecord> GetBlockedRecords(int userId);
+        public Task<User?> GetUserByEmailAsync(string email);
+
+        public Task<User?> GetUserByUsernameAsync(string username);
+
+        public Task AddUserAsync(User user);
+
+        public Task UpdateUserAsync(User user);
+
+        public Task DeleteUserAsync(int userId);
+
+        public Task<UserProfile?> GetUserProfileAsync(int userId);
+
+        public Task UpdateUserProfileAsync(UserProfile userProfile);
+
+        public Task AddBlockedRecordAsync(BlockedRecord blockedRecord);
+
+        public Task<IEnumerable<BlockedRecord>> GetBlockedRecordsAsync(int userId);
     }
 }

@@ -16,6 +16,8 @@ namespace VirtualWallet.DATA.Models
         public string CheckNumber { get; set; }
         public CardType CardType { get; set; }
         public decimal Balance { get; set; }
+        public string PaymentProcessorToken { get; set; }
     }
+
 
 }

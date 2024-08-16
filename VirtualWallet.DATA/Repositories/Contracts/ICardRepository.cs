@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,10 +10,14 @@ namespace VirtualWallet.DATA.Repositories.Contracts
 {
     public interface ICardRepository
     {
-        IEnumerable<Card> GetCardsByUserId(int userId);
-        Card GetCardById(int id);
-        void AddCard(Card card);
-        void UpdateCard(Card card);
-        void RemoveCard(int cardId);
+        public IQueryable<Card> GetCardsByUserId(int userId);
+
+        public Task<Card?> GetCardByIdAsync(int id);
+
+        public Task AddCardAsync(Card card);
+
+        public Task UpdateCardAsync(Card card);
+
+        public Task RemoveCardAsync(int cardId);
     }
 }
