@@ -20,7 +20,7 @@ namespace VirtualWallet.DATA.Models
         public string FaceIdUrl { get; set; }
         public DateTime? DeletedAt { get; set; }
         public UserRole Role { get; set; }
-        public string GoogleId { get; set; }
+        public string? GoogleId { get; set; }
         public ICollection<Card> Cards { get; set; }
         public ICollection<Wallet> Wallets { get; set; }
         public ICollection<UserWallet> UserWallets { get; set; }
