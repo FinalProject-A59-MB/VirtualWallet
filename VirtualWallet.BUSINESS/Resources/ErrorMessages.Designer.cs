@@ -88,6 +88,15 @@ namespace VirtualWallet.BUSINESS.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Comment with id={0} doesn&apos;t exist..
+        /// </summary>
+        internal static string CommentNotFound {
+            get {
+                return ResourceManager.GetString("CommentNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CVV number does not match..
         /// </summary>
         internal static string CVVMismatch {
