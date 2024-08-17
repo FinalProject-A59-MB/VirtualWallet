@@ -1,4 +1,4 @@
-﻿namespace ForumProject.Exceptions
+﻿namespace VirtualWallet.BUSINESS.Exceptions
 {
     public class EntityNotFoundException : ApplicationException
     {

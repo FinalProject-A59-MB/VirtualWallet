@@ -3,7 +3,7 @@ using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Repositories.Contracts;
 using System;
-using ForumProject.Exceptions;
+using VirtualWallet.BUSINESS.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using VirtualWallet.BUSINESS.Resources;
 

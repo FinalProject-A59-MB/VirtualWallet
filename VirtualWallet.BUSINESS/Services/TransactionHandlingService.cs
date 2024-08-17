@@ -59,7 +59,7 @@ namespace VirtualWallet.BUSINESS.Services
                 };
 
                 await _cardTransactionRepository.AddCardTransactionAsync(cardTransaction);
-                await _walletRepository.UpdateAsync(wallet);
+                await _walletRepository.UpdateWalletAsync(wallet);
 
                 await transaction.CommitAsync();
 
@@ -108,7 +108,7 @@ namespace VirtualWallet.BUSINESS.Services
                 }
 
                 await _cardTransactionRepository.AddCardTransactionAsync(cardTransaction);
-                await _walletRepository.UpdateAsync(wallet);
+                await _walletRepository.UpdateWalletAsync(wallet);
 
                 await transaction.CommitAsync();
 
@@ -149,8 +149,8 @@ namespace VirtualWallet.BUSINESS.Services
                 };
 
                 await _walletTransactionRepository.AddWalletTransactionAsync(walletTransaction);
-                await _walletRepository.UpdateAsync(senderWallet);
-                await _walletRepository.UpdateAsync(recipientWallet);
+                await _walletRepository.UpdateWalletAsync(senderWallet);
+                await _walletRepository.UpdateWalletAsync(recipientWallet);
 
                 await transaction.CommitAsync();
 

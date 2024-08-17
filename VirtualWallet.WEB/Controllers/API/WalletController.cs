@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VirtualWallet.DATA.Models;
+using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Services.Contracts;
 
 namespace VirtualWallet.WEB.Controllers.API
@@ -67,9 +68,9 @@ namespace VirtualWallet.WEB.Controllers.API
         }
 
         [HttpPut("{walletId}")]
-        public async Task<IActionResult> UpdateWallet(int walletId, [FromBody] Wallet newWallet)
+        public async Task<IActionResult> UpdateWallet([FromBody] Wallet newWallet)
         {
-            await _walletService.UpdateWalletAsync(walletId, newWallet);
+            await _walletService.UpdateWalletAsync(newWallet);
 
             return Ok();
         }

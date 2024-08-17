@@ -1,4 +1,4 @@
-﻿using ForumProject.Exceptions;
+﻿using VirtualWallet.BUSINESS.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -39,9 +39,6 @@ namespace VirtualWallet.BUSINESS.Services
             if (wallet == null)
                 throw new EntityNotFoundException(ErrorMessages.WalletNotFound);
 
-            if (card.UserId != wallet.OwnerId)
-                throw new UnauthorizedAccessException(ErrorMessages.UnauthorizedCardWallet);
-
             if (amount <= 0)
                 throw new BadRequestException(ErrorMessages.InvalidDepositAmount);
 
@@ -58,9 +55,6 @@ namespace VirtualWallet.BUSINESS.Services
 
             if (card == null)
                 throw new EntityNotFoundException(ErrorMessages.CardNotFound);
-
-            if (wallet.OwnerId != card.UserId)
-                throw new UnauthorizedAccessException(ErrorMessages.UnauthorizedCardWallet);
 
             if (amount <= 0)
                 throw new BadRequestException(ErrorMessages.InvalidWithdrawalAmount);

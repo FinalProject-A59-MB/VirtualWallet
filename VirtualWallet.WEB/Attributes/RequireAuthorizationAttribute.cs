@@ -58,14 +58,14 @@ public class RequireAuthorizationAttribute : Attribute, IAuthorizationFilter
         var userId = int.Parse(userIdClaim.Value);
         var isAdmin = isAdminClaim != null;
 
-        var user = _userRepository.GetUserById(userId);
+        var user = _userRepository.GetUserByIdAsync(userId);
         if (user == null || (_requireAdmin && !isAdmin))
         {
             HandleUnauthorizedRequest(context);
             return;
         }
 
-        if (_checkIfBlocked && user.IsBlocked)
+        if (_checkIfBlocked)//TODO blocked logic
         {
             HandleBlockedUserRequest(context);
             return;

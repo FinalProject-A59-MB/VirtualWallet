@@ -1,10 +1,9 @@
 ﻿using System.Net;
 using System.Security.Authentication;
 using System.Text.Json;
-using ForumProject.Exceptions;
-using Microsoft.AspNetCore.Mvc;
+using VirtualWallet.BUSINESS.Exceptions;
 
-namespace ForumProject.Middlewares
+namespace VirtualWallet.WEB.Middlewares
 {
     public class ExceptionHandlingMiddleware
     {

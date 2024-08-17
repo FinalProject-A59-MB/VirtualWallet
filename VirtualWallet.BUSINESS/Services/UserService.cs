@@ -1,4 +1,4 @@
-﻿using ForumProject.Exceptions;
+﻿using VirtualWallet.BUSINESS.Exceptions;
 using System.Threading.Tasks;
 using VirtualWallet.DATA.Helpers;
 using VirtualWallet.DATA.Models;

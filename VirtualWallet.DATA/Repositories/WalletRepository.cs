@@ -75,12 +75,9 @@ namespace VirtualWallet.DATA.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task UpdateWalletAsync(int walletId, Wallet wallet)
+        public async Task UpdateWalletAsync(Wallet wallet)
         {
-            var walletToUpdate = await GetWalletByIdAsync(walletId);
-
-            walletToUpdate.Name = wallet.Name;
-
+            _dbContext.Update(wallet);
             await _dbContext.SaveChangesAsync();
         }
     }

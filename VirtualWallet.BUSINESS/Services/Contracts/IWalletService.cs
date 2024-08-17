@@ -8,7 +8,7 @@ namespace VirtualWallet.DATA.Services.Contracts
         Task<IEnumerable<Wallet>> GetWalletsByUserIdAsync(int userId);
         Task<Wallet> GetWalletByNameAsync(string walletName);
         Task AddWalletAsync(Wallet wallet);
-        Task UpdateWalletAsync(int walletId, Wallet wallet);
+        Task UpdateWalletAsync(Wallet wallet);
         Task RemoveWalletAsync(int walletId);
     }
 }

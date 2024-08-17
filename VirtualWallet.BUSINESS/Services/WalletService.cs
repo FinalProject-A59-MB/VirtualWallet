@@ -42,9 +42,9 @@ namespace VirtualWallet.DATA.Services
             return _walletRepository.RemoveWalletAsync(walletId);
         }
 
-        public Task UpdateWalletAsync(int walletId, Wallet wallet)
+        public Task UpdateWalletAsync(Wallet wallet)
         {
-            return _walletRepository.UpdateWalletAsync(walletId, wallet);
+            return _walletRepository.UpdateWalletAsync(wallet);
         }
     }
 }
