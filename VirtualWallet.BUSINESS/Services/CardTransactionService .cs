@@ -11,18 +11,16 @@ namespace VirtualWallet.BUSINESS.Services
 {
     public class CardTransactionService : ICardTransactionService
     {
-        private readonly ICardTransactionRepository _cardTransactionRepository;
+
         private readonly ICardRepository _cardRepository;
         private readonly IWalletRepository _walletRepository;
         private readonly ITransactionHandlingService _transactionHandlingService;
 
         public CardTransactionService(
-            ICardTransactionRepository cardTransactionRepository,
             ICardRepository cardRepository,
             IWalletRepository walletRepository,
             ITransactionHandlingService transactionHandlingService)
         {
-            _cardTransactionRepository = cardTransactionRepository;
             _cardRepository = cardRepository;
             _walletRepository = walletRepository;
             _transactionHandlingService = transactionHandlingService;

@@ -3,13 +3,71 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using VirtualWallet.DATA;
+using VirtualWallet.WEB.Middlewares;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using VirtualWallet.BUSINESS.Services.Contracts;
+using VirtualWallet.DATA.Repositories.Contracts;
+using VirtualWallet.DATA.Repositories;
+using VirtualWallet.DATA.Services.Contracts;
+using VirtualWallet.DATA.Services;
+using VirtualWallet.BUSINESS.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+// EF
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    options.UseSqlServer(connectionString);
+    options.EnableSensitiveDataLogging();
+});
+
+// Session configuration
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+builder.Services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
+builder.Services.AddSingleton<ITempDataDictionaryFactory, TempDataDictionaryFactory>();
+
+// Repositories
+//builder.Services.AddScoped<IBlockedRecordRepository, BlockedRecordRepository>(); TODO
+builder.Services.AddScoped<ICardRepository, CardRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICardTransactionRepository, CardTransactionRepository>();
+builder.Services.AddScoped<IRealCardRepository, RealCardRepository>();
+//builder.Services.AddScoped<IRecurringPaymentRepository, RecurringPaymentRepository>(); TODO
+//builder.Services.AddScoped<IUserContactRepository, UserContactRepository>(); TODO
+builder.Services.AddScoped<IUserWalletRepository, UserWalletRepository>();
+builder.Services.AddScoped<IWalletRepository, WalletRepository>();
+builder.Services.AddScoped<IWalletTransactionRepository, WalletTransactionRepository>();
+
+// Services
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICardService, CardService>();
+builder.Services.AddScoped<ICardTransactionService, CardTransactionService>();
+//builder.Services.AddScoped<IEmailService, EmailService>(); TODO
+builder.Services.AddScoped<IPaymentProcessorService, PaymentProcessorService>();
+builder.Services.AddScoped<ITransactionHandlingService, TransactionHandlingService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IWalletService, WalletService>();
+builder.Services.AddScoped<IWalletTransactionService, WalletTransactionService>();
+
+//builder.Services.AddScoped<ICloudinaryService, CloudinaryService>(); TODO
+
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+builder.Services.AddHttpContextAccessor();
+
+// Helpers
+//builder.Services.AddScoped<IModelMapper, ModelMapper>(); TODO
+
+// Attributes
+builder.Services.AddScoped<RequireAuthorizationAttribute>();
 
 
 builder.Services.AddSwaggerGen(options =>
@@ -41,6 +99,10 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+// Exception handling middleware
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.UseHttpsRedirection();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -48,14 +110,17 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
 }
 app.UseStaticFiles();
-
 app.UseRouting();
 
+// JWT authentication
+app.UseAuthentication();
 app.UseAuthorization();
+
 app.UseSwagger();
-app.UseSwaggerUI(c =>
+app.UseSwaggerUI(options =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "VirtualWallet API v1");
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "AspNetCoreDemo API V1");
+    options.RoutePrefix = "api/swagger";
 });
 
 app.UseEndpoints(endpoints =>

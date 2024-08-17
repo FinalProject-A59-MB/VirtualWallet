@@ -6,10 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using SendGrid;
 using SendGrid.Helpers.Mail;
+using VirtualWallet.BUSINESS.Services.Contracts;
 
 namespace VirtualWallet.BUSINESS.Services
 {
-    public class EmailService
+    public class EmailService: IEmailService
     {
         private readonly string _sendGridApiKey;
 
