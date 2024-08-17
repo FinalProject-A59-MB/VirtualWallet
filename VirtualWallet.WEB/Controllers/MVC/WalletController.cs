@@ -21,9 +21,11 @@ namespace VirtualWallet.WEB.Controllers.MVC
         }
 
         [HttpPost]
-        public IActionResult Add(Wallet wallet)
+        public async Task<IActionResult> Add(Wallet wallet)
         {
-            throw new NotImplementedException();
+            await _walletService.AddWalletAsync(wallet);
+
+            return Ok();
         }
     }
 }

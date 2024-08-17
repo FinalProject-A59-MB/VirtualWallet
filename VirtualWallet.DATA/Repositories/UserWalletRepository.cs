@@ -7,19 +7,17 @@ namespace VirtualWallet.DATA.Repositories
     public class UserWalletRepository : IUserWalletRepository
     {
         private readonly ApplicationDbContext _dbContext;
-        private readonly WalletRepository _walletRepository;
 
-        public UserWalletRepository(ApplicationDbContext dbContext, WalletRepository walletRepository)
+        public UserWalletRepository(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
-            _walletRepository = walletRepository;
         }
 
 
-        public void AddUserWallet(UserWallet userWallet)
+        public async Task AddUserWalletAsync(UserWallet userWallet)
         {
             _dbContext.UserWallets.Add(userWallet);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<UserWallet>> GetUserWalletsByUserIdAsync(int userId)
