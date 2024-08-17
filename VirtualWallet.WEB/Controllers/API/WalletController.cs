@@ -16,9 +16,9 @@ namespace VirtualWallet.WEB.Controllers.API
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetWalletById(int id)
+        public async Task<IActionResult> GetWalletById(int id)
         {
-            var wallet = _walletService.GetWalletById(id);
+            var wallet = await _walletService.GetWalletByIdAsync(id);
 
             if (wallet == null)
             {
@@ -29,9 +29,9 @@ namespace VirtualWallet.WEB.Controllers.API
         }
 
         [HttpGet("{userId}")]
-        public IActionResult GetWalletsByUserId(int userId)
+        public async Task<IActionResult> GetWalletsByUserId(int userId)
         {
-            var wallets = _walletService.GetWalletsByUserId(userId);
+            var wallets = await _walletService.GetWalletsByUserIdAsync(userId);
 
             if (wallets == null)
             {
@@ -42,9 +42,9 @@ namespace VirtualWallet.WEB.Controllers.API
         }
 
         [HttpGet("{walletName}")]
-        public IActionResult GetWalletByName(string walletName)
+        public async Task<IActionResult> GetWalletByName(string walletName)
         {
-            var wallet = _walletService.GetWalletByName(walletName);
+            var wallet = await _walletService.GetWalletByNameAsync(walletName);
 
             if (wallet == null)
             {
@@ -55,29 +55,29 @@ namespace VirtualWallet.WEB.Controllers.API
         }
 
         [HttpPost("")]
-        public ActionResult AddWallet([FromBody] Wallet wallet)
+        public async Task<IActionResult> AddWallet([FromBody] Wallet wallet)
         {
             var user = (User)HttpContext.Items["User"];
 
             wallet.UserId = user.Id;
 
-            _walletService.AddWallet(wallet);
+            await _walletService.AddWalletAsync(wallet);
 
             return CreatedAtAction(nameof(AddWallet), wallet);
         }
 
         [HttpPut("{walletId}")]
-        public ActionResult UpdateWallet(int walletId, [FromBody] Wallet newWallet)
+        public async Task<IActionResult> UpdateWallet(int walletId, [FromBody] Wallet newWallet)
         {
-            _walletService.UpdateWallet(walletId, newWallet);
+            await _walletService.UpdateWalletAsync(walletId, newWallet);
 
             return Ok();
         }
 
         [HttpDelete("{walletId}")]
-        public ActionResult RemoveWallet(int walletId)
+        public async Task<IActionResult> RemoveWallet(int walletId)
         {
-            _walletService.RemoveWallet(walletId);
+            await _walletService.RemoveWalletAsync(walletId);
             return Ok("Wallet removed successfully!");
         }
     }

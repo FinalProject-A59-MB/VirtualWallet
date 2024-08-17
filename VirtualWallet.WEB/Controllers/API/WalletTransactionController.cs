@@ -16,9 +16,9 @@ namespace VirtualWallet.WEB.Controllers.API
         }
 
         [HttpGet("{senderId}")]
-        public IActionResult GetTransactionsBySenderId(int senderId)
+        public async Task<IActionResult> GetTransactionsBySenderId(int senderId)
         {
-            var transactions = _walletTransactionService.GetTransactionsBySenderId(senderId);
+            var transactions = await _walletTransactionService.GetTransactionsBySenderIdAsync(senderId);
 
             if (transactions == null)
             {
@@ -29,9 +29,9 @@ namespace VirtualWallet.WEB.Controllers.API
         }
 
         [HttpGet("{recipientId}")]
-        public IActionResult GetTransactionsByRecipientId(int recipientId)
+        public async Task<IActionResult> GetTransactionsByRecipientId(int recipientId)
         {
-            var transactions = _walletTransactionService.GetTransactionsByRecipientId(recipientId);
+            var transactions = await _walletTransactionService.GetTransactionsByRecipientIdAsync(recipientId);
 
             if (transactions == null)
             {
@@ -42,9 +42,9 @@ namespace VirtualWallet.WEB.Controllers.API
         }
 
         [HttpGet("{id}")]
-        public IActionResult GetTransactionById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var transaction = _walletTransactionService.GetTransactionById(id);
+            var transaction = await _walletTransactionService.GetTransactionByIdAsync(id);
 
             if (transaction == null)
             {
@@ -55,9 +55,9 @@ namespace VirtualWallet.WEB.Controllers.API
         }
 
         [HttpPost]
-        public ActionResult AddWalletTransaction(WalletTransaction walletTransaction)
+        public async Task<IActionResult> Add(WalletTransaction walletTransaction)
         {
-            _walletTransactionService.AddWalletTransaction(walletTransaction);
+            await _walletTransactionService.AddWalletTransactionAsync(walletTransaction);
 
             return Ok();
         }

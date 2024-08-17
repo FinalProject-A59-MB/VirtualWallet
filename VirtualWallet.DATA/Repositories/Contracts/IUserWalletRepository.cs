@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VirtualWallet.DATA.Models;
+﻿using VirtualWallet.DATA.Models;
 
 namespace VirtualWallet.DATA.Repositories.Contracts
 {
     public interface IUserWalletRepository
     {
-        IEnumerable<UserWallet> GetUserWalletsByUserId(int userId);
-        IEnumerable<UserWallet> GetUserWalletByWalletId(int walletId);
-        void AddUserWallet(UserWallet userWallet);
-        void RemoveUserWallet(int walletId);
+        Task<IEnumerable<UserWallet>> GetUserWalletsByUserIdAsync(int userId);
+        Task<IEnumerable<UserWallet>> GetUserWalletByWalletIdAsync(int walletId);
+        Task AddUserWalletAsync(UserWallet userWallet);
+        Task RemoveUserWalletAsync(int walletId);
     }
 }

@@ -17,67 +17,71 @@ namespace VirtualWallet.DATA.Repositories
             _dbContext = dbContext;
             _userRepository = userRepository;
         }
-        public void AddWallet(Wallet wallet)
+
+
+        public async Task AddWalletAsync(Wallet wallet)
         {
             _dbContext.Wallets.Add(wallet);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public Wallet GetWalletById(int id)
+        public async Task<Wallet> GetWalletByIdAsync(int id)
         {
-           return _dbContext.Wallets.FirstOrDefault(w => w.Id == id);
-        }
-
-        public Wallet GetWalletByName(string walletName)
-        {
-            return _dbContext.Wallets.FirstOrDefault(w => w.Name == walletName);
-        }
-
-        public IEnumerable<Wallet> GetWalletsByUserId(int userId)
-        {
-            List<Wallet> wallets = _dbContext.Wallets.Where(w => w.UserId == userId).ToList();
-            
-            List<UserWallet> jointWallets = _dbContext.UserWallets.Include(w => w.Wallet).Where(x => x.UserId == userId).ToList();
-
-            wallets.AddRange(jointWallets.Select(x => x.Wallet));
-
-            return wallets;
-        }
-
-        public void RemoveWallet(int walletId)
-        {
-            var wallet = _dbContext.Wallets.FirstOrDefault(w => w.Id == walletId);
+            var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(w => w.Id == id);
 
             if (wallet == null)
             {
                 throw new Exception();
             }
 
+            return wallet;
+        }
+
+        public async Task<Wallet> GetWalletByNameAsync(string walletName)
+        {
+            var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(w => w.Name == walletName);
+
+            if (wallet == null)
+            {
+                throw new Exception();
+            }
+
+            return wallet;
+        }
+
+        public async Task<IEnumerable<Wallet>> GetWalletsByUserIdAsync(int userId)
+        {
+            var wallets = await _dbContext.Wallets.Where(w => w.UserId == userId).ToListAsync();
+
+            var jointWallets = await _dbContext.UserWallets.Include(w => w.Wallet).Where(x => x.UserId == userId).ToListAsync();
+
+            wallets.AddRange(jointWallets.Select(x => x.Wallet));
+
+            return wallets;
+        }
+
+        public async Task RemoveWalletAsync(int walletId)
+        {
+            var wallet = await GetWalletByIdAsync(walletId);
+
             if(wallet.WalletType != Models.Enums.WalletType.Joint)
             {
-                User user = _userRepository.GetUserById(wallet.UserId);
+                var user = await _userRepository.GetUserByIdAsync(wallet.UserId);
 
                 //TODO transfer the money from the wallet back to the user card
             }
 
             _dbContext.Wallets.Remove(wallet);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
-        public void UpdateWallet(int walletId, Wallet wallet)
+        public async Task UpdateWalletAsync(int walletId, Wallet wallet)
         {
-            var walletToUpdate = GetWalletById(walletId);
+            var walletToUpdate = await GetWalletByIdAsync(walletId);
 
-            if (walletToUpdate == null)
-            {
-                throw new Exception();
-            }
-
-            walletToUpdate.Currency = wallet.Currency;
-            walletToUpdate.Balance = wallet.Balance;
             walletToUpdate.Name = wallet.Name;
 
-            // What can we update?
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

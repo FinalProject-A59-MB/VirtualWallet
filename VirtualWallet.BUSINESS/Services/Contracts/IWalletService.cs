@@ -4,11 +4,11 @@ namespace VirtualWallet.DATA.Services.Contracts
 {
     public interface IWalletService
     {
-        Wallet GetWalletById(int id);
-        IEnumerable<Wallet> GetWalletsByUserId(int userId);
-        Wallet GetWalletByName(string walletName);
-        void AddWallet(Wallet wallet);
-        void UpdateWallet(int walletId, Wallet wallet);
-        void RemoveWallet(int walletId);
+        Task<Wallet> GetWalletByIdAsync(int id);
+        Task<IEnumerable<Wallet>> GetWalletsByUserIdAsync(int userId);
+        Task<Wallet> GetWalletByNameAsync(string walletName);
+        Task AddWalletAsync(Wallet wallet);
+        Task UpdateWalletAsync(int walletId, Wallet wallet);
+        Task RemoveWalletAsync(int walletId);
     }
 }

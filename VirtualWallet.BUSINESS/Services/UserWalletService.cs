@@ -12,24 +12,26 @@ namespace VirtualWallet.DATA.Services
         {
             _userWalletRepository = userWalletRepository;
         }
-        public void AddUserWallet(UserWallet userWallet)
+
+
+        public Task AddUserWalletAsync(UserWallet userWallet)
         {
-            _userWalletRepository.AddUserWallet(userWallet);
+             return _userWalletRepository.AddUserWalletAsync(userWallet);
         }
 
-        public IEnumerable<UserWallet> GetUserWalletsByUserId(int userId)
+        public Task<IEnumerable<UserWallet>> GetUserWalletsByUserIdAsync(int userId)
         {
-            return _userWalletRepository.GetUserWalletsByUserId(userId);
+            return _userWalletRepository.GetUserWalletsByUserIdAsync(userId);
         }
 
-        public IEnumerable<UserWallet> GetUserWalletByWalletId(int walletId)
+        public Task<IEnumerable<UserWallet>> GetUserWalletByWalletIdAsync(int walletId)
         {
-            return _userWalletRepository.GetUserWalletByWalletId(walletId);
+            return _userWalletRepository.GetUserWalletByWalletIdAsync(walletId);
         }
 
-        public void RemoveUserWallet(int walletId)
+        public Task RemoveUserWalletAsync(int walletId)
         {
-            _userWalletRepository.RemoveUserWallet(walletId);
+            return _userWalletRepository.RemoveUserWalletAsync(walletId);
         }
     }
 }

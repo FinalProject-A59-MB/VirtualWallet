@@ -16,10 +16,11 @@ namespace VirtualWallet.WEB.Controllers.API
             _userWalletService = userWalletService;
         }
 
+
         [HttpGet("{userId}")]
-        public IActionResult GetUserWalletsByUserId(int userId)
+        public async Task<IActionResult> GetUserWalletsByUserId(int userId)
         {
-            var wallets = _userWalletService.GetUserWalletsByUserId(userId);
+            var wallets = await _userWalletService.GetUserWalletsByUserIdAsync(userId);
 
             if (wallets == null)
             {
@@ -30,9 +31,9 @@ namespace VirtualWallet.WEB.Controllers.API
         }
 
         [HttpGet("{walletId}")]
-        public IActionResult GetUserWalletByWalletId(int walletId)
+        public async Task<IActionResult> GetUserWalletByWalletId(int walletId)
         {
-            var wallet = _userWalletService.GetUserWalletByWalletId(walletId);
+            var wallet = await _userWalletService.GetUserWalletByWalletIdAsync(walletId);
 
             if (wallet == null)
             {
@@ -43,28 +44,28 @@ namespace VirtualWallet.WEB.Controllers.API
         }
 
         [HttpPost("")]
-        public ActionResult AddUserWallet([FromBody] UserWallet userWallet)
+        public async Task<IActionResult> AddUserWallet([FromBody] UserWallet userWallet)
         {
             var user = (User)HttpContext.Items["User"];
 
             userWallet.UserId = user.Id;
 
-            _userWalletService.AddUserWallet(userWallet);
+            await _userWalletService.AddUserWalletAsync(userWallet);
 
             return CreatedAtAction(nameof(AddUserWallet), userWallet);
         }
 
         [HttpDelete("{walletId}")]
-        public ActionResult RemoveUserWallet(int walletId)
+        public async Task<IActionResult> RemoveUserWallet(int walletId)
         {
-            var wallet = _userWalletService.GetUserWalletByWalletId(walletId);
+            var wallet = await _userWalletService.GetUserWalletByWalletIdAsync(walletId);
 
             if (wallet == null)
             {
                 return NotFound($"Wallet with ID {walletId} not found.");
             }
 
-            _userWalletService.RemoveUserWallet(walletId);
+            await _userWalletService.RemoveUserWalletAsync(walletId);
             return Ok("Wallet removed successfully!");
         }
     }
