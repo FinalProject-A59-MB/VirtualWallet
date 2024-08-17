@@ -5,6 +5,7 @@ using VirtualWallet.DATA.Repositories.Contracts;
 using System;
 using ForumProject.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using VirtualWallet.BUSINESS.Resources; // Make sure this points to your resource namespace
 
 namespace VirtualWallet.BUSINESS.Services
 {
@@ -22,7 +23,7 @@ namespace VirtualWallet.BUSINESS.Services
         public async Task<Card> GetCardByIdAsync(int cardId)
         {
             var card = await _cardRepository.GetCardByIdAsync(cardId);
-            if (card == null) throw new EntityNotFoundException("Card not found");
+            if (card == null) throw new EntityNotFoundException(ErrorMessages.CardNotFound);
             return card;
         }
 
@@ -33,21 +34,19 @@ namespace VirtualWallet.BUSINESS.Services
 
         public async Task AddCardAsync(Card card)
         {
-
             var paymentProcessorToken = await _paymentProcessorService.VerifyAndRetrieveTokenAsync(card);
 
             if (string.IsNullOrEmpty(paymentProcessorToken))
-                throw new InvalidOperationException("Failed to retrieve Payment Processor Token.");
+                throw new InvalidOperationException(ErrorMessages.FailedToRetrievePaymentProcessorToken);
 
             card.PaymentProcessorToken = paymentProcessorToken;
             await _cardRepository.AddCardAsync(card);
         }
 
-
         public async Task DeleteCardAsync(int cardId)
         {
             var card = await _cardRepository.GetCardByIdAsync(cardId);
-            if (card == null) throw new EntityNotFoundException("Card not found");
+            if (card == null) throw new EntityNotFoundException(ErrorMessages.CardNotFound);
             await _cardRepository.RemoveCardAsync(cardId);
         }
 

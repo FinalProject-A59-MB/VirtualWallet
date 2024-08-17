@@ -1,13 +1,11 @@
 ﻿using ForumProject.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
-using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Repositories.Contracts;
+using VirtualWallet.BUSINESS.Resources;
 
 namespace VirtualWallet.BUSINESS.Services
 {
@@ -16,38 +14,38 @@ namespace VirtualWallet.BUSINESS.Services
         private readonly ICardTransactionRepository _cardTransactionRepository;
         private readonly ICardRepository _cardRepository;
         private readonly IWalletRepository _walletRepository;
-        private readonly ITransactionHandlingService _transactionService;
+        private readonly ITransactionHandlingService _transactionHandlingService;
 
         public CardTransactionService(
             ICardTransactionRepository cardTransactionRepository,
             ICardRepository cardRepository,
             IWalletRepository walletRepository,
-            ITransactionHandlingService transactionService)
+            ITransactionHandlingService transactionHandlingService)
         {
             _cardTransactionRepository = cardTransactionRepository;
             _cardRepository = cardRepository;
             _walletRepository = walletRepository;
-            _transactionService = transactionService;
+            _transactionHandlingService = transactionHandlingService;
         }
 
         public async Task<CardTransaction> DepositAsync(int cardId, int walletId, decimal amount)
         {
             var card = await _cardRepository.GetCardByIdAsync(cardId);
-            var wallet = await _walletRepository.GetUserByIdAsync(walletId);
+            var wallet = await _walletRepository.GetWalletByIdAsync(walletId);
 
             if (card == null)
-                throw new EntityNotFoundException($"Card with ID {cardId} not found.");
+                throw new EntityNotFoundException(ErrorMessages.CardNotFound);
 
             if (wallet == null)
-                throw new EntityNotFoundException($"Wallet with ID {walletId} not found.");
+                throw new EntityNotFoundException(ErrorMessages.WalletNotFound);
 
             if (card.UserId != wallet.OwnerId)
-                throw new UnauthorizedAccessException("The card and wallet must belong to the same user.");
+                throw new UnauthorizedAccessException(ErrorMessages.UnauthorizedCardWallet);
 
             if (amount <= 0)
-                throw new BadRequestException("The deposit amount must be greater than zero.");
+                throw new BadRequestException(ErrorMessages.InvalidDepositAmount);
 
-            return await _transactionService.ProcessCardToWalletTransactionAsync(card, wallet, amount);
+            return await _transactionHandlingService.ProcessCardToWalletTransactionAsync(card, wallet, amount);
         }
 
         public async Task<CardTransaction> WithdrawAsync(int walletId, int cardId, decimal amount)
@@ -56,21 +54,21 @@ namespace VirtualWallet.BUSINESS.Services
             var card = await _cardRepository.GetCardByIdAsync(cardId);
 
             if (wallet == null)
-                throw new EntityNotFoundException($"Wallet with ID {walletId} not found.");
+                throw new EntityNotFoundException(ErrorMessages.WalletNotFound);
 
             if (card == null)
-                throw new EntityNotFoundException($"Card with ID {cardId} not found.");
+                throw new EntityNotFoundException(ErrorMessages.CardNotFound);
 
             if (wallet.OwnerId != card.UserId)
-                throw new UnauthorizedAccessException("The card and wallet must belong to the same user.");
+                throw new UnauthorizedAccessException(ErrorMessages.UnauthorizedCardWallet);
 
             if (amount <= 0)
-                throw new BadRequestException("The withdrawal amount must be greater than zero.");
+                throw new BadRequestException(ErrorMessages.InvalidWithdrawalAmount);
 
             if (wallet.Balance < amount)
-                throw new BadRequestException("Insufficient funds in the wallet.");
+                throw new BadRequestException(ErrorMessages.InsufficientWalletFunds);
 
-            return await _transactionService.ProcessWalletToCardTransactionAsync(wallet, card, amount);
+            return await _transactionHandlingService.ProcessWalletToCardTransactionAsync(wallet, card, amount);
         }
     }
 }

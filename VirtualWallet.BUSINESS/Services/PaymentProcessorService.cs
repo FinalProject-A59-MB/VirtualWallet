@@ -3,20 +3,17 @@ using System.Threading.Tasks;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Repositories.Contracts;
+using VirtualWallet.BUSINESS.Resources;
 
 namespace VirtualWallet.BUSINESS.Services
 {
     public class PaymentProcessorService : IPaymentProcessorService
     {
         private readonly IRealCardRepository _realCardRepository;
-        private readonly ICardTransactionService _cardTransactionService;
 
-        public PaymentProcessorService(
-            IRealCardRepository realCardRepository,
-            ICardTransactionService cardTransactionService)
+        public PaymentProcessorService(IRealCardRepository realCardRepository)
         {
             _realCardRepository = realCardRepository;
-            _cardTransactionService = cardTransactionService;
         }
 
         public async Task<string> VerifyAndRetrieveTokenAsync(Card card)
@@ -24,66 +21,43 @@ namespace VirtualWallet.BUSINESS.Services
             var realCard = await _realCardRepository.GetByCardNumberAsync(card.CardNumber);
 
             if (realCard == null)
-                throw new EntityNotFoundException("Real card not found.");
+                throw new EntityNotFoundException(ErrorMessages.RealCardNotFound);
 
             if (realCard.CardHolderName != card.CardHolderName)
-                throw new InvalidOperationException("Cardholder name does not match.");
+                throw new InvalidOperationException(ErrorMessages.CardHolderNameMismatch);
 
             if (realCard.CheckNumber != card.CheckNumber)
-                throw new InvalidOperationException("CVV number does not match.");
+                throw new InvalidOperationException(ErrorMessages.CVVMismatch);
 
             return realCard.PaymentProcessorToken;
         }
 
-        public async Task<bool> ProcessDepositAsync(string paymentProcessorToken, int cardId, int walletId, decimal amount)
+        public async Task<bool> WithdrawFromRealCardAsync(string paymentProcessorToken, decimal amount)
         {
             var realCard = await _realCardRepository.GetByPaymentProcessorTokenAsync(paymentProcessorToken);
 
             if (realCard == null)
-                throw new EntityNotFoundException("`Real` card associated with this payment processor token not found.");
+                throw new EntityNotFoundException(ErrorMessages.RealCardTokenNotFound);
 
             if (realCard.Balance < amount)
-                throw new BadRequestException("Insufficient funds in the `real` card.");
+                throw new BadRequestException(ErrorMessages.InsufficientRealCardFunds);
 
-            var isSuccess = SimulateExternalDeposit(realCard, amount);
-
-            if (!isSuccess)
-                throw new Exception("External payment processor failed to process the deposit.");
-
-            await _cardTransactionService.DepositAsync(cardId, walletId, amount);
+            realCard.Balance -= amount;
+            await _realCardRepository.UpdateRealCardAsync(realCard);
 
             return true;
         }
 
-        public async Task<bool> ProcessWithdrawalAsync(string paymentProcessorToken, int walletId, int cardId, decimal amount)
+        public async Task<bool> DepositToRealCardAsync(string paymentProcessorToken, decimal amount)
         {
-
             var realCard = await _realCardRepository.GetByPaymentProcessorTokenAsync(paymentProcessorToken);
 
             if (realCard == null)
-                throw new EntityNotFoundException("`Real` card associated with this payment processor token not found.");
+                throw new EntityNotFoundException(ErrorMessages.RealCardTokenNotFound);
 
-            var isSuccess = SimulateExternalWithdrawal(realCard, amount);
-
-            if (!isSuccess)
-                throw new Exception("External payment processor failed to process the withdrawal.");
-
-            await _cardTransactionService.WithdrawAsync(walletId, cardId, amount);
-
-            return true;
-        }
-
-        private bool SimulateExternalDeposit(RealCard realCard, decimal amount)
-        {
-            realCard.Balance -= amount;
-            _realCardRepository.UpdateRealCardAsync(realCard);
-            return true;
-        }
-
-        private bool SimulateExternalWithdrawal(RealCard realCard, decimal amount)
-        {
             realCard.Balance += amount;
-            _realCardRepository.UpdateRealCardAsync(realCard);
+            await _realCardRepository.UpdateRealCardAsync(realCard);
+
             return true;
         }
     }

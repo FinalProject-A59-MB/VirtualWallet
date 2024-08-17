@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Models;
+using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Repositories.Contracts;
 using VirtualWallet.BUSINESS.Services.Contracts;
 
@@ -41,15 +38,15 @@ namespace VirtualWallet.BUSINESS.Services
 
             try
             {
-                // Simulate contacting the payment processor to withdraw funds from the real card
-                var paymentSuccessful = await _paymentProcessorService.WithdrawFromCardAsync(card.PaymentProcessorToken, amount);
+                // Withdraw funds from the real card via the payment processor
+                var paymentSuccessful = await _paymentProcessorService.WithdrawFromRealCardAsync(card.PaymentProcessorToken, amount);
                 if (!paymentSuccessful)
                 {
                     throw new Exception("Failed to withdraw funds from the real card.");
                 }
 
+                
                 wallet.Balance += amount;
-
 
                 var cardTransaction = new CardTransaction
                 {
@@ -61,9 +58,7 @@ namespace VirtualWallet.BUSINESS.Services
                     Status = TransactionStatus.Completed
                 };
 
-
-                await _cardTransactionRepository.AddAsync(cardTransaction);
-                await _cardRepository.UpdateCardAsync(card);
+                await _cardTransactionRepository.AddCardTransactionAsync(cardTransaction);
                 await _walletRepository.UpdateAsync(wallet);
 
                 await transaction.CommitAsync();
@@ -72,11 +67,10 @@ namespace VirtualWallet.BUSINESS.Services
             }
             catch (Exception ex)
             {
-                // Rollback the transaction
                 await transaction.RollbackAsync();
 
-                // Rollback on the payment processor side if necessary
-                await _paymentProcessorService.RefundToCardAsync(card.PaymentProcessorToken, amount);
+                // Refund the amount to the real card if transaction fails
+                await _paymentProcessorService.DepositToRealCardAsync(card.PaymentProcessorToken, amount);
 
                 throw new Exception($"Transaction failed: {ex.Message}");
             }
@@ -88,16 +82,13 @@ namespace VirtualWallet.BUSINESS.Services
 
             try
             {
-
                 if (wallet.Balance < amount)
                 {
                     throw new Exception("Insufficient funds in the wallet.");
                 }
 
-
+                
                 wallet.Balance -= amount;
-
-
 
                 var cardTransaction = new CardTransaction
                 {
@@ -109,16 +100,15 @@ namespace VirtualWallet.BUSINESS.Services
                     Status = TransactionStatus.Completed
                 };
 
-                // Simulate contacting the payment processor to deposit funds to the real card
-                var paymentSuccessful = await _paymentProcessorService.DepositToCardAsync(card.PaymentProcessorToken, amount);
+                // Deposit the funds to the real card via the payment processor
+                var paymentSuccessful = await _paymentProcessorService.DepositToRealCardAsync(card.PaymentProcessorToken, amount);
                 if (!paymentSuccessful)
                 {
                     throw new Exception("Failed to deposit funds to the real card.");
                 }
 
-                await _cardTransactionRepository.AddAsync(cardTransaction);
+                await _cardTransactionRepository.AddCardTransactionAsync(cardTransaction);
                 await _walletRepository.UpdateAsync(wallet);
-                await _cardRepository.UpdateAsync(card);
 
                 await transaction.CommitAsync();
 
@@ -128,7 +118,8 @@ namespace VirtualWallet.BUSINESS.Services
             {
                 await transaction.RollbackAsync();
 
-                await _paymentProcessorService.WithdrawFromCardAsync(card.PaymentProcessorToken, amount);
+                // Refund the amount to the wallet if transaction fails
+                await _paymentProcessorService.WithdrawFromRealCardAsync(card.PaymentProcessorToken, amount);
 
                 throw new Exception($"Transaction failed: {ex.Message}");
             }
@@ -150,14 +141,14 @@ namespace VirtualWallet.BUSINESS.Services
 
                 var walletTransaction = new WalletTransaction
                 {
-                    SenderId = senderWallet.OwnerId,
-                    RecipientId = recipientWallet.OwnerId,
+                    SenderId = senderWallet.UserId,
+                    RecipientId = recipientWallet.UserId,
                     Amount = amount,
                     CreatedAt = DateTime.UtcNow,
                     Status = TransactionStatus.Completed
                 };
 
-                await _walletTransactionRepository.AddAsync(walletTransaction);
+                await _walletTransactionRepository.AddWalletTransactionAsync(walletTransaction);
                 await _walletRepository.UpdateAsync(senderWallet);
                 await _walletRepository.UpdateAsync(recipientWallet);
 
