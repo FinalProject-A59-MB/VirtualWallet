@@ -12,24 +12,26 @@ namespace VirtualWallet.DATA.Services
         {
             _walletTransactionRepository = walletTransactionRepository;
         }
-        public void AddWalletTransaction(WalletTransaction walletTransaction)
+
+
+        public Task AddWalletTransactionAsync(WalletTransaction walletTransaction)
         {
-            _walletTransactionRepository.AddWalletTransaction(walletTransaction);
+            return _walletTransactionRepository.AddWalletTransactionAsync(walletTransaction);
         }
 
-        public WalletTransaction GetTransactionById(int id)
+        public Task<WalletTransaction?> GetTransactionByIdAsync(int id)
         {
-            return _walletTransactionRepository.GetTransactionById(id);
+            return _walletTransactionRepository.GetTransactionByIdAsync(id);
         }
 
-        public IEnumerable<WalletTransaction> GetTransactionsByRecipientId(int recipientId)
+        public Task<IEnumerable<WalletTransaction>> GetTransactionsByRecipientIdAsync(int recipientId)
         {
-            return _walletTransactionRepository.GetTransactionsByRecipientId(recipientId);
+            return _walletTransactionRepository.GetTransactionsByRecipientIdAsync(recipientId);
         }
 
-        public IEnumerable<WalletTransaction> GetTransactionsBySenderId(int senderId)
+        public Task<IEnumerable<WalletTransaction>> GetTransactionsBySenderIdAsync(int senderId)
         {
-            return _walletTransactionRepository.GetTransactionsBySenderId(senderId);
+            return _walletTransactionRepository.GetTransactionsBySenderIdAsync(senderId);
         }
     }
 }

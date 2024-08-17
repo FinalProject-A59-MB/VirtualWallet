@@ -1,4 +1,5 @@
-﻿using VirtualWallet.DATA.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Repositories.Contracts;
 
 namespace VirtualWallet.DATA.Repositories
@@ -12,25 +13,26 @@ namespace VirtualWallet.DATA.Repositories
             _dbContext = dbContext;
         }
 
-        public void AddWalletTransaction(WalletTransaction walletTransaction)
+
+        public async Task<IEnumerable<WalletTransaction>> GetTransactionsByRecipientIdAsync(int recipientId)
+        {
+            return await _dbContext.WalletTransactions.Where(t => t.RecipientId == recipientId).ToListAsync();
+        }
+
+        public async Task<IEnumerable<WalletTransaction>> GetTransactionsBySenderIdAsync(int senderId)
+        {
+            return await _dbContext.WalletTransactions.Where(t => t.SenderId == senderId).ToListAsync();
+        }
+
+        public async Task<WalletTransaction?> GetTransactionByIdAsync(int id)
+        {
+            return await _dbContext.WalletTransactions.FirstOrDefaultAsync(t => t.Id == id);
+        }
+
+        public async Task AddWalletTransactionAsync(WalletTransaction walletTransaction)
         {
             _dbContext.WalletTransactions.Add(walletTransaction);
-            _dbContext.SaveChanges();
-        }
-
-        public WalletTransaction GetTransactionById(int id)
-        {
-            return _dbContext.WalletTransactions.FirstOrDefault(t => t.Id == id);
-        }
-
-        public IEnumerable<WalletTransaction> GetTransactionsByRecipientId(int recipientId)
-        {
-            return _dbContext.WalletTransactions.Where(t => t.RecipientId == recipientId);
-        }
-
-        public IEnumerable<WalletTransaction> GetTransactionsBySenderId(int senderId)
-        {
-            return _dbContext.WalletTransactions.Where(t => t.SenderId == senderId);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

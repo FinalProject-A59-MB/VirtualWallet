@@ -17,34 +17,34 @@ namespace VirtualWallet.DATA.Services
         {
             _walletRepository = walletRepository;
         }
-        public void AddWallet(Wallet wallet)
+        public Task AddWalletAsync(Wallet wallet)
         {
-            _walletRepository.AddWallet(wallet);
+            return _walletRepository.AddWalletAsync(wallet);
         }
 
-        public Wallet GetWalletById(int id)
+        public Task<Wallet> GetWalletByIdAsync(int id)
         {
-            return _walletRepository.GetWalletById(id);
+            return _walletRepository.GetWalletByIdAsync(id);
         }
 
-        public Wallet GetWalletByName(string walletName)
+        public Task<Wallet> GetWalletByNameAsync(string walletName)
         {
-            return _walletRepository.GetWalletByName(walletName);
+            return _walletRepository.GetWalletByNameAsync(walletName);
         }
 
-        public IEnumerable<Wallet> GetWalletsByUserId(int userId)
+        public Task<IEnumerable<Wallet>> GetWalletsByUserIdAsync(int userId)
         {
-            return _walletRepository.GetWalletsByUserId(userId);
+            return _walletRepository.GetWalletsByUserIdAsync(userId);
         }
 
-        public void RemoveWallet(int walletId)
+        public Task RemoveWalletAsync(int walletId)
         {
-            _walletRepository.RemoveWallet(walletId);
+            return _walletRepository.RemoveWalletAsync(walletId);
         }
 
-        public void UpdateWallet(Wallet wallet)
+        public Task UpdateWalletAsync(int walletId, Wallet wallet)
         {
-            _walletRepository.UpdateWallet(wallet);
+            return _walletRepository.UpdateWalletAsync(walletId, wallet);
         }
     }
 }

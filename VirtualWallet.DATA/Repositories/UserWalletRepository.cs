@@ -1,4 +1,5 @@
-﻿using VirtualWallet.DATA.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Repositories.Contracts;
 
 namespace VirtualWallet.DATA.Repositories
@@ -13,27 +14,29 @@ namespace VirtualWallet.DATA.Repositories
             _dbContext = dbContext;
             _walletRepository = walletRepository;
         }
+
+
         public void AddUserWallet(UserWallet userWallet)
         {
             _dbContext.UserWallets.Add(userWallet);
             _dbContext.SaveChanges();
         }
 
-        public IEnumerable<UserWallet> GetUserWalletsByUserId(int userId)
+        public async Task<IEnumerable<UserWallet>> GetUserWalletsByUserIdAsync(int userId)
         {
-            return _dbContext.UserWallets.Where(w => w.UserId == userId);
+            return await _dbContext.UserWallets.Where(w => w.UserId == userId).ToListAsync();
         }
 
-        public IEnumerable<UserWallet> GetUserWalletsByWalletId(int walletId)
+        public async Task<IEnumerable<UserWallet>> GetUserWalletByWalletIdAsync(int walletId)
         {
-            return _dbContext.UserWallets.Where(w => w.WalletId == walletId);
+            return await _dbContext.UserWallets.Where(w => w.WalletId == walletId).ToListAsync();
         }
 
-        public void RemoveUserWallet(int walletId)
+        public async Task RemoveUserWalletAsync(int walletId)
         {
             //Remove user from joint wallet
 
-            var wallet = _dbContext.UserWallets.FirstOrDefault(w => w.Id == walletId);
+            var wallet = await _dbContext.UserWallets.FirstOrDefaultAsync(w => w.Id == walletId);
 
             if (wallet == null)
             {
@@ -43,7 +46,7 @@ namespace VirtualWallet.DATA.Repositories
             //TODO Does the money stay in the wallet when user is removed?
 
             _dbContext.UserWallets.Remove(wallet);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
