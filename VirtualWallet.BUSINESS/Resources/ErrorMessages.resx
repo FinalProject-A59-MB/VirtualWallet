@@ -126,6 +126,9 @@
   <data name="CardNotFound" xml:space="preserve">
     <value>Card not found.</value>
   </data>
+  <data name="CommentNotFound" xml:space="preserve">
+    <value>Comment with id={0} doesn't exist.</value>
+  </data>
   <data name="CVVMismatch" xml:space="preserve">
     <value>CVV number does not match.</value>
   </data>
