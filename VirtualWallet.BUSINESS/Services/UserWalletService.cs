@@ -22,9 +22,9 @@ namespace VirtualWallet.DATA.Services
             return _userWalletRepository.GetUserWalletsByUserId(userId);
         }
 
-        public IEnumerable<UserWallet> GetUserWalletsByWalletId(int walletId)
+        public IEnumerable<UserWallet> GetUserWalletByWalletId(int walletId)
         {
-            return _userWalletRepository.GetUserWalletsByWalletId(walletId);
+            return _userWalletRepository.GetUserWalletByWalletId(walletId);
         }
 
         public void RemoveUserWallet(int walletId)

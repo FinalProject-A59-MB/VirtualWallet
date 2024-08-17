@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using VirtualWallet.WEB.Models;
 
-namespace VirtualWallet.WEB.Controllers
+namespace VirtualWallet.WEB.Controllers.MVC
 {
     public class HomeController : Controller
     {

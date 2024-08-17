@@ -10,7 +10,7 @@ namespace VirtualWallet.DATA.Repositories.Contracts
     public interface IUserWalletRepository
     {
         IEnumerable<UserWallet> GetUserWalletsByUserId(int userId);
-        IEnumerable<UserWallet> GetUserWalletsByWalletId(int walletId);
+        IEnumerable<UserWallet> GetUserWalletByWalletId(int walletId);
         void AddUserWallet(UserWallet userWallet);
         void RemoveUserWallet(int walletId);
     }

@@ -64,9 +64,9 @@ namespace VirtualWallet.DATA.Repositories
             _dbContext.SaveChanges();
         }
 
-        public void UpdateWallet(Wallet wallet)
+        public void UpdateWallet(int walletId, Wallet wallet)
         {
-            var walletToUpdate = GetWalletById(wallet.Id);
+            var walletToUpdate = GetWalletById(walletId);
 
             if (walletToUpdate == null)
             {

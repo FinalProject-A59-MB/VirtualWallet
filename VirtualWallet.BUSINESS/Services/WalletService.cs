@@ -42,9 +42,9 @@ namespace VirtualWallet.DATA.Services
             _walletRepository.RemoveWallet(walletId);
         }
 
-        public void UpdateWallet(Wallet wallet)
+        public void UpdateWallet(int walletId, Wallet wallet)
         {
-            _walletRepository.UpdateWallet(wallet);
+            _walletRepository.UpdateWallet(walletId, wallet);
         }
     }
 }

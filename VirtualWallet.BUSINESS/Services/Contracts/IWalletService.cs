@@ -8,7 +8,7 @@ namespace VirtualWallet.DATA.Services.Contracts
         IEnumerable<Wallet> GetWalletsByUserId(int userId);
         Wallet GetWalletByName(string walletName);
         void AddWallet(Wallet wallet);
-        void UpdateWallet(Wallet wallet);
+        void UpdateWallet(int walletId, Wallet wallet);
         void RemoveWallet(int walletId);
     }
 }

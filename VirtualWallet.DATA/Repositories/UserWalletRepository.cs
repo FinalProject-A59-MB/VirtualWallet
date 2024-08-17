@@ -24,7 +24,7 @@ namespace VirtualWallet.DATA.Repositories
             return _dbContext.UserWallets.Where(w => w.UserId == userId);
         }
 
-        public IEnumerable<UserWallet> GetUserWalletsByWalletId(int walletId)
+        public IEnumerable<UserWallet> GetUserWalletByWalletId(int walletId)
         {
             return _dbContext.UserWallets.Where(w => w.WalletId == walletId);
         }
