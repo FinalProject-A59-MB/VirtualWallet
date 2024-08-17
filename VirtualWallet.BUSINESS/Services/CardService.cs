@@ -5,7 +5,7 @@ using VirtualWallet.DATA.Repositories.Contracts;
 using System;
 using ForumProject.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using VirtualWallet.BUSINESS.Resources; // Make sure this points to your resource namespace
+using VirtualWallet.BUSINESS.Resources;
 
 namespace VirtualWallet.BUSINESS.Services
 {
