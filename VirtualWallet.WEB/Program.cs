@@ -11,11 +11,13 @@ using VirtualWallet.DATA.Repositories;
 using VirtualWallet.DATA.Services.Contracts;
 using VirtualWallet.DATA.Services;
 using VirtualWallet.BUSINESS.Services;
+using VirtualWallet.DATA.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
 // EF
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
@@ -103,13 +105,15 @@ var app = builder.Build();
 // Exception handling middleware
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-app.UseHttpsRedirection();
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+// Data Seeding
+using (var scope = app.Services.CreateScope())
 {
-    app.UseExceptionHandler("/Home/Error");
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<ApplicationDbContext>();
+    InitializeData.Initialize(context);
 }
+
+app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 

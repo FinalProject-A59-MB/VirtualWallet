@@ -1,15 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using VirtualWallet.WEB.Attributes;
 
 namespace VirtualWallet.WEB.Models.ViewModels
 {
     public class LoginViewModel
     {
         [Required]
-        [StringLength(50, MinimumLength = 5)]
-        public string Username { get; set; }
+        [CustomEmailOrUsername]
+        public string UsernameOrEmail { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Password is required.")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
+
+        public string? CustomError { get; set; }
     }
+
 }

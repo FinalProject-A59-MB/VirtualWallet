@@ -27,17 +27,20 @@ namespace VirtualWallet.BUSINESS.Services
             _userRepository = userRepository;
         }
 
-        public async Task<User> Authenticate(string credentials)
+        public async Task<User?> Authenticate(string credentials)
         {
             if (credentials == null || !credentials.Contains(':'))
-                throw new InvalidCredentialException(string.Format(ErrorMessages.InvalidCredentialsFormat, credentials));
+                return null;
+
             string[] parts = credentials.Split(':');
-            var username = parts[0] ?? "";
+            var identifier = parts[0] ?? "";
             var password = parts[1] ?? "";
-            User user = await _userRepository.GetUserByUsernameAsync(username) ??
-                throw new InvalidCredentialException(string.Format(ErrorMessages.InvalidCredentialsFormat, credentials));
-            if (!PasswordHasher.VerifyPassword(user.Password, password))
-                throw new InvalidCredentialException(string.Format(ErrorMessages.InvalidCredentialsFormat, credentials));
+            User? user = await _userRepository.GetUserByUsernameAsync(identifier) ??
+                         await _userRepository.GetUserByEmailAsync(identifier);
+
+            if (user == null || !PasswordHasher.VerifyPassword(password,user.Password))
+                return null;
+
             return user;
         }
 

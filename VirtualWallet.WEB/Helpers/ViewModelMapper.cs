@@ -25,11 +25,7 @@ public class ViewModelMapper : IViewModelMapper
 
     public LoginViewModel ToLoginViewModel(User user)
     {
-        return new LoginViewModel
-        {
-            Username = user.Username,
-            Password = user.Password
-        };
+        throw new NotImplementedException();
     }
 
     public UserViewModel ToUserViewModel(User user)

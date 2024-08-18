@@ -1,0 +1,40 @@
+﻿@{
+    ViewData["Title"] = "Error";
+    int statusCode = ViewBag.StatusCode ?? 500;
+    string errorMessage = ViewBag.Message ?? "An unexpected error occurred.";
+    string displayMessage = "Oops! Something went wrong";
+
+    if (statusCode >= 400 && statusCode < 500)
+    {
+        displayMessage = "Attention!";
+    }
+}
+
+<!-- Bootstrap Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="errorModalLabel">@displayMessage</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-3">Status Code: <br><strong>@statusCode</strong></p>
+                <p class="text-muted mb-4">Error Message: <br><strong>@errorMessage</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="history.back()">Go Back</button>
+                <a href="/" class="btn btn-primary">Go Back Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        var myModal = new bootstrap.Modal(document.getElementById('errorModal'), {
+            keyboard: false
+        });
+        myModal.show();
+    });
+</script>

@@ -27,6 +27,12 @@ public class ApplicationDbContext : DbContext
             .WithOne(p => p.User)
             .HasForeignKey<UserProfile>(p => p.UserId);
 
+        modelBuilder.Entity<User>()
+        .HasOne(u => u.DefaultWallet)
+        .WithOne(p=>p.User)
+        .HasForeignKey<User>(u => u.DefaultWalletId)
+        .OnDelete(DeleteBehavior.NoAction);
+
         // One-to-Many
         modelBuilder.Entity<User>()
             .HasMany(u => u.BlockedRecords)

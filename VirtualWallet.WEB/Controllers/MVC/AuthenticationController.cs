@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 using VirtualWallet.BUSINESS.Exceptions;
 using VirtualWallet.BUSINESS.Services;
@@ -37,27 +38,33 @@ namespace ForumProject.Controllers.MVC
                 return View(model);
             }
 
-            try
-            {
-                var user = await _authService.Authenticate($"{model.Username}:{model.Password}");
-                var token = _authService.GenerateToken(user);
-                HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
+            User user = await _authService.Authenticate($"{model.UsernameOrEmail}:{model.Password}");
 
-                var returnUrl = HttpContext.Request.Cookies["ReturnUrl"];
-                if (!string.IsNullOrEmpty(returnUrl))
-                {
-                    HttpContext.Response.Cookies.Delete("ReturnUrl");
-                    return Redirect(returnUrl);
-                }
-
-                return RedirectToAction("Index", "Home");
-            }
-            catch (Exception ex)
+            if (user == null)
             {
-                ModelState.AddModelError("Error", ex.Message);
+                ModelState.AddModelError("CustomError", "Invalid credentials. Please try again.");
                 return View(model);
             }
+
+
+            var token = _authService.GenerateToken(user);
+            HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
+
+            var returnUrl = HttpContext.Request.Cookies["ReturnUrl"];
+            if (!string.IsNullOrEmpty(returnUrl))
+            {
+                HttpContext.Response.Cookies.Delete("ReturnUrl");
+                return Redirect(returnUrl);
+            }
+
+            return RedirectToAction( "Index", "Home");
         }
+
+
+
+
+
+
 
         [HttpGet]
         public IActionResult Register()

@@ -20,7 +20,8 @@ namespace VirtualWallet.DATA.Migrations
                     CardHolderName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CheckNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CardType = table.Column<int>(type: "int", nullable: false),
-                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PaymentProcessorToken = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -113,7 +114,7 @@ namespace VirtualWallet.DATA.Migrations
                     FaceIdUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Role = table.Column<int>(type: "int", nullable: false),
-                    GoogleId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    GoogleId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DefaultWalletId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -127,11 +128,11 @@ namespace VirtualWallet.DATA.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     WalletType = table.Column<int>(type: "int", nullable: false),
                     Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Currency = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true)
+                    Currency = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -140,7 +141,8 @@ namespace VirtualWallet.DATA.Migrations
                         name: "FK_Wallets_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -228,6 +230,7 @@ namespace VirtualWallet.DATA.Migrations
                 {
                     UserId = table.Column<int>(type: "int", nullable: false),
                     WalletId = table.Column<int>(type: "int", nullable: false),
+                    Id = table.Column<int>(type: "int", nullable: false),
                     Role = table.Column<int>(type: "int", nullable: false),
                     JoinedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -341,7 +344,9 @@ namespace VirtualWallet.DATA.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Users_DefaultWalletId",
                 table: "Users",
-                column: "DefaultWalletId");
+                column: "DefaultWalletId",
+                unique: true,
+                filter: "[DefaultWalletId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserWallets_WalletId",

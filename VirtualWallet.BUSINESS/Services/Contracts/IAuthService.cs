@@ -11,10 +11,11 @@ namespace VirtualWallet.BUSINESS.Services.Contracts
 {
     public interface IAuthService
     {
-        public Task<User> Authenticate(string credentials);
+        public Task<User?> Authenticate(string credentials);
 
         public string GenerateToken(User user);
 
         public bool ValidateToken(string token);
+
     }
 }
