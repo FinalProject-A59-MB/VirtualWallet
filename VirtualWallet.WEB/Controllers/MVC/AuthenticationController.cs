@@ -1,21 +1,26 @@
-﻿using ForumProject.Models.DTOs;
-using ForumProject.Services.Contracts;
-using Microsoft.AspNetCore.Mvc;
-using ForumProject.Models.ViewModels;
-using ForumProject.Exceptions;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using VirtualWallet.BUSINESS.Exceptions;
+using VirtualWallet.BUSINESS.Services;
 using VirtualWallet.BUSINESS.Services.Contracts;
+using VirtualWallet.DATA.Models;
+using VirtualWallet.DATA.Services.Contracts;
+using VirtualWallet.WEB.Models.DTOs;
+using VirtualWallet.WEB.Models.ViewModels;
 
 namespace ForumProject.Controllers.MVC
 {
     public class AuthenticationController : Controller
     {
         private readonly IAuthService _authService;
+        private readonly IViewModelMapper _viewModelMapper;
+        private readonly IUserService _userService;
 
-        public AuthenticationController(IAuthService authService)
+        public AuthenticationController(IAuthService authService,IViewModelMapper modelMapper,IUserService userService)
         {
             _authService = authService;
+            _viewModelMapper = modelMapper;
+            _userService = userService;
         }
 
         [HttpGet]
@@ -34,7 +39,7 @@ namespace ForumProject.Controllers.MVC
 
             try
             {
-                var user = await _authService.AuthenticateAsync($"{model.Username}:{model.Password}");
+                var user = await _authService.Authenticate($"{model.Username}:{model.Password}");
                 var token = _authService.GenerateToken(user);
                 HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
 
@@ -70,14 +75,11 @@ namespace ForumProject.Controllers.MVC
 
             try
             {
-                var userRequest = new UserRequestDto
-                {
-                    Username = model.Username,
-                    Password = model.Password,
-                    Email = model.Email
-                };
+                User userRequest = _viewModelMapper.ToUser(model);
 
-                var user = await _authService.RegisterAsync(userRequest);
+
+
+                var user = await _userService.RegisterUserAsync(userRequest);
                 var token = _authService.GenerateToken(user);
                 HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
 

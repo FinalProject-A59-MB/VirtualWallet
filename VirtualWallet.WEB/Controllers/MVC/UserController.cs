@@ -37,39 +37,39 @@ namespace ForumProject.Controllers.MVC
             return RedirectToAction("Profile");
         }
 
-        [RequireAuthorization(requireAdmin: true)]
-        public async Task<IActionResult> ManageUsers()
-        {
-            var users = await _userService.GetAllUsersAsync();
-            return View(users);
-        }
+        //[RequireAuthorization(requireAdmin: true)]
+        //public async Task<IActionResult> ManageUsers()
+        //{
+        //    var users = await _userService.GetAllUsersAsync();
+        //    return View(users);
+        //}
 
-        [RequireAuthorization(requireAdmin: true)]
-        public async Task<IActionResult> BanUser(int userId)
-        {
-            try
-            {
-                await _userService.BanUserAsync(userId);
-                return RedirectToAction("ManageUsers");
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-        }
+        //[RequireAuthorization(requireAdmin: true)]
+        //public async Task<IActionResult> BanUser(int userId)
+        //{
+        //    try
+        //    {
+        //        await _userService.BanUserAsync(userId);
+        //        return RedirectToAction("ManageUsers");
+        //    }
+        //    catch (EntityNotFoundException ex)
+        //    {
+        //        return NotFound(ex.Message);
+        //    }
+        //}
 
-        [RequireAuthorization(requireAdmin: true)]
-        public async Task<IActionResult> PromoteUser(int userId)
-        {
-            try
-            {
-                await _userService.PromoteUserToAdminAsync(userId);
-                return RedirectToAction("ManageUsers");
-            }
-            catch (EntityNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-        }
+        //[RequireAuthorization(requireAdmin: true)]
+        //public async Task<IActionResult> PromoteUser(int userId)
+        //{
+        //    try
+        //    {
+        //        await _userService.PromoteUserToAdminAsync(userId);
+        //        return RedirectToAction("ManageUsers");
+        //    }
+        //    catch (EntityNotFoundException ex)
+        //    {
+        //        return NotFound(ex.Message);
+        //    }
+        //}
     }
 }

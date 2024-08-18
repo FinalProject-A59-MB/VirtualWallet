@@ -5,6 +5,10 @@ public interface IViewModelMapper
 {
     public UserViewModel ToUserViewModel(User user);
 
+    public User ToUser(RegisterViewModel model);
+
+    public LoginViewModel ToLoginViewModel(User user);
+
     public UserProfileViewModel ToUserProfileViewModel(UserProfile profile);
 
     public CardViewModel ToCardViewModel(Card card);

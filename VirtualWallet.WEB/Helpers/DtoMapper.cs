@@ -98,6 +98,17 @@ public class DtoMapper : IDtoMapper
         };
     }
 
+    public UserRequestDto ToUserDto(User dto)
+    {
+        return new UserRequestDto
+        {
+            Username = dto.Username,
+            Email = dto.Email,
+            Password = dto.Password,
+            Role = UserRole.RegisteredUser,
+        };
+    }
+
     public Card ToCard(CardRequestDto dto)
     {
         return new Card
