@@ -1,4 +1,4 @@
-namespace VirtualWallet.WEB.Models
+namespace VirtualWallet.WEB.Models.ViewModels
 {
     public class ErrorViewModel
     {
