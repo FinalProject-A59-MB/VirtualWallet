@@ -17,8 +17,11 @@ namespace VirtualWallet.DATA.Services
             _userRepository = userRepository;
         }
 
-        public async Task<User> RegisterUserAsync(string username, string password, string email)
+        public async Task<User> RegisterUserAsync(User userToRegister)
         {
+            var username = userToRegister.Username;
+            var email = userToRegister.Email;
+            var password = userToRegister.Password;
             var existingUser = await _userRepository.GetUserByUsernameAsync(username)??
                 throw new DuplicateEntityException("Username already exists.");
 

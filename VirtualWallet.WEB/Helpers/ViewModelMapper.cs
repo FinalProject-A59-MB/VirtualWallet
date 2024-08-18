@@ -12,6 +12,26 @@ public class ViewModelMapper : IViewModelMapper
     {
     }
 
+    public User ToUser(RegisterViewModel model)
+    {
+        return new User
+        {
+            Username = model.Username,
+            Email = model.Email,
+            Password = model.Password,
+            
+        };
+    }
+
+    public LoginViewModel ToLoginViewModel(User user)
+    {
+        return new LoginViewModel
+        {
+            Username = user.Username,
+            Password = user.Password
+        };
+    }
+
     public UserViewModel ToUserViewModel(User user)
     {
         return new UserViewModel

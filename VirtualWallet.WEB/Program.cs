@@ -64,7 +64,8 @@ builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 
 // Helpers
-//builder.Services.AddScoped<IModelMapper, ModelMapper>(); TODO
+builder.Services.AddScoped<IViewModelMapper, ViewModelMapper>();
+builder.Services.AddScoped<IDtoMapper, DtoMapper>();
 
 // Attributes
 builder.Services.AddScoped<RequireAuthorizationAttribute>();

@@ -59,6 +59,7 @@ public class RequireAuthorizationAttribute : Attribute, IAuthorizationFilter
         var isAdmin = isAdminClaim != null;
 
         var user = _userRepository.GetUserByIdAsync(userId);
+
         if (user == null || (_requireAdmin && !isAdmin))
         {
             HandleUnauthorizedRequest(context);
