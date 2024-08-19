@@ -22,11 +22,18 @@ namespace VirtualWallet.DATA.Services
             var username = userToRegister.Username;
             var email = userToRegister.Email;
             var password = userToRegister.Password;
-            var existingUser = await _userRepository.GetUserByUsernameAsync(username)??
-                throw new DuplicateEntityException("Username already exists.");
 
-            existingUser = await _userRepository.GetUserByEmailAsync(email)??
+            var existingUser = await _userRepository.GetUserByUsernameAsync(username);
+            if (existingUser != null)
+            {
+                throw new DuplicateEntityException("Username already exists.");
+            }
+
+            existingUser = await _userRepository.GetUserByEmailAsync(email);
+            if (existingUser != null)
+            {
                 throw new DuplicateEntityException("Email already exists.");
+            }
 
             var hashedPassword = PasswordHasher.HashPassword(password);
 
@@ -41,8 +48,18 @@ namespace VirtualWallet.DATA.Services
 
             await _userRepository.AddUserAsync(user);
 
+            var userProfile = new UserProfile
+            {
+                UserId = user.Id,
+                FirstName = "",
+                LastName = "",
+            };
+
+            await _userRepository.AddUserProfileAsync(userProfile);
+
             return user;
         }
+
 
 
         public async Task<User> GetUserByIdAsync(int userId)

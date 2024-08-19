@@ -1,32 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Net;
 using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
-using SendGrid;
-using SendGrid.Helpers.Mail;
+using Microsoft.Extensions.Configuration;
 using VirtualWallet.BUSINESS.Services.Contracts;
 
-namespace VirtualWallet.BUSINESS.Services
+public class SmtpEmailService : IEmailService
 {
-    public class EmailService: IEmailService
+    private readonly IConfiguration _configuration;
+
+    public SmtpEmailService(IConfiguration configuration)
     {
-        private readonly string _sendGridApiKey;
+        _configuration = configuration;
+    }
 
-        public EmailService(string sendGridApiKey)
-        {
-            _sendGridApiKey = sendGridApiKey;
-        }
+    public async Task SendEmailAsync(string toEmail, string subject, string message)
+    {
+        var smtpSettings = _configuration.GetSection("EmailSettings");
 
-        public async Task SendEmailAsync(string toEmail, string subject, string message)
+        var smtpClient = new SmtpClient(smtpSettings["SmtpServer"])
         {
-            var client = new SendGridClient(_sendGridApiKey);
-            var from = new EmailAddress("your-email@example.com", "Your Name");
-            var to = new EmailAddress(toEmail);
-            var htmlContent = "<strong>additional content</strong>";
-            var emailMessage = MailHelper.CreateSingleEmail(from, to, subject, message, htmlContent);
-            await client.SendEmailAsync(emailMessage).ConfigureAwait(false);
+            Port = int.Parse(smtpSettings["SmtpPort"]),
+            Credentials = new NetworkCredential(smtpSettings["SmtpUsername"], smtpSettings["SmtpPassword"]),
+            EnableSsl = bool.Parse(smtpSettings["EnableSsl"]),
+        };
+
+        using (smtpClient)
+        {
+            var mailMessage = new MailMessage
+            {
+                From = new MailAddress(smtpSettings["SmtpUsername"]),
+                Subject = subject,
+                Body = message,
+                IsBodyHtml = true
+            };
+
+            mailMessage.To.Add(toEmail);
+
+            await smtpClient.SendMailAsync(mailMessage);
         }
     }
 }

@@ -16,12 +16,14 @@ namespace ForumProject.Controllers.MVC
         private readonly IAuthService _authService;
         private readonly IViewModelMapper _viewModelMapper;
         private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
 
-        public AuthenticationController(IAuthService authService,IViewModelMapper modelMapper,IUserService userService)
+        public AuthenticationController(IAuthService authService,IViewModelMapper modelMapper,IUserService userService,IEmailService emailService)
         {
             _authService = authService;
             _viewModelMapper = modelMapper;
             _userService = userService;
+            _emailService = emailService;
         }
 
         [HttpGet]
@@ -46,24 +48,10 @@ namespace ForumProject.Controllers.MVC
                 return View(model);
             }
 
-
             var token = _authService.GenerateToken(user);
             HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
-
-            var returnUrl = HttpContext.Request.Cookies["ReturnUrl"];
-            if (!string.IsNullOrEmpty(returnUrl))
-            {
-                HttpContext.Response.Cookies.Delete("ReturnUrl");
-                return Redirect(returnUrl);
-            }
-
-            return RedirectToAction( "Index", "Home");
+            return RedirectToAction("Index", "Home");
         }
-
-
-
-
-
 
 
         [HttpGet]
@@ -80,29 +68,15 @@ namespace ForumProject.Controllers.MVC
                 return View(model);
             }
 
-            try
-            {
-                User userRequest = _viewModelMapper.ToUser(model);
+            User userRequest = _viewModelMapper.ToUser(model);
+            var user = await _userService.RegisterUserAsync(userRequest);
+            var token = _authService.GenerateToken(user);
+            HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
+            var verificationLink = Url.Action("VerifyEmail", "Authentication", new { token = token }, Request.Scheme);
+            string emailContent = $"Please verify your email by clicking <a href='{verificationLink}'>here</a>.";
+            await _emailService.SendEmailAsync(user.Email, "Email Verification", emailContent);
 
-
-
-                var user = await _userService.RegisterUserAsync(userRequest);
-                var token = _authService.GenerateToken(user);
-                HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
-
-                return RedirectToAction("Index", "Home");
-            }
-            catch (DuplicateEntityException e)
-            {
-                ModelState.AddModelError("Username", e.Message);
-                return View(model);
-            }
-            catch (Exception e)
-            {
-                ViewData["ErrorMessage"] = e.Message;
-                Response.StatusCode = 500;
-                return View("Error");
-            }
+            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult Logout()

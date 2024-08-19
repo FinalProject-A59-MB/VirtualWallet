@@ -47,6 +47,8 @@ public class ViewModelMapper : IViewModelMapper
         return new UserProfileViewModel
         {
             Id = profile.Id,
+            UserName = profile.User.Username,
+            Email = profile.User.Email,
             FirstName = profile.FirstName,
             LastName = profile.LastName,
             PhotoUrl = profile.PhotoUrl,

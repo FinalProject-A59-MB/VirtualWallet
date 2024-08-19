@@ -8,9 +8,9 @@ namespace VirtualWallet.DATA.Models.Enums
 {
     public enum UserVerificationStatus
     {
-        Verified,
         NotVerified,
         PendingVerification,
+        Verified,
     }
 
 }

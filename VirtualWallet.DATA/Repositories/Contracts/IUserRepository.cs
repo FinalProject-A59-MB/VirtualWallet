@@ -19,6 +19,7 @@ namespace VirtualWallet.DATA.Repositories.Contracts
         public Task<User?> GetUserByUsernameAsync(string username);
 
         public Task AddUserAsync(User user);
+        public Task AddUserProfileAsync(UserProfile userProfile);
 
         public Task UpdateUserAsync(User user);
 

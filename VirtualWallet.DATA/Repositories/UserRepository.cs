@@ -52,6 +52,13 @@ namespace VirtualWallet.DATA.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task AddUserProfileAsync(UserProfile userProfile)
+        {
+            _context.UserProfiles.Add(userProfile);
+            await _context.SaveChangesAsync();
+        }
+
+
         public async Task UpdateUserAsync(User user)
         {
             _context.Users.Update(user);
