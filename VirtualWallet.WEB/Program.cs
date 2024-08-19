@@ -12,6 +12,8 @@ using VirtualWallet.DATA.Services.Contracts;
 using VirtualWallet.DATA.Services;
 using VirtualWallet.BUSINESS.Services;
 using VirtualWallet.DATA.Context;
+using System.Net.Mail;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,7 +55,7 @@ builder.Services.AddScoped<IWalletTransactionRepository, WalletTransactionReposi
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICardService, CardService>();
 builder.Services.AddScoped<ICardTransactionService, CardTransactionService>();
-//builder.Services.AddScoped<IEmailService, EmailService>(); TODO
+builder.Services.AddScoped<IEmailService, SmtpEmailService>();
 builder.Services.AddScoped<IPaymentProcessorService, PaymentProcessorService>();
 builder.Services.AddScoped<ITransactionHandlingService, TransactionHandlingService>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -101,9 +103,13 @@ builder.Services.AddSwaggerGen(options =>
                 });
 });
 
+
+
+
 var app = builder.Build();
-// Exception handling middleware
+// Custom middlewares
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<CurrentUserMiddleware>();
 
 // Data Seeding
 using (var scope = app.Services.CreateScope())
@@ -120,6 +126,9 @@ app.UseRouting();
 // JWT authentication
 app.UseAuthentication();
 app.UseAuthorization();
+
+// troubleshooting
+app.UseDeveloperExceptionPage();
 
 app.UseSwagger();
 app.UseSwaggerUI(options =>

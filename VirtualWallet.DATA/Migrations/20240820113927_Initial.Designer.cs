@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace VirtualWallet.DATA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240818111501_Initial")]
+    [Migration("20240820113927_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -70,7 +70,7 @@ namespace VirtualWallet.DATA.Migrations
                     b.Property<int>("CardType")
                         .HasColumnType("int");
 
-                    b.Property<string>("CheckNumber")
+                    b.Property<string>("Cvv")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -167,12 +167,16 @@ namespace VirtualWallet.DATA.Migrations
                     b.Property<int>("CardType")
                         .HasColumnType("int");
 
-                    b.Property<string>("CheckNumber")
+                    b.Property<string>("Cvv")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ExpirationDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Issuer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PaymentProcessorToken")
                         .IsRequired()

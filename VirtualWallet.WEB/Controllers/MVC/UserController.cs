@@ -4,23 +4,26 @@ using VirtualWallet.DATA.Models;
 using System.Threading.Tasks;
 using VirtualWallet.BUSINESS.Exceptions;
 using VirtualWallet.DATA.Services.Contracts;
+using VirtualWallet.WEB.Controllers;
 
 namespace ForumProject.Controllers.MVC
 {
     public class UserController : Controller
     {
         private readonly IUserService _userService;
+        private readonly IViewModelMapper _modelMapper;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService,IViewModelMapper modelMapper)
         {
             _userService = userService;
+            _modelMapper = modelMapper;
         }
 
         [RequireAuthorization]
-        public async Task<IActionResult> Profile()
+        public IActionResult Profile()
         {
-            var user = HttpContext.Items["User"] as User;
-            var profile = await _userService.GetUserProfileAsync(user.Id);
+            var profile = _modelMapper.ToUserProfileViewModel(HttpContext.Items["UserProfile"] as UserProfile);
+
             return View(profile);
         }
 

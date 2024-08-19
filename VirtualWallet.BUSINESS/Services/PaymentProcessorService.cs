@@ -26,7 +26,7 @@ namespace VirtualWallet.BUSINESS.Services
             if (realCard.CardHolderName != card.CardHolderName)
                 throw new InvalidOperationException(ErrorMessages.CardHolderNameMismatch);
 
-            if (realCard.CheckNumber != card.CheckNumber)
+            if (realCard.Cvv != card.Cvv)
                 throw new InvalidOperationException(ErrorMessages.CVVMismatch);
 
             return realCard.PaymentProcessorToken;

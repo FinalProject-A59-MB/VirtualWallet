@@ -16,8 +16,8 @@ namespace VirtualWallet.DATA.Models
         public string Email { get; set; }
         public UserProfile UserProfile { get; set; }
         public UserVerificationStatus VerificationStatus { get; set; }
-        public string PhotoIdUrl { get; set; }
-        public string FaceIdUrl { get; set; }
+        public string PhotoIdUrl { get; set; } = "default";
+        public string FaceIdUrl { get; set; } = "default";
         public DateTime? DeletedAt { get; set; }
         public UserRole Role { get; set; }
         public string? GoogleId { get; set; }

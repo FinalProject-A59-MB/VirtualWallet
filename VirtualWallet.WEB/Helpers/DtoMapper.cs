@@ -66,7 +66,7 @@ public class DtoMapper : IDtoMapper
             CardNumber = card.CardNumber,
             ExpirationDate = card.ExpirationDate,
             CardHolderName = card.CardHolderName,
-            CheckNumber = card.CheckNumber,
+            Cvv = card.Cvv,
             UserId = card.UserId,
             PaymentProcessorToken = card.PaymentProcessorToken,
             CardType = card.CardType.ToString(),
@@ -117,7 +117,7 @@ public class DtoMapper : IDtoMapper
             CardNumber = dto.CardNumber,
             ExpirationDate = dto.ExpirationDate,
             CardHolderName = dto.CardHolderName,
-            CheckNumber = dto.CheckNumber,
+            Cvv = dto.CheckNumber,
             UserId = dto.UserId,
         };
     }

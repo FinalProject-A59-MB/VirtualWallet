@@ -17,8 +17,9 @@ namespace VirtualWallet.DATA.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CardNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Issuer = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CardHolderName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CheckNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Cvv = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CardType = table.Column<int>(type: "int", nullable: false),
                     Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PaymentProcessorToken = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -54,7 +55,7 @@ namespace VirtualWallet.DATA.Migrations
                     CardNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CardHolderName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CheckNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Cvv = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     CardType = table.Column<int>(type: "int", nullable: false),
                     PaymentProcessorToken = table.Column<string>(type: "nvarchar(max)", nullable: false)

@@ -9,7 +9,7 @@
         public string CardHolderName { get; set; }
         public string CardType { get; set; }
 
-        public string CheckNumber { get; set; }
+        public string Cvv { get; set; }
         public string PaymentProcessorToken { get; set; }
     }
 

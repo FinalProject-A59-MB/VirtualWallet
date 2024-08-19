@@ -1,0 +1,28 @@
+﻿@model bool
+
+@{
+    ViewData["Title"] = "Email Verification";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-body">
+                    @if (Model)
+                    {
+                        <h3 class="card-title text-success">Email Verification Successful</h3>
+                        <p class="card-text">Thank you for verifying your email address. Your account is now activated.</p>
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-primary">Go to Home</a>
+                    }
+                    else
+                    {
+                        <h3 class="card-title text-danger">Email Verification Failed</h3>
+                        <p class="card-text">We were unable to verify your email address. Please try again later or contact support.</p>
+                        <a href="@Url.Action("Contact", "Home")" class="btn btn-primary">Contact Support</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

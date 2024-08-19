@@ -8,7 +8,7 @@
         public DateTime ExpirationDate { get; set; }
         public string CardHolderName { get; set; }
 
-        public string CheckNumber { get; set; }
+        public string Cvv { get; set; }
 
         public int UserId { get; set; }
 

@@ -47,6 +47,8 @@ public class ViewModelMapper : IViewModelMapper
         return new UserProfileViewModel
         {
             Id = profile.Id,
+            UserName = profile.User.Username,
+            Email = profile.User.Email,
             FirstName = profile.FirstName,
             LastName = profile.LastName,
             PhotoUrl = profile.PhotoUrl,
@@ -69,7 +71,7 @@ public class ViewModelMapper : IViewModelMapper
             CardNumber = card.CardNumber,
             ExpirationDate = card.ExpirationDate,
             CardHolderName = card.CardHolderName,
-            CheckNumber = card.CheckNumber,
+            Cvv = card.Cvv,
             CardType = card.CardType.ToString(),
         };
     }

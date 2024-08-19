@@ -17,5 +17,7 @@ namespace VirtualWallet.BUSINESS.Services.Contracts
 
         public bool ValidateToken(string token);
 
+        public int GetUserIdFromToken(string token);
+
     }
 }

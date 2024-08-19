@@ -95,5 +95,41 @@ namespace VirtualWallet.BUSINESS.Services
                 return false;
             }
         }
+
+        public int GetUserIdFromToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtSettings = _configuration.GetSection("Jwt");
+            var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = true,
+                ValidIssuer = jwtSettings["Issuer"],
+                ValidateAudience = true,
+                ValidAudience = jwtSettings["Audience"],
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+
+            tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken validatedToken);
+
+            var jwtToken = validatedToken as JwtSecurityToken;
+            if (jwtToken == null)
+            {
+                throw new SecurityTokenException("Invalid token");
+            }
+
+            var userIdClaim = jwtToken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+            if (userIdClaim == null)
+            {
+                throw new SecurityTokenException("Token does not contain user ID claim");
+            }
+
+            return int.Parse(userIdClaim.Value);
+        }
+
     }
 }
