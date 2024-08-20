@@ -18,12 +18,10 @@ public interface IDtoMapper
 
     public Card ToCard(CardRequestDto dto);
 
-    //public Wallet ToWallet(WalletRequestDto dto); TODO
+    public Wallet ToWallet(WalletRequestDto dto);
 
+    public WalletTransactionDto ToWalletTransactionDto(WalletTransaction transaction); 
 
-    //public WalletTransactionDto ToWalletTransactionDto(WalletTransaction transaction); TODO
-
-
-    //public WalletDto ToWalletDto(Wallet wallet); TODO
+    public WalletResponseDto ToWalletDto(Wallet wallet); 
 
 }

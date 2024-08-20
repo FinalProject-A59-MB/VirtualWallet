@@ -122,15 +122,45 @@ public class DtoMapper : IDtoMapper
         };
     }
 
-    //public Wallet ToWallet(WalletRequestDto dto) TODO
-    //{
-    //}
+    public Wallet ToWallet(WalletRequestDto dto)
+    {
+        return new Wallet
+        {
+            Id = dto.Id,
+            Name = dto.Name,
+            UserId = dto.UserId,
+            Currency = dto.Currency,
+            WalletType = dto.WalletType
+        };
+    }
 
-    //public WalletTransactionDto ToWalletTransactionDto(WalletTransaction transaction) TODO
-    //{
-    //}
+    public WalletTransactionDto ToWalletTransactionDto(WalletTransaction transaction)
+    {
+        return new WalletTransactionDto
+        {
+            Id = transaction.Id,
+            Amount = transaction.Amount,
+            CreatedAt = transaction.CreatedAt,
+            Status = transaction.Status.ToString(),
+            SenderId = transaction.SenderId,
+            SenderName = transaction.Sender.Name,
+            RecipientId = transaction.RecipientId,
+            RecipientName = transaction.Recipient.Name,
+            Category = transaction.Category.ToString(),
+        };
+    }
 
-    //public WalletDto ToWalletDto(Wallet wallet) TODO
-    //{
-    //}
+    public WalletResponseDto ToWalletDto(Wallet wallet)
+    {
+        return new WalletResponseDto
+        {
+            Id = wallet.Id,
+            UserId = wallet.UserId,
+            User = wallet.User,
+            Name = wallet.Name,
+            Currency = wallet.Currency,
+            WalletType = wallet.WalletType,
+            Balance = wallet.Balance
+        };
+    }
 }

@@ -19,10 +19,12 @@ namespace VirtualWallet.DATA.Repositories
         }
 
 
-        public async Task AddWalletAsync(Wallet wallet)
+        public async Task<int> AddWalletAsync(Wallet wallet)
         {
-            _dbContext.Wallets.Add(wallet);
+            var newWallet = await _dbContext.Wallets.AddAsync(wallet);
             await _dbContext.SaveChangesAsync();
+
+            return newWallet.Entity.Id;
         }
 
         public async Task<Wallet> GetWalletByIdAsync(int id)
@@ -77,7 +79,9 @@ namespace VirtualWallet.DATA.Repositories
 
         public async Task UpdateWalletAsync(Wallet wallet)
         {
-            _dbContext.Update(wallet);
+            var walletToUpdate = await GetWalletByIdAsync(wallet.Id);
+
+            walletToUpdate.Name = wallet.Name;
             await _dbContext.SaveChangesAsync();
         }
     }

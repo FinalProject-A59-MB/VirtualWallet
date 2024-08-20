@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Transactions;
-using VirtualWallet.DATA.Models.Contract;
+﻿using VirtualWallet.DATA.Models.Contract;
 using VirtualWallet.DATA.Models.Enums;
 using TransactionStatus = VirtualWallet.DATA.Models.Enums.TransactionStatus;
 
@@ -21,10 +15,10 @@ namespace VirtualWallet.DATA.Models
         public string Destination { get; set; } // Example "Receiver.Name"
 
         public int SenderId { get; set; }
-        public User Sender { get; set; }
+        public Wallet Sender { get; set; }
 
         public int RecipientId { get; set; }
-        public User Recipient { get; set; }
+        public Wallet Recipient { get; set; }
 
         public TransactionCategory Category { get; set; }
 

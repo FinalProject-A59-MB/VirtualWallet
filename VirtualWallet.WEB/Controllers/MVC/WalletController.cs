@@ -1,17 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VirtualWallet.DATA.Models;
-using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Services.Contracts;
+using VirtualWallet.WEB.Models.DTOs;
 
 namespace VirtualWallet.WEB.Controllers.MVC
 {
     public class WalletController : Controller
     { 
         private readonly IWalletService _walletService;
+        private readonly IDtoMapper _dtoMapper;
 
-        public WalletController(IWalletService walletService)
+        public WalletController(IWalletService walletService, IDtoMapper dtoMapper)
         {
             _walletService = walletService;
+            _dtoMapper = dtoMapper;
         }
 
 
@@ -23,17 +25,24 @@ namespace VirtualWallet.WEB.Controllers.MVC
         }
 
         [HttpGet]
+        [RequireAuthorization]
         public IActionResult Add()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(Wallet wallet)
+        [RequireAuthorization]
+        public async Task<IActionResult> Add(WalletRequestDto wallet)
         {
-            await _walletService.AddWalletAsync(wallet);
+            //Get loged in user id
+            int userId = 0;
 
-            return Ok();
+            wallet.UserId = userId;
+
+            var newWalletId = await _walletService.AddWalletAsync(_dtoMapper.ToWallet(wallet));
+
+            return RedirectToAction("Index", new { id = newWalletId});
         }
 
         [HttpGet]
@@ -45,11 +54,15 @@ namespace VirtualWallet.WEB.Controllers.MVC
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(Wallet wallet)
+        public async Task<IActionResult> Update(WalletRequestDto wallet)
         {
-            await _walletService.UpdateWalletAsync(wallet);
+            int userId = 0;
 
-            return Ok();
+            wallet.UserId = userId;
+
+            await _walletService.UpdateWalletAsync(_dtoMapper.ToWallet(wallet));
+
+            return RedirectToAction("Index", new { id = wallet.Id });
         }
 
         [HttpDelete]

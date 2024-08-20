@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VirtualWallet.DATA.Models;
+﻿using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Repositories.Contracts;
 using VirtualWallet.DATA.Services.Contracts;
 
@@ -17,9 +12,11 @@ namespace VirtualWallet.DATA.Services
         {
             _walletRepository = walletRepository;
         }
-        public Task AddWalletAsync(Wallet wallet)
+        public async Task<int> AddWalletAsync(Wallet wallet)
         {
-            return _walletRepository.AddWalletAsync(wallet);
+            var newWalletId = await _walletRepository.AddWalletAsync(wallet);
+
+            return newWalletId;
         }
 
         public Task<Wallet> GetWalletByIdAsync(int id)
