@@ -64,22 +64,7 @@
 
                     <hr />
                     <h3>Unverified Users</h3>
-@*                     @if (ViewData["UnverifiedUsers"] != null)
-                    {
-                        <ul class="list-group">
-                            @foreach (var unverifiedUser in ViewData["UnverifiedUsers"] as List<UserVerificationViewModel>)
-                            {
-                                <li class="list-group-item">
-                                    <strong>@unverifiedUser.Username</strong>
-                                    <a href="@Url.Action("ReviewVerification", "Admin", new { userId = unverifiedUser.UserId })" class="btn btn-sm btn-primary">Review</a>
-                                </li>
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-                        <p>No users pending verification.</p>
-                    } *@
+                    <a href="@Url.Action("UnverifiedUsers", "User")" class="btn btn-warning">Review Unverified Users</a>
                 </div>
             </div>
         </div>

@@ -36,12 +36,6 @@ namespace ForumProject.Controllers.MVC
         {
             var user = HttpContext.Items["CurrentUser"] as User;
             var profile = _modelMapper.ToUserViewModel(user);
-
-            var users = await _userService.GetUsers();
-            var filteredUsers = users
-                .Where(u => u.VerificationStatus == UserVerificationStatus.PendingVerification)
-                .ToList();
-            ViewData["UnverifiedUsers"] = filteredUsers;
             return View(profile);
         }
 
@@ -130,62 +124,47 @@ namespace ForumProject.Controllers.MVC
         public async Task<IActionResult> UnverifiedUsers()
         {
             var users = await _userService.GetUsers();
-
-            var filteredUsers = users
+            var unverifiedUsers = users
                 .Where(u => u.VerificationStatus == UserVerificationStatus.PendingVerification)
-                .ToList();
-
-            var viewModel = new UnverifiedUsersViewModel
-            {
-                Users = filteredUsers.Select(u => new UserVerificationViewModel
+                .Select(u => new UserVerificationViewModel
                 {
                     UserId = u.Id,
                     Username = u.Username,
                     PhotoIdUrl = u.PhotoIdUrl,
                     LicenseIdUrl = u.FaceIdUrl,
                     VerificationStatus = u.VerificationStatus
-                }).ToList()
-            };
+                }).ToList();
 
-            return View(viewModel);
+            return View(unverifiedUsers);
         }
 
 
 
-        [HttpGet]
+        [HttpPost]
         public async Task<IActionResult> VerifyUser(int userId)
         {
             var user = await _userService.GetUserByIdAsync(userId);
-            if (user == null || user.VerificationStatus != UserVerificationStatus.PendingVerification)
+            if (user != null)
             {
-                return NotFound();
+                user.VerificationStatus = UserVerificationStatus.Verified;
+                await _userService.UpdateUserAsync(user);
             }
-
-            var model = new UserVerificationViewModel
-            {
-                UserId = user.Id,
-                Username = user.Username,
-                PhotoIdUrl = user.PhotoIdUrl,
-                LicenseIdUrl = user.FaceIdUrl,
-                VerificationStatus = user.VerificationStatus
-            };
-
-            return View(model);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> VerifyUser(UserVerificationViewModel model, bool isVerified)
-        {
-            var user = await _userService.GetUserByIdAsync(model.UserId);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            user.VerificationStatus = isVerified ? UserVerificationStatus.Verified : UserVerificationStatus.PendingVerification;
-            await _userService.UpdateUserAsync(user);
 
             return RedirectToAction("UnverifiedUsers");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> DenyUserVerification(int userId)
+        {
+            var user = await _userService.GetUserByIdAsync(userId);
+            if (user != null)
+            {
+                user.VerificationStatus = UserVerificationStatus.NotVerified;
+                await _userService.UpdateUserAsync(user);
+            }
+
+            return RedirectToAction("UnverifiedUsers");
+        }
+
     }
 }

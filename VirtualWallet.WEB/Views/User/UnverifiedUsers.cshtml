@@ -1,0 +1,45 @@
+﻿@model List<UserVerificationViewModel>
+
+@{
+    ViewData["Title"] = "Unverified Users";
+}
+
+<h2>Unverified Users</h2>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Photo ID</th>
+                <th>License ID</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.Username</td>
+                    <td><img src="@user.PhotoIdUrl" alt="Photo ID" style="max-height: 100px;" /></td>
+                    <td><img src="@user.LicenseIdUrl" alt="License ID" style="max-height: 100px;" /></td>
+                    <td>
+                        <form asp-action="VerifyUser" method="post" style="display:inline-block;">
+                            <input type="hidden" name="userId" value="@user.UserId" />
+                            <button type="submit" class="btn btn-success">Verify</button>
+                        </form>
+                        <form asp-action="DenyUserVerification" method="post" style="display:inline-block;">
+                            <input type="hidden" name="userId" value="@user.UserId" />
+                            <button type="submit" class="btn btn-danger">Deny</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No users are pending verification at this time.</p>
+}

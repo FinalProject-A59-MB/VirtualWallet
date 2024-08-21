@@ -128,7 +128,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // troubleshooting
-app.UseDeveloperExceptionPage();
+//app.UseDeveloperExceptionPage();
 
 app.UseSwagger();
 app.UseSwaggerUI(options =>
