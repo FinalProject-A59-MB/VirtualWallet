@@ -62,7 +62,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IWalletService, WalletService>();
 builder.Services.AddScoped<IWalletTransactionService, WalletTransactionService>();
 
-//builder.Services.AddScoped<ICloudinaryService, CloudinaryService>(); TODO
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 builder.Services.AddHttpContextAccessor();

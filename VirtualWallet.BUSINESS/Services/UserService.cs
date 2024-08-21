@@ -61,6 +61,12 @@ namespace VirtualWallet.DATA.Services
         }
 
 
+        public async Task<IQueryable<User>> GetUsers()
+        {
+            var users = _userRepository.GetAllUsers();
+            return users;
+        }
+
 
         public async Task<User> GetUserByIdAsync(int userId)
         {

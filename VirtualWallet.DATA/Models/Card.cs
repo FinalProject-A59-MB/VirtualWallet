@@ -15,6 +15,8 @@ namespace VirtualWallet.DATA.Models
         public string CardNumber { get; set; }
         public DateTime ExpirationDate { get; set; }
         public string CardHolderName { get; set; }
+        public CurrencyType Currency { get; set; }
+        public string Issuer { get; set; }
         public string Cvv { get; set; }
         public int UserId { get; set; }
         public User User { get; set; }

@@ -28,10 +28,10 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey<UserProfile>(p => p.UserId);
 
         modelBuilder.Entity<User>()
-        .HasOne(u => u.DefaultWallet)
-        .WithOne(p=>p.User)
-        .HasForeignKey<User>(u => u.DefaultWalletId)
-        .OnDelete(DeleteBehavior.NoAction);
+        .HasOne(u => u.MainWallet)
+        .WithOne(w=>w.User)
+        .HasForeignKey<User>(u => u.MainWalletId)
+        .OnDelete(DeleteBehavior.Restrict);
 
         // One-to-Many
         modelBuilder.Entity<User>()

@@ -10,6 +10,7 @@ namespace VirtualWallet.DATA.Services.Contracts
 {
     public interface IUserService
     {
+        public Task<IQueryable<User>> GetUsers();
         public Task<User> GetUserByIdAsync(int userId);
 
         public Task<User> GetUserByUsernameAsync(string userName);

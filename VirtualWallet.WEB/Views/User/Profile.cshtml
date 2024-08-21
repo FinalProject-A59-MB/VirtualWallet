@@ -1,7 +1,9 @@
-﻿@model UserProfileViewModel
+﻿@model UserViewModel
 
 @{
     ViewData["Title"] = "Profile";
+    var wallets = Model.Wallets != null;
+    var mainWalletName = Model.MainWallet?.Name ?? "No main wallet assigned";
 }
 
 <div class="card mb-4 w-50 mx-auto">
@@ -9,21 +11,75 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-4">
-                    <img src="@Model.PhotoUrl" alt="Profile Picture" />
+                    <img src="@Model.UserProfile.PhotoUrl" alt="Profile Picture" class="img-thumbnail" />
+                    <a href="@Url.Action("EditProfile", "User", new { userId = Model.Id })" class="btn btn-secondary btn-block mt-3">Edit Profile</a>
                 </div>
                 <div class="col-md-8">
-                    <h2><strong>@Model.UserName</strong> </h2>
-                    <p><strong>First Name:</strong>@Model.FirstName</p>
-                    <p><strong>Last Name:</strong>@Model.FirstName</p>
+                    <h2><strong>@Model.Username</strong></h2>
+                    <p><strong>First Name:</strong> @Model.UserProfile.FirstName</p>
+                    <p><strong>Last Name:</strong> @Model.UserProfile.LastName</p>
                     <p><strong>Email:</strong> @Model.Email</p>
-                    <p><strong>Date of Birth:</strong> @Model.DateOfBirth.ToString("MMMM dd, yyyy")</p>
-                    <p><strong>Phone Number:</strong> @Model.PhoneNumber</p>
+                    <p><strong>Date of Birth:</strong> @Model.UserProfile.DateOfBirth.ToString("MMMM dd, yyyy")</p>
+                    <p><strong>Phone Number:</strong> @Model.UserProfile.PhoneNumber</p>
                     <p><strong>Address:</strong></p>
-                    <p><strong>Country:</strong>@Model.Country</p>
-                    <p><strong>State:</strong>@Model.State</p>
-                    <p><strong>City:</strong>@Model.City</p>
-                    <p><strong>Street:</strong>@Model.Street</p>
-                    <p><strong>PostalCode:</strong>@Model.PostalCode</p>
+                    <p><strong>Country:</strong> @Model.UserProfile.Country</p>
+                    <p><strong>State:</strong> @Model.UserProfile.State</p>
+                    <p><strong>City:</strong> @Model.UserProfile.City</p>
+                    <p><strong>Street:</strong> @Model.UserProfile.Street</p>
+                    <p><strong>Postal Code:</strong> @Model.UserProfile.PostalCode</p>
+
+                    <hr />
+
+                    <h3>Verification</h3>
+                    <p>Your account is not fully verified. Please complete the verification process.</p>
+                    <a href="@Url.Action("UploadVerification", "User")" class="btn btn-warning">Complete Verification</a>
+
+                    <hr />
+
+                    <h3>My Cards</h3>
+                    <ul class="list-group">
+                        @foreach (var card in Model.Cards)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                @card.CardNumber - @card.Issuer
+                                <form asp-controller="Card" asp-action="DeleteCard" method="get" class="d-inline">
+                                    <input type="hidden" name="cardId" value="@card.Id" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+
+                    <a href="@Url.Action("AddCard", "Card", new { userId = Model.Id })" class="btn btn-primary mt-3">Add New Card</a>
+
+                    <hr />
+
+                    <h3>My Wallets</h3>
+                    <ul class="list-group">
+                        @foreach (var wallet in Model.Wallets)
+                        {
+                            <li>@wallet.Name - @wallet.Balance @wallet.Currency @wallet.WalletType</li>
+                        }
+                    </ul>
+
+                    <hr />
+                    <h3>Unverified Users</h3>
+@*                     @if (ViewData["UnverifiedUsers"] != null)
+                    {
+                        <ul class="list-group">
+                            @foreach (var unverifiedUser in ViewData["UnverifiedUsers"] as List<UserVerificationViewModel>)
+                            {
+                                <li class="list-group-item">
+                                    <strong>@unverifiedUser.Username</strong>
+                                    <a href="@Url.Action("ReviewVerification", "Admin", new { userId = unverifiedUser.UserId })" class="btn btn-sm btn-primary">Review</a>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>No users pending verification.</p>
+                    } *@
                 </div>
             </div>
         </div>

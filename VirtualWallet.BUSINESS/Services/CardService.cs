@@ -32,14 +32,9 @@ namespace VirtualWallet.BUSINESS.Services
             return await _cardRepository.GetCardsByUserId(userId).ToListAsync();
         }
 
-        public async Task AddCardAsync(Card card)
+        public async Task AddCardAsync(User user, Card card)
         {
-            var paymentProcessorToken = await _paymentProcessorService.VerifyAndRetrieveTokenAsync(card);
-
-            if (string.IsNullOrEmpty(paymentProcessorToken))
-                throw new InvalidOperationException(ErrorMessages.FailedToRetrievePaymentProcessorToken);
-
-            card.PaymentProcessorToken = paymentProcessorToken;
+            user.Cards.Add(card);
             await _cardRepository.AddCardAsync(card);
         }
 

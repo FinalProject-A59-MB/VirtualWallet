@@ -20,7 +20,9 @@ namespace VirtualWallet.DATA.Repositories
             return _context.Users
                 .Include(u => u.UserProfile)
                 .Include(u => u.Cards)
-                .Include(u => u.BlockedRecords);
+                .Include(u => u.BlockedRecords)
+                .Include(u => u.Wallets)
+                .Include(u => u.MainWallet);
         }
 
         public IQueryable<User> GetAllUsers()
@@ -57,7 +59,6 @@ namespace VirtualWallet.DATA.Repositories
             _context.UserProfiles.Add(userProfile);
             await _context.SaveChangesAsync();
         }
-
 
         public async Task UpdateUserAsync(User user)
         {
@@ -101,3 +102,4 @@ namespace VirtualWallet.DATA.Repositories
         }
     }
 }
+

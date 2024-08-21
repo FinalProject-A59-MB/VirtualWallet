@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using VirtualWallet.DATA.Models;
+using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Repositories.Contracts;
 
 namespace VirtualWallet.DATA.Repositories

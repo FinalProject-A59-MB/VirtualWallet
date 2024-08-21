@@ -23,6 +23,36 @@ public class ViewModelMapper : IViewModelMapper
         };
     }
 
+    public User ToUser(UserViewModel model)
+    {
+        return new User
+        {
+            Id = model.Id,
+            Username = model.Username,
+            Email = model.Email,
+            Role = Enum.Parse<UserRole>(model.Role),
+            UserProfile = ToUserProfile(model.UserProfile),
+            Cards = model.Cards?.Select(ToCard).ToList(),
+            Wallets = model.Wallets?.Select(ToWallet).ToList(),
+        };
+    }
+    public UserProfile ToUserProfile(UserProfileViewModel model)
+    {
+        return new UserProfile
+        {
+            FirstName = model.FirstName,
+            LastName = model.LastName,
+            PhoneNumber = model.PhoneNumber,
+            Street = model.Street,
+            City = model.City,
+            State = model.State,
+            Country = model.Country,
+            PostalCode = model.PostalCode,
+            PhotoUrl = model.PhotoUrl,
+            UserId = model.UserId,
+        };
+    }
+
     public LoginViewModel ToLoginViewModel(User user)
     {
         throw new NotImplementedException();
@@ -38,7 +68,8 @@ public class ViewModelMapper : IViewModelMapper
             Role = user.Role.ToString(),
             UserProfile = ToUserProfileViewModel(user.UserProfile),
             Cards = user.Cards?.Select(ToCardViewModel).ToList(),
-            //Wallets = user.UserWallets?.Select(uw => ToWalletViewModel(uw.Wallet)).ToList(),
+            Wallets = user.Wallets?.Select(ToWalletViewModel).ToList(),
+            MainWallet = user.MainWallet==null ? null:ToWalletViewModel(user.MainWallet),
         };
     }
 
@@ -48,7 +79,6 @@ public class ViewModelMapper : IViewModelMapper
         {
             Id = profile.Id,
             UserName = profile.User.Username,
-            Email = profile.User.Email,
             FirstName = profile.FirstName,
             LastName = profile.LastName,
             PhotoUrl = profile.PhotoUrl,
@@ -62,21 +92,60 @@ public class ViewModelMapper : IViewModelMapper
         };
     }
 
+    public Card ToCard(CardViewModel model)
+    {
+        return new Card
+        {
+            Id = model.Id,
+            CardHolderName = model.CardHolderName,
+            CardNumber = model.CardNumber,
+            Issuer = model.Issuer,
+            ExpirationDate = model.ExpirationDate,
+            Cvv = model.Cvv,
+            PaymentProcessorToken = model.PaymentProcessorToken,
+            CardType = model.CardType
+        };
+    }
+
     public CardViewModel ToCardViewModel(Card card)
     {
         return new CardViewModel
         {
             Id = card.Id,
             Name = card.Name,
+            UserId = card.UserId,
             CardNumber = card.CardNumber,
             ExpirationDate = card.ExpirationDate,
             CardHolderName = card.CardHolderName,
             Cvv = card.Cvv,
-            CardType = card.CardType.ToString(),
+            CardType = card.CardType,
         };
     }
 
-    //public WalletViewModel ToWalletViewModel(Wallet wallet) TODO
-    //{
-    //}
+    public WalletViewModel ToWalletViewModel(Wallet wallet)
+    {
+        return new WalletViewModel
+        {
+            Id = wallet.Id,
+            Name = wallet.Name,
+            WalletType = wallet.WalletType,
+            Balance = wallet.Balance,
+            Currency = wallet.Currency
+        };
+    }
+
+    public Wallet ToWallet(WalletViewModel model)
+    {
+        return new Wallet
+        {
+            Id = model.Id,
+            Name = model.Name,
+            WalletType = model.WalletType,
+            Balance = model.Balance,
+            Currency = model.Currency
+        };
+    }
+
 }
+
+
