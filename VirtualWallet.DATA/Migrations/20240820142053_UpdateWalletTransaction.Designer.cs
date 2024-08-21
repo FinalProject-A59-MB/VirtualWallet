@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace VirtualWallet.DATA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240820142053_UpdateWalletTransaction")]
+    partial class UpdateWalletTransaction
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,19 +70,12 @@ namespace VirtualWallet.DATA.Migrations
                     b.Property<int>("CardType")
                         .HasColumnType("int");
 
-                    b.Property<int>("Currency")
-                        .HasColumnType("int");
-
                     b.Property<string>("Cvv")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ExpirationDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("Issuer")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -172,9 +167,6 @@ namespace VirtualWallet.DATA.Migrations
                     b.Property<int>("CardType")
                         .HasColumnType("int");
 
-                    b.Property<int>("Currency")
-                        .HasColumnType("int");
-
                     b.Property<string>("Cvv")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -252,6 +244,9 @@ namespace VirtualWallet.DATA.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int?>("DefaultWalletId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
@@ -265,9 +260,6 @@ namespace VirtualWallet.DATA.Migrations
 
                     b.Property<string>("GoogleId")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("MainWalletId")
-                        .HasColumnType("int");
 
                     b.Property<string>("Password")
                         .IsRequired()
@@ -289,9 +281,9 @@ namespace VirtualWallet.DATA.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("MainWalletId")
+                    b.HasIndex("DefaultWalletId")
                         .IsUnique()
-                        .HasFilter("[MainWalletId] IS NOT NULL");
+                        .HasFilter("[DefaultWalletId] IS NOT NULL");
 
                     b.ToTable("Users");
                 });
@@ -554,12 +546,12 @@ namespace VirtualWallet.DATA.Migrations
 
             modelBuilder.Entity("VirtualWallet.DATA.Models.User", b =>
                 {
-                    b.HasOne("VirtualWallet.DATA.Models.Wallet", "MainWallet")
+                    b.HasOne("VirtualWallet.DATA.Models.Wallet", "DefaultWallet")
                         .WithOne("User")
-                        .HasForeignKey("VirtualWallet.DATA.Models.User", "MainWalletId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("VirtualWallet.DATA.Models.User", "DefaultWalletId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
-                    b.Navigation("MainWallet");
+                    b.Navigation("DefaultWallet");
                 });
 
             modelBuilder.Entity("VirtualWallet.DATA.Models.UserContact", b =>
