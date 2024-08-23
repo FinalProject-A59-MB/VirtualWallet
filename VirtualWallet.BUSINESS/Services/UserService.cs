@@ -1,5 +1,6 @@
-﻿using VirtualWallet.BUSINESS.Exceptions;
+﻿using System.Linq;
 using System.Threading.Tasks;
+using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.DATA.Helpers;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Models.Enums;
@@ -17,7 +18,7 @@ namespace VirtualWallet.DATA.Services
             _userRepository = userRepository;
         }
 
-        public async Task<User> RegisterUserAsync(User userToRegister)
+        public async Task<Result<User>> RegisterUserAsync(User userToRegister)
         {
             var username = userToRegister.Username;
             var email = userToRegister.Email;
@@ -26,13 +27,13 @@ namespace VirtualWallet.DATA.Services
             var existingUser = await _userRepository.GetUserByUsernameAsync(username);
             if (existingUser != null)
             {
-                throw new DuplicateEntityException("Username already exists.");
+                return Result<User>.Failure("Username already exists.");
             }
 
             existingUser = await _userRepository.GetUserByEmailAsync(email);
             if (existingUser != null)
             {
-                throw new DuplicateEntityException("Email already exists.");
+                return Result<User>.Failure("Email already exists.");
             }
 
             var hashedPassword = PasswordHasher.HashPassword(password);
@@ -57,53 +58,106 @@ namespace VirtualWallet.DATA.Services
 
             await _userRepository.AddUserProfileAsync(userProfile);
 
-            return user;
+            return Result<User>.Success(user);
         }
 
-
-        public async Task<IQueryable<User>> GetUsers()
+        public async Task<Result<IQueryable<User>>> GetUsers()
         {
             var users = _userRepository.GetAllUsers();
-            return users;
+            return Result<IQueryable<User>>.Success(users);
         }
 
-
-        public async Task<User> GetUserByIdAsync(int userId)
+        public async Task<Result<User>> GetUserByIdAsync(int userId)
         {
-            var user = await _userRepository.GetUserByIdAsync(userId) ??
-                throw new EntityNotFoundException("User not found");
-            return user;
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                return Result<User>.Failure("User not found.");
+            }
+            return Result<User>.Success(user);
         }
 
-        public async Task<User> GetUserByUsernameAsync(string userName)
+        public async Task<Result<User>> GetUserByUsernameAsync(string userName)
         {
-            var user = await _userRepository.GetUserByUsernameAsync(userName) ??
-                throw new EntityNotFoundException("User not found"); ;
-            return user;
+            var user = await _userRepository.GetUserByUsernameAsync(userName);
+            if (user == null)
+            {
+                return Result<User>.Failure("User not found.");
+            }
+            return Result<User>.Success(user);
         }
 
-        public async Task<UserProfile> GetUserProfileAsync(int userId)
+        public async Task<Result<UserProfile>> GetUserProfileAsync(int userId)
         {
-            var userProfile = await _userRepository.GetUserProfileAsync(userId) ??
-                throw new EntityNotFoundException("User profile not found");
-            return userProfile;
+            var userProfile = await _userRepository.GetUserProfileAsync(userId);
+            if (userProfile == null)
+            {
+                return Result<UserProfile>.Failure("User profile not found.");
+            }
+            return Result<UserProfile>.Success(userProfile);
         }
 
-        public async Task UpdateUserAsync(User user)
+        public async Task<Result> UpdateUserAsync(User user)
         {
             await _userRepository.UpdateUserAsync(user);
+            return Result.Success();
         }
 
-        public async Task UpdateUserProfileAsync(UserProfile userProfile)
+        public async Task<Result> UpdateUserProfileAsync(UserProfile userProfile)
         {
             await _userRepository.UpdateUserProfileAsync(userProfile);
+            return Result.Success();
         }
 
-        public async Task DeleteUserAsync(int userId)
+        public async Task<Result> DeleteUserAsync(int userId)
         {
-            var user = await _userRepository.GetUserByIdAsync(userId)??
-                throw new EntityNotFoundException("User not found");
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                return Result.Failure("User not found.");
+            }
+
             await _userRepository.DeleteUserAsync(userId);
+            return Result.Success();
         }
+
+        public async Task<Result> AddFriendAsync(int userId, int contactId)
+        {
+            if (await _userRepository.IsContactExistsAsync(userId, contactId))
+            {
+                return Result.Failure("This user is already in your friend list.");
+            }
+
+            var userContact = new UserContact
+            {
+                UserId = userId,
+                ContactId = contactId,
+                AddedDate = DateTime.UtcNow
+            };
+
+            await _userRepository.AddContactAsync(userContact);
+
+            return Result.Success();
+        }
+
+        public async Task<List<User>> GetFriendsAsync(int userId)
+        {
+            return await _userRepository.GetUserContactsAsync(userId);
+        }
+
+        public async Task<Result> RemoveFriendAsync(int userId, int contactId)
+        {
+            var userContact = await _userRepository.GetUserContactAsync(userId, contactId);
+            if (userContact == null)
+            {
+                return Result.Failure("Contact not found in your friend list.");
+            }
+
+            await _userRepository.RemoveContactAsync(userContact);
+
+            return Result.Success();
+        }
+
+
     }
 }

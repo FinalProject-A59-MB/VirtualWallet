@@ -1,10 +1,11 @@
-﻿using VirtualWallet.DATA.Models;
+﻿using VirtualWallet.BUSINESS.Results;
+using VirtualWallet.DATA.Models;
 
 namespace VirtualWallet.BUSINESS.Services.Contracts
 {
     public interface ICardTransactionService
     {
-        Task<CardTransaction> DepositAsync(int cardId, int walletId, decimal amount);
-        Task<CardTransaction> WithdrawAsync(int walletId, int cardId, decimal amount);
+        public Task<Result<CardTransaction>> DepositAsync(int cardId, int walletId, decimal amount);
+        public Task<Result<CardTransaction>> WithdrawAsync(int walletId, int cardId, decimal amount);
     }
 }

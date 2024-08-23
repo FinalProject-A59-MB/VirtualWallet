@@ -20,7 +20,7 @@ namespace VirtualWallet.DATA.Repositories
             return _context.Users
                 .Include(u => u.UserProfile)
                 .Include(u => u.Cards)
-                .Include(u => u.BlockedRecords)
+                .Include(u => u.BlockedRecord)
                 .Include(u => u.Wallets)
                 .Include(u => u.MainWallet);
         }
@@ -99,6 +99,37 @@ namespace VirtualWallet.DATA.Repositories
             return await _context.BlockedRecords
                 .Where(br => br.UserId == userId)
                 .ToListAsync();
+        }
+        public async Task AddContactAsync(UserContact userContact)
+        {
+            _context.UserContacts.Add(userContact);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<User>> GetUserContactsAsync(int userId)
+        {
+            return await _context.UserContacts
+                .Where(uc => uc.UserId == userId)
+                .Select(uc => uc.Contact)
+                .ToListAsync();
+        }
+
+        public async Task<UserContact> GetUserContactAsync(int userId, int contactId)
+        {
+            return await _context.UserContacts
+                .FirstOrDefaultAsync(uc => uc.UserId == userId && uc.ContactId == contactId);
+        }
+
+        public async Task RemoveContactAsync(UserContact userContact)
+        {
+            _context.UserContacts.Remove(userContact);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> IsContactExistsAsync(int userId, int contactId)
+        {
+            return await _context.UserContacts
+                .AnyAsync(uc => uc.UserId == userId && uc.ContactId == contactId);
         }
     }
 }

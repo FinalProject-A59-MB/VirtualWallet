@@ -9,10 +9,11 @@ using VirtualWallet.WEB.Models.ViewModels;
 using VirtualWallet.DATA.Models.Enums;
 using System.ComponentModel;
 using System.Linq;
+using VirtualWallet.BUSINESS.Results;
 
 namespace ForumProject.Controllers.MVC
 {
-    public class UserController : Controller
+    public class UserController : BaseController
     {
         private readonly IUserService _userService;
         private readonly IViewModelMapper _modelMapper;
@@ -34,17 +35,15 @@ namespace ForumProject.Controllers.MVC
         [RequireAuthorization]
         public async Task<IActionResult> Profile()
         {
-            var user = HttpContext.Items["CurrentUser"] as User;
-            var profile = _modelMapper.ToUserViewModel(user);
+            var profile = _modelMapper.ToUserViewModel(CurrentUser);
             return View(profile);
         }
 
         [RequireAuthorization]
         public IActionResult EditProfile()
         {
-            var user = HttpContext.Items["CurrentUser"] as User;
-            var profile = _modelMapper.ToUserProfileViewModel(user.UserProfile);
-            profile.UserId = user.Id;
+            var profile = _modelMapper.ToUserProfileViewModel(CurrentUser.UserProfile);
+            profile.UserId = CurrentUser.Id;
 
             return View(profile);
         }
@@ -55,7 +54,6 @@ namespace ForumProject.Controllers.MVC
         {
             if (!ModelState.IsValid)
             {
-                var errors = ModelState.Values.ToList();
                 return View("EditProfile", user);
             }
             if (profilePicture != null)
@@ -82,7 +80,6 @@ namespace ForumProject.Controllers.MVC
         {
             if (model.PhotoId == null || model.LicenseId == null)
             {
-                //ModelState.AddModelError("", "Both Photo ID and License ID are required.");
                 return View(model);
             }
 
@@ -100,31 +97,64 @@ namespace ForumProject.Controllers.MVC
             return RedirectToAction("Profile", "User");
         }
 
+
+
+
         [RequireAuthorization]
-        public async Task<IActionResult> BlockUser(int userId)
+        public async Task<IActionResult> BlockUser(int userId, string reason)
         {
             var user = await _userService.GetUserByIdAsync(userId);
-            user.Role = UserRole.Blocked;
-            await _userService.UpdateUserAsync(user);
+            if (user == null || !user.IsSuccess)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("ManageUsers");
+            }
+
+            user.Value.Role = UserRole.Blocked;
+
+            var blockRecord = new BlockedRecord
+            {
+                UserId = userId,
+                Reason = reason,
+                BlockedDate = DateTime.UtcNow
+            };
+
+            user.Value.BlockedRecord = blockRecord;
+
+            await _userService.UpdateUserAsync(user.Value);
 
             return RedirectToAction("ManageUsers");
         }
+
 
         [RequireAuthorization]
         public async Task<IActionResult> UnblockUser(int userId)
         {
             var user = await _userService.GetUserByIdAsync(userId);
-            user.Role = UserRole.RegisteredUser;
-            await _userService.UpdateUserAsync(user);
+            if (user == null || !user.IsSuccess)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("ManageUsers");
+            }
+
+            user.Value.Role = UserRole.RegisteredUser;
+
+            if (user.Value.BlockedRecord != null)
+            {
+                user.Value.BlockedRecord=null;
+            }
+
+            await _userService.UpdateUserAsync(user.Value);
 
             return RedirectToAction("ManageUsers");
         }
+
 
         [HttpGet]
         public async Task<IActionResult> UnverifiedUsers()
         {
             var users = await _userService.GetUsers();
-            var unverifiedUsers = users
+            var unverifiedUsers = users.Value
                 .Where(u => u.VerificationStatus == UserVerificationStatus.PendingVerification)
                 .Select(u => new UserVerificationViewModel
                 {
@@ -146,8 +176,8 @@ namespace ForumProject.Controllers.MVC
             var user = await _userService.GetUserByIdAsync(userId);
             if (user != null)
             {
-                user.VerificationStatus = UserVerificationStatus.Verified;
-                await _userService.UpdateUserAsync(user);
+                user.Value.VerificationStatus = UserVerificationStatus.Verified;
+                await _userService.UpdateUserAsync(user.Value);
             }
 
             return RedirectToAction("UnverifiedUsers");
@@ -159,12 +189,62 @@ namespace ForumProject.Controllers.MVC
             var user = await _userService.GetUserByIdAsync(userId);
             if (user != null)
             {
-                user.VerificationStatus = UserVerificationStatus.NotVerified;
-                await _userService.UpdateUserAsync(user);
+                user.Value.VerificationStatus = UserVerificationStatus.NotVerified;
+                await _userService.UpdateUserAsync(user.Value);
             }
 
             return RedirectToAction("UnverifiedUsers");
         }
+        [RequireAuthorization]
+        [HttpPost]
+        public async Task<IActionResult> AddFriend(int contactId)
+        {
+            var userId = CurrentUser.Id;
 
+            var result = await _userService.AddFriendAsync(userId, contactId);
+
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+                return RedirectToAction("Profile");
+            }
+
+            return RedirectToAction("Profile");
+        }
+
+        [RequireAuthorization]
+        [HttpPost]
+        public async Task<IActionResult> RemoveFriend(int contactId)
+        {
+            var userId = CurrentUser.Id;
+
+            var result = await _userService.RemoveFriendAsync(userId, contactId);
+
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+                return RedirectToAction("Profile");
+            }
+
+            return RedirectToAction("Profile");
+        }
+
+        [RequireAuthorization]
+        [HttpGet]
+        public async Task<IActionResult> GetFriends()
+        {
+            var userId = CurrentUser.Id;
+
+            var friends = await _userService.GetFriendsAsync(userId);
+
+            var friendViewModels = friends.Select(f => new UserViewModel
+            {
+                Id = f.Id,
+                Username = f.Username,
+                Email = f.Email
+            }).ToList();
+
+            return View(friendViewModels);
+        }
     }
 }

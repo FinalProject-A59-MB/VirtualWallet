@@ -29,15 +29,25 @@ public class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<User>()
         .HasOne(u => u.MainWallet)
-        .WithOne(w=>w.User)
+        .WithOne(w => w.User)
         .HasForeignKey<User>(u => u.MainWalletId)
         .OnDelete(DeleteBehavior.Restrict);
 
+
         // One-to-Many
+
         modelBuilder.Entity<User>()
-            .HasMany(u => u.BlockedRecords)
-            .WithOne(b => b.User)
-            .HasForeignKey(b => b.UserId);
+          .HasOne(u => u.BlockedRecord)
+          .WithMany()
+          .HasForeignKey(u => u.BlockedRecordId)
+          .OnDelete(DeleteBehavior.Restrict);
+
+
+        modelBuilder.Entity<BlockedRecord>()
+            .HasOne(br => br.User)
+            .WithMany()
+            .HasForeignKey(u => u.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<RecurringPayment>()
             .HasOne(rp => rp.User)
@@ -52,7 +62,7 @@ public class ApplicationDbContext : DbContext
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<UserContact>()
-            .HasKey(uc => new { uc.UserId, uc.ContactId });
+           .HasKey(uc => new { uc.UserId, uc.ContactId });
 
         modelBuilder.Entity<UserContact>()
             .HasOne(uc => uc.User)
@@ -76,12 +86,6 @@ public class ApplicationDbContext : DbContext
             .HasOne(wt => wt.Recipient)
             .WithMany()
             .HasForeignKey(wt => wt.RecipientId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<User>()
-            .HasMany(u => u.CardTransactions)
-            .WithOne(ct => ct.User)
-            .HasForeignKey(ct => ct.UserId)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Wallet>()

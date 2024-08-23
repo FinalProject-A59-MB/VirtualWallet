@@ -5,19 +5,20 @@ using System.Security.Authentication;
 using System.Security.Claims;
 using System.Text;
 using VirtualWallet.BUSINESS.Resources;
+using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.DATA.Models;
 
 namespace VirtualWallet.BUSINESS.Services.Contracts
 {
     public interface IAuthService
     {
-        public Task<User?> Authenticate(string credentials);
+        public Task<Result<User>> AuthenticateAsync(string identifier, string password);
 
         public string GenerateToken(User user);
 
-        public bool ValidateToken(string token);
+        public Result<bool> ValidateToken(string token);
 
-        public int GetUserIdFromToken(string token);
+        public Result<int> GetUserIdFromToken(string token);
 
     }
 }

@@ -24,6 +24,7 @@ namespace VirtualWallet.DATA.Models
 
         public ICollection<CardTransaction> CardTransactions { get; set; }
         public string PaymentProcessorToken { get; set; }
+
     }
 
 }

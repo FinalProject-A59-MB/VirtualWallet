@@ -1,5 +1,5 @@
-﻿using VirtualWallet.BUSINESS.Exceptions;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Repositories.Contracts;
@@ -16,49 +16,49 @@ namespace VirtualWallet.BUSINESS.Services
             _realCardRepository = realCardRepository;
         }
 
-        public async Task<string> VerifyAndRetrieveTokenAsync(Card card)
+        public async Task<Result<string>> VerifyAndRetrieveTokenAsync(Card card)
         {
             var realCard = await _realCardRepository.GetByCardNumberAsync(card.CardNumber);
 
             if (realCard == null)
-                throw new EntityNotFoundException(ErrorMessages.RealCardNotFound);
+                return Result<string>.Failure(ErrorMessages.RealCardNotFound);
 
             if (realCard.CardHolderName != card.CardHolderName)
-                throw new InvalidOperationException(ErrorMessages.CardHolderNameMismatch);
+                return Result<string>.Failure(ErrorMessages.CardHolderNameMismatch);
 
             if (realCard.Cvv != card.Cvv)
-                throw new InvalidOperationException(ErrorMessages.CVVMismatch);
+                return Result<string>.Failure(ErrorMessages.CVVMismatch);
 
-            return realCard.PaymentProcessorToken;
+            return Result<string>.Success(realCard.PaymentProcessorToken);
         }
 
-        public async Task<bool> WithdrawFromRealCardAsync(string paymentProcessorToken, decimal amount)
+        public async Task<Result> WithdrawFromRealCardAsync(string paymentProcessorToken, decimal amount)
         {
             var realCard = await _realCardRepository.GetByPaymentProcessorTokenAsync(paymentProcessorToken);
 
             if (realCard == null)
-                throw new EntityNotFoundException(ErrorMessages.RealCardTokenNotFound);
+                return Result.Failure(ErrorMessages.RealCardTokenNotFound);
 
             if (realCard.Balance < amount)
-                throw new BadRequestException(ErrorMessages.InsufficientRealCardFunds);
+                return Result.Failure(ErrorMessages.InsufficientRealCardFunds);
 
             realCard.Balance -= amount;
             await _realCardRepository.UpdateRealCardAsync(realCard);
 
-            return true;
+            return Result.Success();
         }
 
-        public async Task<bool> DepositToRealCardAsync(string paymentProcessorToken, decimal amount)
+        public async Task<Result> DepositToRealCardAsync(string paymentProcessorToken, decimal amount)
         {
             var realCard = await _realCardRepository.GetByPaymentProcessorTokenAsync(paymentProcessorToken);
 
             if (realCard == null)
-                throw new EntityNotFoundException(ErrorMessages.RealCardTokenNotFound);
+                return Result.Failure(ErrorMessages.RealCardTokenNotFound);
 
             realCard.Balance += amount;
             await _realCardRepository.UpdateRealCardAsync(realCard);
 
-            return true;
+            return Result.Success();
         }
     }
 }

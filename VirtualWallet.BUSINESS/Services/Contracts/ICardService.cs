@@ -5,19 +5,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VirtualWallet.DATA.Models;
+using VirtualWallet.BUSINESS.Resources;
+using VirtualWallet.BUSINESS.Results;
 
 namespace VirtualWallet.BUSINESS.Services.Contracts
 {
     public interface ICardService
     {
-        public Task<Card> GetCardByIdAsync(int cardId);
+        public Task<Result<Card>> GetCardByIdAsync(int cardId);
 
-        public Task<IEnumerable<Card>> GetUserCardsAsync(int userId);
+        public Task<Result<IEnumerable<Card>>> GetUserCardsAsync(int userId);
 
-        public Task AddCardAsync(User user, Card card);
+        public Task<Result> AddCardAsync(User user, Card card);
 
-        public Task DeleteCardAsync(int cardId);
+        public Task<Result> DeleteCardAsync(int cardId);
 
-        public Task UpdateCardAsync(Card card);
+        public Task<Result> UpdateCardAsync(Card card);
     }
 }

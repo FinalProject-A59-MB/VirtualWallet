@@ -25,12 +25,12 @@ namespace VirtualWallet.DATA.Models
         public ICollection<Wallet> Wallets { get; set; } = new List<Wallet>();
         public ICollection<UserWallet> UserWallets { get; set; } = new List<UserWallet>();
         public ICollection<UserContact> Contacts { get; set; } = new List<UserContact>();
-        public ICollection<CardTransaction> CardTransactions { get; set; } = new List<CardTransaction>();
-        public ICollection<WalletTransaction> WalletTransactions { get; set; } = new List<WalletTransaction>();
         public ICollection<RecurringPayment> RecurringPayments { get; set; } = new List<RecurringPayment>();
-        public ICollection<BlockedRecord> BlockedRecords { get; set; } = new List<BlockedRecord>();
         public int? MainWalletId { get; set; }
         public Wallet? MainWallet { get; set; }
+        public int? BlockedRecordId { get; set; }
+        public BlockedRecord? BlockedRecord { get; set; }
     }
+
 
 }

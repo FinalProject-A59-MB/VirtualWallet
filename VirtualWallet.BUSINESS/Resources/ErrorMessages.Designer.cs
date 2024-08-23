@@ -22,7 +22,7 @@ namespace VirtualWallet.BUSINESS.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class ErrorMessages {
+    public class ErrorMessages {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("VirtualWallet.BUSINESS.Resources.ErrorMessages", typeof(ErrorMessages).Assembly);
@@ -51,7 +51,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -63,7 +63,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Your account has been blocked and cannot perform this task..
         /// </summary>
-        internal static string AccountBlocked {
+        public static string AccountBlocked {
             get {
                 return ResourceManager.GetString("AccountBlocked", resourceCulture);
             }
@@ -72,7 +72,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Cardholder name does not match..
         /// </summary>
-        internal static string CardHolderNameMismatch {
+        public static string CardHolderNameMismatch {
             get {
                 return ResourceManager.GetString("CardHolderNameMismatch", resourceCulture);
             }
@@ -81,7 +81,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Card not found..
         /// </summary>
-        internal static string CardNotFound {
+        public static string CardNotFound {
             get {
                 return ResourceManager.GetString("CardNotFound", resourceCulture);
             }
@@ -90,7 +90,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Comment with id={0} doesn&apos;t exist..
         /// </summary>
-        internal static string CommentNotFound {
+        public static string CommentNotFound {
             get {
                 return ResourceManager.GetString("CommentNotFound", resourceCulture);
             }
@@ -99,7 +99,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to CVV number does not match..
         /// </summary>
-        internal static string CVVMismatch {
+        public static string CVVMismatch {
             get {
                 return ResourceManager.GetString("CVVMismatch", resourceCulture);
             }
@@ -108,7 +108,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Email &apos;{0}&apos; is already taken..
         /// </summary>
-        internal static string EmailTaken {
+        public static string EmailTaken {
             get {
                 return ResourceManager.GetString("EmailTaken", resourceCulture);
             }
@@ -117,7 +117,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Only admins can perform this action!.
         /// </summary>
-        internal static string ErrorMessageNotAdmin {
+        public static string ErrorMessageNotAdmin {
             get {
                 return ResourceManager.GetString("ErrorMessageNotAdmin", resourceCulture);
             }
@@ -126,7 +126,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to User is already admin..
         /// </summary>
-        internal static string ExceptionMessageAlreadyAdmin {
+        public static string ExceptionMessageAlreadyAdmin {
             get {
                 return ResourceManager.GetString("ExceptionMessageAlreadyAdmin", resourceCulture);
             }
@@ -135,7 +135,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to User is already not an admin..
         /// </summary>
-        internal static string ExceptionMessageAlreadyNotAdmin {
+        public static string ExceptionMessageAlreadyNotAdmin {
             get {
                 return ResourceManager.GetString("ExceptionMessageAlreadyNotAdmin", resourceCulture);
             }
@@ -144,7 +144,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Id must be positive integer!.
         /// </summary>
-        internal static string ExceptionMessageIdMustBePositive {
+        public static string ExceptionMessageIdMustBePositive {
             get {
                 return ResourceManager.GetString("ExceptionMessageIdMustBePositive", resourceCulture);
             }
@@ -153,7 +153,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to User doesn&apos;t exist!.
         /// </summary>
-        internal static string ExceptionMessageUserNotExist {
+        public static string ExceptionMessageUserNotExist {
             get {
                 return ResourceManager.GetString("ExceptionMessageUserNotExist", resourceCulture);
             }
@@ -162,7 +162,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to User with id {0} doesn&apos;t exist!.
         /// </summary>
-        internal static string ExceptionMessageUserWithIdNotExist {
+        public static string ExceptionMessageUserWithIdNotExist {
             get {
                 return ResourceManager.GetString("ExceptionMessageUserWithIdNotExist", resourceCulture);
             }
@@ -171,7 +171,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to User with username {0} doesn&apos;t exist!.
         /// </summary>
-        internal static string ExceptionMessageUserWithUsernameNotExist {
+        public static string ExceptionMessageUserWithUsernameNotExist {
             get {
                 return ResourceManager.GetString("ExceptionMessageUserWithUsernameNotExist", resourceCulture);
             }
@@ -180,7 +180,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to External payment processor failed to process the deposit..
         /// </summary>
-        internal static string ExternalDepositFailure {
+        public static string ExternalDepositFailure {
             get {
                 return ResourceManager.GetString("ExternalDepositFailure", resourceCulture);
             }
@@ -189,7 +189,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to External payment processor failed to process the withdrawal..
         /// </summary>
-        internal static string ExternalWithdrawalFailure {
+        public static string ExternalWithdrawalFailure {
             get {
                 return ResourceManager.GetString("ExternalWithdrawalFailure", resourceCulture);
             }
@@ -198,7 +198,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Failed to retrieve Payment Processor Token..
         /// </summary>
-        internal static string FailedToRetrievePaymentProcessorToken {
+        public static string FailedToRetrievePaymentProcessorToken {
             get {
                 return ResourceManager.GetString("FailedToRetrievePaymentProcessorToken", resourceCulture);
             }
@@ -207,7 +207,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Credentials: &apos; Username: {0} and Password: {1} &apos; are incorrect..
         /// </summary>
-        internal static string IncorrectCredentials {
+        public static string IncorrectCredentials {
             get {
                 return ResourceManager.GetString("IncorrectCredentials", resourceCulture);
             }
@@ -216,7 +216,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Insufficient funds in the real card..
         /// </summary>
-        internal static string InsufficientRealCardFunds {
+        public static string InsufficientRealCardFunds {
             get {
                 return ResourceManager.GetString("InsufficientRealCardFunds", resourceCulture);
             }
@@ -225,7 +225,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Insufficient funds in the wallet..
         /// </summary>
-        internal static string InsufficientWalletFunds {
+        public static string InsufficientWalletFunds {
             get {
                 return ResourceManager.GetString("InsufficientWalletFunds", resourceCulture);
             }
@@ -234,16 +234,16 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Credentials are invalid..
         /// </summary>
-        internal static string InvalidCredentialsFormat {
+        public static string InvalidCredentials {
             get {
-                return ResourceManager.GetString("InvalidCredentialsFormat", resourceCulture);
+                return ResourceManager.GetString("InvalidCredentials", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to The deposit amount must be greater than zero..
         /// </summary>
-        internal static string InvalidDepositAmount {
+        public static string InvalidDepositAmount {
             get {
                 return ResourceManager.GetString("InvalidDepositAmount", resourceCulture);
             }
@@ -252,16 +252,25 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to The withdrawal amount must be greater than zero..
         /// </summary>
-        internal static string InvalidWithdrawalAmount {
+        public static string InvalidWithdrawalAmount {
             get {
                 return ResourceManager.GetString("InvalidWithdrawalAmount", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There are not enough funds in the card..
+        /// </summary>
+        public static string NoCardsFound {
+            get {
+                return ResourceManager.GetString("NoCardsFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Post with id={0} doesn&apos;t exist..
         /// </summary>
-        internal static string PostNotFound {
+        public static string PostNotFound {
             get {
                 return ResourceManager.GetString("PostNotFound", resourceCulture);
             }
@@ -270,7 +279,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Real card not found..
         /// </summary>
-        internal static string RealCardNotFound {
+        public static string RealCardNotFound {
             get {
                 return ResourceManager.GetString("RealCardNotFound", resourceCulture);
             }
@@ -279,7 +288,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Real card associated with this payment processor token not found..
         /// </summary>
-        internal static string RealCardTokenNotFound {
+        public static string RealCardTokenNotFound {
             get {
                 return ResourceManager.GetString("RealCardTokenNotFound", resourceCulture);
             }
@@ -288,7 +297,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to You are not authorized to perform this task..
         /// </summary>
-        internal static string UnauthorizedAdminTask {
+        public static string UnauthorizedAdminTask {
             get {
                 return ResourceManager.GetString("UnauthorizedAdminTask", resourceCulture);
             }
@@ -297,7 +306,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to The card and wallet must belong to the same user..
         /// </summary>
-        internal static string UnauthorizedCardWallet {
+        public static string UnauthorizedCardWallet {
             get {
                 return ResourceManager.GetString("UnauthorizedCardWallet", resourceCulture);
             }
@@ -306,7 +315,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to You are not authorized to perform this task..
         /// </summary>
-        internal static string UnauthorizedTask {
+        public static string UnauthorizedTask {
             get {
                 return ResourceManager.GetString("UnauthorizedTask", resourceCulture);
             }
@@ -315,7 +324,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Username &apos;{0}&apos; is already taken..
         /// </summary>
-        internal static string UsernameTaken {
+        public static string UsernameTaken {
             get {
                 return ResourceManager.GetString("UsernameTaken", resourceCulture);
             }
@@ -324,7 +333,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to User with id={0} doesn&apos;t exist..
         /// </summary>
-        internal static string UserNotFound {
+        public static string UserNotFound {
             get {
                 return ResourceManager.GetString("UserNotFound", resourceCulture);
             }
@@ -333,7 +342,7 @@ namespace VirtualWallet.BUSINESS.Resources {
         /// <summary>
         ///   Looks up a localized string similar to Wallet not found..
         /// </summary>
-        internal static string WalletNotFound {
+        public static string WalletNotFound {
             get {
                 return ResourceManager.GetString("WalletNotFound", resourceCulture);
             }

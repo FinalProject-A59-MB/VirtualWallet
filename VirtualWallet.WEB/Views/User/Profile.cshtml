@@ -2,71 +2,92 @@
 
 @{
     ViewData["Title"] = "Profile";
-    var wallets = Model.Wallets != null;
-    var mainWalletName = Model.MainWallet?.Name ?? "No main wallet assigned";
+    var isAdmin = Model.Role == "Admin";
 }
 
-<div class="card mb-4 w-50 mx-auto">
+<div class="card mb-4 w-75 mx-auto">
     <div class="card-body">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    <img src="@Model.UserProfile.PhotoUrl" alt="Profile Picture" class="img-thumbnail" />
-                    <a href="@Url.Action("EditProfile", "User", new { userId = Model.Id })" class="btn btn-secondary btn-block mt-3">Edit Profile</a>
-                </div>
-                <div class="col-md-8">
-                    <h2><strong>@Model.Username</strong></h2>
-                    <p><strong>First Name:</strong> @Model.UserProfile.FirstName</p>
-                    <p><strong>Last Name:</strong> @Model.UserProfile.LastName</p>
-                    <p><strong>Email:</strong> @Model.Email</p>
-                    <p><strong>Date of Birth:</strong> @Model.UserProfile.DateOfBirth.ToString("MMMM dd, yyyy")</p>
-                    <p><strong>Phone Number:</strong> @Model.UserProfile.PhoneNumber</p>
-                    <p><strong>Address:</strong></p>
-                    <p><strong>Country:</strong> @Model.UserProfile.Country</p>
-                    <p><strong>State:</strong> @Model.UserProfile.State</p>
-                    <p><strong>City:</strong> @Model.UserProfile.City</p>
-                    <p><strong>Street:</strong> @Model.UserProfile.Street</p>
-                    <p><strong>Postal Code:</strong> @Model.UserProfile.PostalCode</p>
+        <ul class="nav nav-tabs" id="profileTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="profile-details-tab" data-bs-toggle="tab" href="#profile-details" role="tab" aria-controls="profile-details" aria-selected="true">Profile Details</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="wallets-tab" data-bs-toggle="tab" href="#wallets" role="tab" aria-controls="wallets" aria-selected="false">Wallets</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="cards-tab" data-bs-toggle="tab" href="#cards" role="tab" aria-controls="cards" aria-selected="false">Cards</a>
+            </li>
+            @if (isAdmin)
+            {
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="admin-tab" data-bs-toggle="tab" href="#admin" role="tab" aria-controls="admin" aria-selected="false">Admin</a>
+                </li>
+            }
+        </ul>
 
-                    <hr />
-
-                    <h3>Verification</h3>
-                    <p>Your account is not fully verified. Please complete the verification process.</p>
-                    <a href="@Url.Action("UploadVerification", "User")" class="btn btn-warning">Complete Verification</a>
-
-                    <hr />
-
-                    <h3>My Cards</h3>
-                    <ul class="list-group">
-                        @foreach (var card in Model.Cards)
-                        {
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                @card.CardNumber - @card.Issuer
-                                <form asp-controller="Card" asp-action="DeleteCard" method="get" class="d-inline">
-                                    <input type="hidden" name="cardId" value="@card.Id" />
-                                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                </form>
-                            </li>
-                        }
-                    </ul>
-
-                    <a href="@Url.Action("AddCard", "Card", new { userId = Model.Id })" class="btn btn-primary mt-3">Add New Card</a>
-
-                    <hr />
-
-                    <h3>My Wallets</h3>
-                    <ul class="list-group">
-                        @foreach (var wallet in Model.Wallets)
-                        {
-                            <li>@wallet.Name - @wallet.Balance @wallet.Currency @wallet.WalletType</li>
-                        }
-                    </ul>
-
-                    <hr />
-                    <h3>Unverified Users</h3>
-                    <a href="@Url.Action("UnverifiedUsers", "User")" class="btn btn-warning">Review Unverified Users</a>
+        <div class="tab-content" id="profileTabsContent">
+            <!-- Profile Details Tab -->
+            <div class="tab-pane fade show active" id="profile-details" role="tabpanel" aria-labelledby="profile-details-tab">
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="@Model.UserProfile.PhotoUrl" alt="Profile Picture" class="img-thumbnail" />
+                        <a href="@Url.Action("EditProfile", "User", new { userId = Model.Id })" class="btn btn-secondary btn-block mt-3">Edit Profile</a>
+                    </div>
+                    <div class="col-md-8">
+                        <h2><strong>@Model.Username</strong></h2>
+                        <p><strong>First Name:</strong> @Model.UserProfile.FirstName</p>
+                        <p><strong>Last Name:</strong> @Model.UserProfile.LastName</p>
+                        <p><strong>Email:</strong> @Model.Email</p>
+                        <p><strong>Date of Birth:</strong> @Model.UserProfile.DateOfBirth.ToString("MMMM dd, yyyy")</p>
+                        <p><strong>Phone Number:</strong> @Model.UserProfile.PhoneNumber</p>
+                        <p><strong>Address:</strong></p>
+                        <p><strong>Country:</strong> @Model.UserProfile.Country</p>
+                        <p><strong>State:</strong> @Model.UserProfile.State</p>
+                        <p><strong>City:</strong> @Model.UserProfile.City</p>
+                        <p><strong>Street:</strong> @Model.UserProfile.Street</p>
+                        <p><strong>Postal Code:</strong> @Model.UserProfile.PostalCode</p>
+                    </div>
                 </div>
             </div>
+
+            <!-- Wallets Tab -->
+            <div class="tab-pane fade" id="wallets" role="tabpanel" aria-labelledby="wallets-tab">
+                <h3>My Wallets</h3>
+                <ul class="list-group">
+                    @foreach (var wallet in Model.Wallets)
+                    {
+                        <li class="list-group-item">@wallet.Name - @wallet.Balance @wallet.Currency @wallet.WalletType</li>
+                    }
+                </ul>
+            </div>
+
+            <!-- Cards Tab -->
+            <div class="tab-pane fade" id="cards" role="tabpanel" aria-labelledby="cards-tab">
+                <h3>My Cards</h3>
+                <ul class="list-group">
+                    @foreach (var card in Model.Cards)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            @card.CardNumber - @card.Issuer
+                            <form asp-controller="Card" asp-action="DeleteCard" method="get" class="d-inline">
+                                <input type="hidden" name="cardId" value="@card.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </li>
+                    }
+                </ul>
+                <a href="@Url.Action("AddCard", "Card", new { userId = Model.Id })" class="btn btn-primary mt-3">Add New Card</a>
+            </div>
+
+            <!-- Admin Tab (Visible only for Admins) -->
+            @if (isAdmin)
+            {
+                <div class="tab-pane fade" id="admin" role="tabpanel" aria-labelledby="admin-tab">
+                    <h3>Admin Section</h3>
+                    <a href="@Url.Action("UnverifiedUsers", "User")" class="btn btn-warning">Review Unverified Users</a>
+                    <!-- Other Admin related actions -->
+                </div>
+            }
         </div>
     </div>
 </div>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,5 +33,15 @@ namespace VirtualWallet.DATA.Repositories.Contracts
         public Task AddBlockedRecordAsync(BlockedRecord blockedRecord);
 
         public Task<IEnumerable<BlockedRecord>> GetBlockedRecordsAsync(int userId);
+
+        public Task AddContactAsync(UserContact userContact);
+
+        public Task<List<User>> GetUserContactsAsync(int userId);
+
+        public Task<UserContact> GetUserContactAsync(int userId, int contactId);
+
+        public Task RemoveContactAsync(UserContact userContact);
+
+        public Task<bool> IsContactExistsAsync(int userId, int contactId);
     }
 }

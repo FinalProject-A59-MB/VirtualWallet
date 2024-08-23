@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
+using VirtualWallet.BUSINESS.Results;
+using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Repositories.Contracts;
-using VirtualWallet.BUSINESS.Services.Contracts;
 
 namespace VirtualWallet.BUSINESS.Services
 {
@@ -32,20 +33,18 @@ namespace VirtualWallet.BUSINESS.Services
             _paymentProcessorService = paymentProcessorService;
         }
 
-        public async Task<CardTransaction> ProcessCardToWalletTransactionAsync(Card card, Wallet wallet, decimal amount)
+        public async Task<Result<CardTransaction>> ProcessCardToWalletTransactionAsync(Card card, Wallet wallet, decimal amount)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
 
             try
             {
-                // Withdraw funds from the real card via the payment processor
-                var paymentSuccessful = await _paymentProcessorService.WithdrawFromRealCardAsync(card.PaymentProcessorToken, amount);
-                if (!paymentSuccessful)
+                var paymentResult = await _paymentProcessorService.WithdrawFromRealCardAsync(card.PaymentProcessorToken, amount);
+                if (!paymentResult.IsSuccess)
                 {
-                    throw new Exception("Failed to withdraw funds from the real card.");
+                    return Result<CardTransaction>.Failure("Failed to withdraw funds from the real card.");
                 }
 
-                
                 wallet.Balance += amount;
 
                 var cardTransaction = new CardTransaction
@@ -63,7 +62,7 @@ namespace VirtualWallet.BUSINESS.Services
 
                 await transaction.CommitAsync();
 
-                return cardTransaction;
+                return Result<CardTransaction>.Success(cardTransaction);
             }
             catch (Exception ex)
             {
@@ -72,11 +71,11 @@ namespace VirtualWallet.BUSINESS.Services
                 // Refund the amount to the real card if transaction fails
                 await _paymentProcessorService.DepositToRealCardAsync(card.PaymentProcessorToken, amount);
 
-                throw new Exception($"Transaction failed: {ex.Message}");
+                return Result<CardTransaction>.Failure($"Transaction failed: {ex.Message}");
             }
         }
 
-        public async Task<CardTransaction> ProcessWalletToCardTransactionAsync(Wallet wallet, Card card, decimal amount)
+        public async Task<Result<CardTransaction>> ProcessWalletToCardTransactionAsync(Wallet wallet, Card card, decimal amount)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
 
@@ -84,11 +83,16 @@ namespace VirtualWallet.BUSINESS.Services
             {
                 if (wallet.Balance < amount)
                 {
-                    throw new Exception("Insufficient funds in the wallet.");
+                    return Result<CardTransaction>.Failure("Insufficient funds in the wallet.");
                 }
 
-                
                 wallet.Balance -= amount;
+
+                var paymentResult = await _paymentProcessorService.DepositToRealCardAsync(card.PaymentProcessorToken, amount);
+                if (!paymentResult.IsSuccess)
+                {
+                    return Result<CardTransaction>.Failure("Failed to deposit funds to the real card.");
+                }
 
                 var cardTransaction = new CardTransaction
                 {
@@ -100,19 +104,12 @@ namespace VirtualWallet.BUSINESS.Services
                     Status = TransactionStatus.Completed
                 };
 
-                // Deposit the funds to the real card via the payment processor
-                var paymentSuccessful = await _paymentProcessorService.DepositToRealCardAsync(card.PaymentProcessorToken, amount);
-                if (!paymentSuccessful)
-                {
-                    throw new Exception("Failed to deposit funds to the real card.");
-                }
-
                 await _cardTransactionRepository.AddCardTransactionAsync(cardTransaction);
                 await _walletRepository.UpdateWalletAsync(wallet);
 
                 await transaction.CommitAsync();
 
-                return cardTransaction;
+                return Result<CardTransaction>.Success(cardTransaction);
             }
             catch (Exception ex)
             {
@@ -121,11 +118,11 @@ namespace VirtualWallet.BUSINESS.Services
                 // Refund the amount to the wallet if transaction fails
                 await _paymentProcessorService.WithdrawFromRealCardAsync(card.PaymentProcessorToken, amount);
 
-                throw new Exception($"Transaction failed: {ex.Message}");
+                return Result<CardTransaction>.Failure($"Transaction failed: {ex.Message}");
             }
         }
 
-        public async Task<WalletTransaction> ProcessWalletToWalletTransactionAsync(Wallet senderWallet, Wallet recipientWallet, decimal amount)
+        public async Task<Result<WalletTransaction>> ProcessWalletToWalletTransactionAsync(Wallet senderWallet, Wallet recipientWallet, decimal amount)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
 
@@ -133,7 +130,7 @@ namespace VirtualWallet.BUSINESS.Services
             {
                 if (senderWallet.Balance < amount)
                 {
-                    throw new Exception("Insufficient funds in the sender's wallet.");
+                    return Result<WalletTransaction>.Failure("Insufficient funds in the sender's wallet.");
                 }
 
                 senderWallet.Balance -= amount;
@@ -154,13 +151,13 @@ namespace VirtualWallet.BUSINESS.Services
 
                 await transaction.CommitAsync();
 
-                return walletTransaction;
+                return Result<WalletTransaction>.Success(walletTransaction);
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
 
-                throw new Exception($"Transaction failed: {ex.Message}");
+                return Result<WalletTransaction>.Failure($"Transaction failed: {ex.Message}");
             }
         }
     }

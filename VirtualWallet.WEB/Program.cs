@@ -14,6 +14,8 @@ using VirtualWallet.BUSINESS.Services;
 using VirtualWallet.DATA.Context;
 using System.Net.Mail;
 using System.Net;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +27,30 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     options.UseSqlServer(connectionString);
+
     options.EnableSensitiveDataLogging();
+});
+
+//Google Oauth
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+})
+.AddCookie()
+.AddGoogle(options =>
+{
+    options.ClientId = builder.Configuration["Authentication:client_id"];
+    options.ClientSecret = builder.Configuration["Authentication:client_secret"];
+    options.CallbackPath = new PathString("/signin-google");
+
+});
+
+// ActionFilters
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add<HandleServiceResultAttribute>();
 });
 
 // Session configuration
@@ -128,7 +153,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // troubleshooting
-//app.UseDeveloperExceptionPage();
+app.UseDeveloperExceptionPage();
 
 app.UseSwagger();
 app.UseSwaggerUI(options =>

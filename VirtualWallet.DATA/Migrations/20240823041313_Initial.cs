@@ -119,11 +119,18 @@ namespace VirtualWallet.DATA.Migrations
                     DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Role = table.Column<int>(type: "int", nullable: false),
                     GoogleId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    MainWalletId = table.Column<int>(type: "int", nullable: true)
+                    MainWalletId = table.Column<int>(type: "int", nullable: true),
+                    BlockedRecordId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_BlockedRecords_BlockedRecordId",
+                        column: x => x.BlockedRecordId,
+                        principalTable: "BlockedRecords",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -180,7 +187,7 @@ namespace VirtualWallet.DATA.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_CardTransactions_Wallets_WalletId",
                         column: x => x.WalletId,
@@ -269,29 +276,23 @@ namespace VirtualWallet.DATA.Migrations
                     Destination = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SenderId = table.Column<int>(type: "int", nullable: false),
                     RecipientId = table.Column<int>(type: "int", nullable: false),
-                    Category = table.Column<int>(type: "int", nullable: false),
-                    WalletId = table.Column<int>(type: "int", nullable: true)
+                    Category = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_WalletTransactions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_WalletTransactions_Users_RecipientId",
+                        name: "FK_WalletTransactions_Wallets_RecipientId",
                         column: x => x.RecipientId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_WalletTransactions_Users_SenderId",
-                        column: x => x.SenderId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_WalletTransactions_Wallets_WalletId",
-                        column: x => x.WalletId,
                         principalTable: "Wallets",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_WalletTransactions_Wallets_SenderId",
+                        column: x => x.SenderId,
+                        principalTable: "Wallets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -346,6 +347,11 @@ namespace VirtualWallet.DATA.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_BlockedRecordId",
+                table: "Users",
+                column: "BlockedRecordId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_MainWalletId",
                 table: "Users",
                 column: "MainWalletId",
@@ -372,18 +378,13 @@ namespace VirtualWallet.DATA.Migrations
                 table: "WalletTransactions",
                 column: "SenderId");
 
-            migrationBuilder.CreateIndex(
-                name: "IX_WalletTransactions_WalletId",
-                table: "WalletTransactions",
-                column: "WalletId");
-
             migrationBuilder.AddForeignKey(
                 name: "FK_BlockedRecords_Users_UserId",
                 table: "BlockedRecords",
                 column: "UserId",
                 principalTable: "Users",
                 principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Cards_Users_UserId",
@@ -429,11 +430,12 @@ namespace VirtualWallet.DATA.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Wallets_Users_UserId",
-                table: "Wallets");
+                name: "FK_Users_Wallets_MainWalletId",
+                table: "Users");
 
-            migrationBuilder.DropTable(
-                name: "BlockedRecords");
+            migrationBuilder.DropForeignKey(
+                name: "FK_BlockedRecords_Users_UserId",
+                table: "BlockedRecords");
 
             migrationBuilder.DropTable(
                 name: "CardTransactions");
@@ -460,10 +462,13 @@ namespace VirtualWallet.DATA.Migrations
                 name: "Cards");
 
             migrationBuilder.DropTable(
+                name: "Wallets");
+
+            migrationBuilder.DropTable(
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "Wallets");
+                name: "BlockedRecords");
         }
     }
 }

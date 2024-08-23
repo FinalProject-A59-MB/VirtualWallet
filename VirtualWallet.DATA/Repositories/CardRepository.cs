@@ -35,8 +35,15 @@ namespace VirtualWallet.DATA.Repositories
 
         public async Task AddCardAsync(Card card)
         {
+            card.CardNumber = ObfuscateCardNumber(card.CardNumber);
             await _context.Cards.AddAsync(card);
             await _context.SaveChangesAsync();
+        }
+
+        private string ObfuscateCardNumber(string cardNumber)
+        {
+            var lastFourDigits = cardNumber[^4..];
+            return new string('*', cardNumber.Length - 4) + lastFourDigits;
         }
 
         public async Task UpdateCardAsync(Card card)

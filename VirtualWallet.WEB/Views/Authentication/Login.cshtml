@@ -27,7 +27,15 @@
                         <div class="form-group text-center">
                             <button type="submit" class="btn btn-primary">Login</button>
                         </div>
-                        <div class="text-center">
+
+                 
+                        <div class="form-group text-center">
+                            <a href="@Url.Action("GoogleLogin", "Authentication")" class="btn btn-danger mt-3">
+                                <i class="fab fa-google"></i> Login with Google
+                            </a>
+                        </div>
+
+                        <div class="text-center mt-3">
                             <a href="@Url.Action("Register", "Authentication")">Don't have an account?</a>
                         </div>
                         <div class="text-center">

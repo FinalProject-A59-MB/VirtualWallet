@@ -2,7 +2,8 @@
 using System.Security.Claims;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
-using VirtualWallet.DATA.Services;
+using VirtualWallet.BUSINESS.Results;
+using Microsoft.AspNetCore.Http;
 using VirtualWallet.DATA.Services.Contracts;
 
 namespace VirtualWallet.WEB.Middlewares
@@ -28,35 +29,47 @@ namespace VirtualWallet.WEB.Middlewares
                 token = context.Request.Cookies["jwt"];
             }
 
-            if (token != null && authService.ValidateToken(token))
+            if (token != null)
             {
-                var handler = new JwtSecurityTokenHandler();
-                var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
+                var validateTokenResult = authService.ValidateToken(token);
 
-                if (jwtToken != null)
+                if (validateTokenResult.IsSuccess)
                 {
-                    var usernameClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)
-                                        ?? jwtToken.Claims.FirstOrDefault(claim => claim.Type == "unique_name")
-                                        ?? jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name);
+                    var handler = new JwtSecurityTokenHandler();
+                    var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
 
-                    if (usernameClaim != null)
+                    if (jwtToken != null)
                     {
-                        var username = usernameClaim.Value;
-                        var user = await userService.GetUserByUsernameAsync(username);
+                        var usernameClaim = jwtToken.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)
+                                            ?? jwtToken.Claims.FirstOrDefault(claim => claim.Type == "unique_name")
+                                            ?? jwtToken.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Name);
 
-                        if (user != null)
+                        if (usernameClaim != null)
                         {
-                            var userProfile = await userService.GetUserProfileAsync(user.Id);
-                            context.Items["CurrentUser"] = user;
-                            context.Items["UserProfile"] = userProfile;
+                            var username = usernameClaim.Value;
+
+                            var userResult = await userService.GetUserByUsernameAsync(username);
+
+                            if (userResult.IsSuccess)
+                            {
+                                var user = userResult.Value;
+
+                                var userProfileResult = await userService.GetUserProfileAsync(user.Id);
+                                if (userProfileResult.IsSuccess)
+                                {
+                                    context.Items["CurrentUser"] = user;
+                                    context.Items["UserProfile"] = userProfileResult.Value;
+                                }
+                                
+                            }
+                            
                         }
                     }
                 }
+                
             }
 
             await _next(context);
         }
     }
-
-
 }

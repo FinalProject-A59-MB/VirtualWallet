@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Security.Authentication;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using VirtualWallet.BUSINESS.Exceptions;
-using VirtualWallet.BUSINESS.Services;
+using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Services.Contracts;
-using VirtualWallet.WEB.Models.DTOs;
 using VirtualWallet.WEB.Models.ViewModels;
 
 namespace ForumProject.Controllers.MVC
@@ -19,7 +19,11 @@ namespace ForumProject.Controllers.MVC
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
 
-        public AuthenticationController(IAuthService authService,IViewModelMapper modelMapper,IUserService userService,IEmailService emailService)
+        public AuthenticationController(
+            IAuthService authService,
+            IViewModelMapper modelMapper,
+            IUserService userService,
+            IEmailService emailService)
         {
             _authService = authService;
             _viewModelMapper = modelMapper;
@@ -41,19 +45,42 @@ namespace ForumProject.Controllers.MVC
                 return View(model);
             }
 
-            User user = await _authService.Authenticate($"{model.UsernameOrEmail}:{model.Password}");
+            var authResult = await _authService.AuthenticateAsync(model.UsernameOrEmail, model.Password);
 
-            if (user == null)
+            if (!authResult.IsSuccess)
             {
-                ModelState.AddModelError("CustomError", "Invalid credentials. Please try again.");
+                ModelState.AddModelError("CustomError", authResult.Error);
                 return View(model);
             }
 
-            var token = _authService.GenerateToken(user);
+            var token = _authService.GenerateToken(authResult.Value);
             HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
             return RedirectToAction("Index", "Home");
         }
 
+        public IActionResult GoogleLogin()
+        {
+            var properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleResponse") };
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+        }
+
+        public async Task<IActionResult> GoogleResponse()
+        {
+            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            if (result?.Principal != null)
+            {
+                var claims = result.Principal.Identities
+                                .FirstOrDefault()?.Claims
+                                .Select(claim => new
+                                {
+                                    claim.Type,
+                                    claim.Value
+                                });
+            }
+
+            return RedirectToAction("Index", "Home");
+        }
 
         [HttpGet]
         public IActionResult Register()
@@ -69,13 +96,21 @@ namespace ForumProject.Controllers.MVC
                 return View(model);
             }
 
-            User userRequest = _viewModelMapper.ToUser(model);
-            var user = await _userService.RegisterUserAsync(userRequest);
-            var token = _authService.GenerateToken(user);
+            var userRequest = _viewModelMapper.ToUser(model);
+            var registerResult = await _userService.RegisterUserAsync(userRequest);
+
+            if (!registerResult.IsSuccess)
+            {
+                ModelState.AddModelError("CustomError", registerResult.Error);
+                return View(model);
+            }
+
+            var token = _authService.GenerateToken(registerResult.Value);
             HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
+
             var verificationLink = Url.Action("VerifyEmail", "Authentication", new { token = token }, Request.Scheme);
             string emailContent = $"Please verify your email by clicking <a href='{verificationLink}'>here</a>.";
-            await _emailService.SendEmailAsync(user.Email, "Email Verification", emailContent);
+            await _emailService.SendEmailAsync(registerResult.Value.Email, "Email Verification", emailContent);
 
             return RedirectToAction("Index", "Home");
         }
@@ -83,29 +118,43 @@ namespace ForumProject.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> VerifyEmail(string token)
         {
-            if (string.IsNullOrEmpty(token) || !_authService.ValidateToken(token))
+            var validateToken = _authService.ValidateToken(token);
+            if (!validateToken.IsSuccess)
             {
+                TempData["ErrorMessage"] = validateToken.Error;
                 return View("VerificationResult", false);
             }
 
             var userId = _authService.GetUserIdFromToken(token);
-            var user = await _userService.GetUserByIdAsync(userId);
-
-            if (user == null)
+            if (!userId.IsSuccess)
             {
+                TempData["ErrorMessage"] = userId.Error;
                 return View("VerificationResult", false);
             }
+
+            var userResult = await _userService.GetUserByIdAsync(userId.Value);
+
+            if (!userResult.IsSuccess)
+            {
+                TempData["ErrorMessage"] = userResult.Error;
+                return View("VerificationResult", false);
+            }
+
+            var user = userResult.Value;
             user.VerificationStatus = UserVerificationStatus.Verified;
-            await _userService.UpdateUserAsync(user);
+            var updateResult = await _userService.UpdateUserAsync(user);
+
+            if (!updateResult.IsSuccess)
+            {
+                TempData["ErrorMessage"] = updateResult.Error;
+                return View("VerificationResult", false);
+            }
 
             var newToken = _authService.GenerateToken(user);
-
             HttpContext.Response.Cookies.Append("jwt", newToken, new CookieOptions { HttpOnly = true });
 
             return View("VerificationResult", true);
         }
-
-
 
         public IActionResult Logout()
         {

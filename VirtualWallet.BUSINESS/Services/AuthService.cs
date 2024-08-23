@@ -4,16 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Authentication;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using VirtualWallet.BUSINESS.Resources;
+using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
-using VirtualWallet.DATA.Models;
-using VirtualWallet.DATA.Models.Enums;
-using VirtualWallet.DATA.Repositories.Contracts;
 using VirtualWallet.DATA.Helpers;
+using VirtualWallet.DATA.Models;
+using VirtualWallet.DATA.Repositories.Contracts;
 
 namespace VirtualWallet.BUSINESS.Services
 {
@@ -21,27 +20,22 @@ namespace VirtualWallet.BUSINESS.Services
     {
         private readonly IConfiguration _configuration;
         private readonly IUserRepository _userRepository;
+
         public AuthService(IConfiguration configuration, IUserRepository userRepository)
         {
             _configuration = configuration;
             _userRepository = userRepository;
         }
 
-        public async Task<User?> Authenticate(string credentials)
+        public async Task<Result<User>> AuthenticateAsync(string identifier, string password)
         {
-            if (credentials == null || !credentials.Contains(':'))
-                return null;
-
-            string[] parts = credentials.Split(':');
-            var identifier = parts[0] ?? "";
-            var password = parts[1] ?? "";
             User? user = await _userRepository.GetUserByUsernameAsync(identifier) ??
                          await _userRepository.GetUserByEmailAsync(identifier);
 
-            if (user == null || !PasswordHasher.VerifyPassword(password,user.Password))
-                return null;
+            if (user == null || !PasswordHasher.VerifyPassword(password, user.Password))
+                return Result<User>.Failure(ErrorMessages.InvalidCredentials);
 
-            return user;
+            return Result<User>.Success(user);
         }
 
         public string GenerateToken(User user)
@@ -52,10 +46,10 @@ namespace VirtualWallet.BUSINESS.Services
 
             var claims = new List<Claim>
             {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Username)
+                new Claim(JwtRegisteredClaimNames.Sub, user.Username),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.Username)
             };
 
             var token = new JwtSecurityToken(
@@ -68,7 +62,7 @@ namespace VirtualWallet.BUSINESS.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public bool ValidateToken(string token)
+        public Result<bool> ValidateToken(string token)
         {
             var jwtSettings = _configuration.GetSection("Jwt");
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -88,48 +82,54 @@ namespace VirtualWallet.BUSINESS.Services
                     ClockSkew = TimeSpan.Zero
                 }, out SecurityToken validatedToken);
 
-                return true;
+                return Result<bool>.Success(true);
             }
-            catch
+            catch (Exception ex)
             {
-                return false;
+                return Result<bool>.Failure($"Token validation failed: {ex.Message}");
             }
         }
 
-        public int GetUserIdFromToken(string token)
+        public Result<int> GetUserIdFromToken(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var jwtSettings = _configuration.GetSection("Jwt");
             var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
-            var tokenValidationParameters = new TokenValidationParameters
+            try
             {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(key),
-                ValidateIssuer = true,
-                ValidIssuer = jwtSettings["Issuer"],
-                ValidateAudience = true,
-                ValidAudience = jwtSettings["Audience"],
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
-            };
+                var tokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtSettings["Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = jwtSettings["Audience"],
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                };
 
-            tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken validatedToken);
+                tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken validatedToken);
 
-            var jwtToken = validatedToken as JwtSecurityToken;
-            if (jwtToken == null)
-            {
-                throw new SecurityTokenException("Invalid token");
+                var jwtToken = validatedToken as JwtSecurityToken;
+                if (jwtToken == null)
+                {
+                    return Result<int>.Failure("Invalid token format");
+                }
+
+                var userIdClaim = jwtToken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+                if (userIdClaim == null)
+                {
+                    return Result<int>.Failure("Token does not contain user ID claim");
+                }
+
+                return Result<int>.Success(int.Parse(userIdClaim.Value));
             }
-
-            var userIdClaim = jwtToken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
-            if (userIdClaim == null)
+            catch (Exception ex)
             {
-                throw new SecurityTokenException("Token does not contain user ID claim");
+                return Result<int>.Failure($"Failed to extract user ID from token: {ex.Message}");
             }
-
-            return int.Parse(userIdClaim.Value);
         }
-
     }
 }

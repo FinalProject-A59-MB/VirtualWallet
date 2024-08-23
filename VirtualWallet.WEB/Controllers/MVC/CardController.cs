@@ -1,23 +1,25 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Models.Enums;
-using VirtualWallet.DATA.Services;
 using VirtualWallet.DATA.Services.Contracts;
 using VirtualWallet.WEB.Models.ViewModels;
 
 namespace VirtualWallet.WEB.Controllers.MVC
 {
-    public class CardController : Controller
+    [HandleServiceResult]
+    public class CardController : BaseController
     {
         private readonly ICardService _cardService;
         private readonly IUserService _userService;
         private readonly IPaymentProcessorService _paymentProcessorService;
         private readonly IViewModelMapper _viewModelMapper;
         private readonly IWalletService _walletService;
+
         public CardController(
-            ICardService cardService, 
-            IUserService userService, 
+            ICardService cardService,
+            IUserService userService,
             IPaymentProcessorService paymentProcessorService,
             IViewModelMapper modelMapper,
             IWalletService walletService)
@@ -44,8 +46,6 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 return View(model);
             }
 
-            User user = HttpContext.Items["CurrentUser"] as User;
-
             var cardToVerify = new Card
             {
                 CardHolderName = model.CardHolderName,
@@ -55,7 +55,13 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 Issuer = model.Issuer
             };
 
-            var paymentProcessorToken = await _paymentProcessorService.VerifyAndRetrieveTokenAsync(cardToVerify);
+            var tokenResult = await _paymentProcessorService.VerifyAndRetrieveTokenAsync(cardToVerify);
+
+            if (!tokenResult.IsSuccess)
+            {
+                TempData["ErrorMessage"] = tokenResult.Error;
+                return View("AddCard", model);
+            }
 
             var card = new Card
             {
@@ -64,45 +70,70 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 Issuer = model.Issuer,
                 ExpirationDate = model.ExpirationDate,
                 Cvv = model.Cvv,
-                PaymentProcessorToken = paymentProcessorToken,
+                PaymentProcessorToken = tokenResult.Value,
                 CardType = model.CardType
             };
 
-            await _cardService.AddCardAsync(user, card);
+            var addCardResult = await _cardService.AddCardAsync(CurrentUser, card);
 
-            if (!user.MainWalletId.HasValue)
+            if (!addCardResult.IsSuccess)
+            {
+                TempData["ErrorMessage"] = addCardResult.Error;
+                return View("AddCard", model);
+            }
+
+            if (!CurrentUser.MainWalletId.HasValue)
             {
                 var wallet = new Wallet
                 {
                     Name = "Main Wallet",
                     WalletType = WalletType.Main,
-                    UserId = user.Id,
+                    UserId = CurrentUser.Id,
                     Currency = card.Currency
                 };
-                user.MainWalletId = wallet.Id;
-                user.MainWallet = wallet;
-                await _walletService.AddWalletAsync(wallet);
-                user.Wallets.Add(wallet);
-            }
-            return RedirectToAction("Profile", "User", new { id = model.UserId });
-        }
-    
+                CurrentUser.MainWalletId = wallet.Id;
+                CurrentUser.MainWallet = wallet;
 
-    [HttpGet]
+                var walletResult = await _walletService.AddWalletAsync(wallet);
+                //if (!walletResult.IsSuccess) TODO => UPDATE TO USE RESULT PATTERN
+                //{
+                //    TempData["ErrorMessage"] = walletResult.Error;
+                //    return View("AddCard", model);
+                //}
+
+                CurrentUser.Wallets.Add(wallet);
+            }
+
+            return RedirectToAction("Profile", "User");
+        }
+
+        [HttpGet]
         public async Task<IActionResult> DeleteCard(int cardId)
         {
-            var card = await _cardService.GetCardByIdAsync(cardId);
-            var model = _viewModelMapper.ToCardViewModel(card);
+            var cardResult = await _cardService.GetCardByIdAsync(cardId);
+
+            if (!cardResult.IsSuccess)
+            {
+                TempData["ErrorMessage"] = cardResult.Error;
+                return RedirectToAction("Profile", "User");
+            }
+
+            var model = _viewModelMapper.ToCardViewModel(cardResult.Value);
             return View(model);
         }
 
         [HttpPost]
         public async Task<IActionResult> Delete(CardViewModel model)
         {
-            var card = await _cardService.GetCardByIdAsync(model.Id);
-            await _cardService.DeleteCardAsync(model.Id);
-            return RedirectToAction("Profile", "User", new { id = model.UserId });
-        }
+            var deleteResult = await _cardService.DeleteCardAsync(model.Id);
 
+            if (!deleteResult.IsSuccess)
+            {
+                TempData["ErrorMessage"] = deleteResult.Error;
+                return RedirectToAction("Profile", "User");
+            }
+
+            return RedirectToAction("Profile", "User");
+        }
     }
 }

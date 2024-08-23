@@ -5,24 +5,31 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VirtualWallet.DATA.Models;
+using VirtualWallet.BUSINESS.Results;
 
 namespace VirtualWallet.DATA.Services.Contracts
 {
     public interface IUserService
     {
-        public Task<IQueryable<User>> GetUsers();
-        public Task<User> GetUserByIdAsync(int userId);
+        public Task<Result<IQueryable<User>>> GetUsers();
+        public Task<Result<User>> GetUserByIdAsync(int userId);
 
-        public Task<User> GetUserByUsernameAsync(string userName);
+        public Task<Result<User>> GetUserByUsernameAsync(string userName);
 
-        public Task<User> RegisterUserAsync(User user);
+        public Task<Result<User>> RegisterUserAsync(User user);
 
-        public Task<UserProfile> GetUserProfileAsync(int userId);
+        public Task<Result<UserProfile>> GetUserProfileAsync(int userId);
 
-        public Task UpdateUserAsync(User user);
+        public Task<Result> UpdateUserAsync(User user);
 
-        public Task UpdateUserProfileAsync(UserProfile userProfile);
+        public Task<Result> UpdateUserProfileAsync(UserProfile userProfile);
 
-        public Task DeleteUserAsync(int userId);
+        public Task<Result> DeleteUserAsync(int userId);
+
+        public  Task<Result> AddFriendAsync(int userId, int contactId);
+
+        public  Task<List<User>> GetFriendsAsync(int userId);
+
+        public  Task<Result> RemoveFriendAsync(int userId, int contactId);
     }
 }

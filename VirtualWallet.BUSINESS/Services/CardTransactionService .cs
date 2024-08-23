@@ -1,7 +1,5 @@
-﻿using VirtualWallet.BUSINESS.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Repositories.Contracts;
@@ -11,7 +9,6 @@ namespace VirtualWallet.BUSINESS.Services
 {
     public class CardTransactionService : ICardTransactionService
     {
-
         private readonly ICardRepository _cardRepository;
         private readonly IWalletRepository _walletRepository;
         private readonly ITransactionHandlingService _transactionHandlingService;
@@ -25,42 +22,41 @@ namespace VirtualWallet.BUSINESS.Services
             _walletRepository = walletRepository;
             _transactionHandlingService = transactionHandlingService;
         }
-
-        public async Task<CardTransaction> DepositAsync(int cardId, int walletId, decimal amount)
+        public async Task<Result<CardTransaction>> DepositAsync(int cardId, int walletId, decimal amount)
         {
-            var card = await _cardRepository.GetCardByIdAsync(cardId);
-            var wallet = await _walletRepository.GetWalletByIdAsync(walletId);
+            var cardResult = await _cardRepository.GetCardByIdAsync(cardId);
+            if (cardResult == null)
+                return Result<CardTransaction>.Failure(ErrorMessages.CardNotFound);
 
-            if (card == null)
-                throw new EntityNotFoundException(ErrorMessages.CardNotFound);
-
-            if (wallet == null)
-                throw new EntityNotFoundException(ErrorMessages.WalletNotFound);
+            var walletResult = await _walletRepository.GetWalletByIdAsync(walletId);
+            if (walletResult == null)
+                return Result<CardTransaction>.Failure(ErrorMessages.WalletNotFound);
 
             if (amount <= 0)
-                throw new BadRequestException(ErrorMessages.InvalidDepositAmount);
+                return Result<CardTransaction>.Failure(ErrorMessages.InvalidDepositAmount);
 
-            return await _transactionHandlingService.ProcessCardToWalletTransactionAsync(card, wallet, amount);
+            var transactionResult = await _transactionHandlingService.ProcessCardToWalletTransactionAsync(cardResult, walletResult, amount);
+            return transactionResult;
         }
 
-        public async Task<CardTransaction> WithdrawAsync(int walletId, int cardId, decimal amount)
+        public async Task<Result<CardTransaction>> WithdrawAsync(int walletId, int cardId, decimal amount)
         {
-            var wallet = await _walletRepository.GetWalletByIdAsync(walletId);
-            var card = await _cardRepository.GetCardByIdAsync(cardId);
+            var walletResult = await _walletRepository.GetWalletByIdAsync(walletId);
+            if (walletResult == null)
+                return Result<CardTransaction>.Failure(ErrorMessages.WalletNotFound);
 
-            if (wallet == null)
-                throw new EntityNotFoundException(ErrorMessages.WalletNotFound);
-
-            if (card == null)
-                throw new EntityNotFoundException(ErrorMessages.CardNotFound);
+            var cardResult = await _cardRepository.GetCardByIdAsync(cardId);
+            if (cardResult == null) 
+                return Result<CardTransaction>.Failure(ErrorMessages.CardNotFound);
 
             if (amount <= 0)
-                throw new BadRequestException(ErrorMessages.InvalidWithdrawalAmount);
+                return Result<CardTransaction>.Failure(ErrorMessages.InvalidWithdrawalAmount);
 
-            if (wallet.Balance < amount)
-                throw new BadRequestException(ErrorMessages.InsufficientWalletFunds);
+            if (walletResult.Balance < amount)
+                return Result<CardTransaction>.Failure(ErrorMessages.InsufficientWalletFunds);
 
-            return await _transactionHandlingService.ProcessWalletToCardTransactionAsync(wallet, card, amount);
+            var transactionResult = await _transactionHandlingService.ProcessWalletToCardTransactionAsync(walletResult, cardResult, amount);
+            return transactionResult;
         }
     }
 }

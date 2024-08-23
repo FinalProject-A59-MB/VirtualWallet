@@ -4,15 +4,19 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using VirtualWallet.DATA.Repositories.Contracts;
+using System.Threading.Tasks;
+using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
+using VirtualWallet.DATA.Models;
+using VirtualWallet.DATA.Models.Enums;
+using VirtualWallet.DATA.Services.Contracts;
 
-public class RequireAuthorizationAttribute : Attribute, IAuthorizationFilter
+public class RequireAuthorizationAttribute : Attribute, IAsyncAuthorizationFilter
 {
     private readonly bool _requireAdmin;
     private readonly bool _checkIfBlocked;
     private IAuthService _authService;
-    private IUserRepository _userRepository;
+    private IUserService _userRepository;
 
     public RequireAuthorizationAttribute(bool requireAdmin = false, bool checkIfBlocked = false)
     {
@@ -20,10 +24,11 @@ public class RequireAuthorizationAttribute : Attribute, IAuthorizationFilter
         _checkIfBlocked = checkIfBlocked;
     }
 
-    public void OnAuthorization(AuthorizationFilterContext context)
+    public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
         _authService = context.HttpContext.RequestServices.GetService<IAuthService>();
-        _userRepository = context.HttpContext.RequestServices.GetService<IUserRepository>();
+        _userRepository = context.HttpContext.RequestServices.GetService<IUserService>();
+
         var token = context.HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
         if (token == null)
@@ -31,7 +36,8 @@ public class RequireAuthorizationAttribute : Attribute, IAuthorizationFilter
             token = context.HttpContext.Request.Cookies["jwt"];
         }
 
-        if (token == null || !_authService.ValidateToken(token))
+        var validateTokenResult = _authService.ValidateToken(token);
+        if (!validateTokenResult.IsSuccess)
         {
             HandleUnauthorizedRequest(context);
             return;
@@ -58,15 +64,16 @@ public class RequireAuthorizationAttribute : Attribute, IAuthorizationFilter
         var userId = int.Parse(userIdClaim.Value);
         var isAdmin = isAdminClaim != null;
 
-        var user = _userRepository.GetUserByIdAsync(userId);
-
-        if (user == null || (_requireAdmin && !isAdmin))
+        var userResult = await _userRepository.GetUserByIdAsync(userId);
+        if (!userResult.IsSuccess || (_requireAdmin && !isAdmin))
         {
             HandleUnauthorizedRequest(context);
             return;
         }
 
-        if (_checkIfBlocked)//TODO blocked logic
+        var user = userResult.Value;
+
+        if (_checkIfBlocked && user.Role == UserRole.Blocked)
         {
             HandleBlockedUserRequest(context);
             return;
