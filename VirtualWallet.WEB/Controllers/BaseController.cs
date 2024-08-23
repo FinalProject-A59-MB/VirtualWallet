@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VirtualWallet.DATA.Models;
-using VirtualWallet.BUSINESS.Results;
 
 namespace VirtualWallet.WEB.Controllers
 {

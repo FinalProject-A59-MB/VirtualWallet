@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace VirtualWallet.BUSINESS.Results
+﻿namespace VirtualWallet.BUSINESS.Results
 {
     public class Result
     {

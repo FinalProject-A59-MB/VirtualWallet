@@ -1,7 +1,4 @@
-﻿using SendGrid.Helpers.Mail;
-using SendGrid;
-
-namespace VirtualWallet.BUSINESS.Services.Contracts
+﻿namespace VirtualWallet.BUSINESS.Services.Contracts
 {
     public interface IEmailService
     {

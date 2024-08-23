@@ -1,9 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using VirtualWallet.BUSINESS.Services.Contracts;
-using VirtualWallet.DATA.Models;
-using VirtualWallet.BUSINESS.Results;
-using Microsoft.AspNetCore.Http;
 using VirtualWallet.DATA.Services.Contracts;
 
 namespace VirtualWallet.WEB.Middlewares

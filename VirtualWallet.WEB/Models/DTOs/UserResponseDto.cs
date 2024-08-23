@@ -1,7 +1,4 @@
-﻿using VirtualWallet.DATA.Models;
-using VirtualWallet.DATA.Models.Enums;
-
-namespace VirtualWallet.WEB.Models.DTOs
+﻿namespace VirtualWallet.WEB.Models.DTOs
 {
     public class UserResponseDto
     {

@@ -1,8 +1,5 @@
 using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
-using VirtualWallet.DATA;
 using VirtualWallet.WEB.Middlewares;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using VirtualWallet.BUSINESS.Services.Contracts;
@@ -12,8 +9,6 @@ using VirtualWallet.DATA.Services.Contracts;
 using VirtualWallet.DATA.Services;
 using VirtualWallet.BUSINESS.Services;
 using VirtualWallet.DATA.Context;
-using System.Net.Mail;
-using System.Net;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 

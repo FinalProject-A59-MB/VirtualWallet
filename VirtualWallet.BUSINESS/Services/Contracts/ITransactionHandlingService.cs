@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using VirtualWallet.DATA.Models.Enums;
-using VirtualWallet.DATA.Models;
+﻿using VirtualWallet.DATA.Models;
 using VirtualWallet.BUSINESS.Results;
 
 namespace VirtualWallet.BUSINESS.Services.Contracts

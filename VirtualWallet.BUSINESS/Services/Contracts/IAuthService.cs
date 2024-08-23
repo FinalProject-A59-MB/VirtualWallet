@@ -1,11 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Authentication;
-using System.Security.Claims;
-using System.Text;
-using VirtualWallet.BUSINESS.Resources;
-using VirtualWallet.BUSINESS.Results;
+﻿using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.DATA.Models;
 
 namespace VirtualWallet.BUSINESS.Services.Contracts

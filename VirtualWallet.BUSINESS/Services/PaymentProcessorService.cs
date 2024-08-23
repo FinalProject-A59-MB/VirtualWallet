@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using VirtualWallet.BUSINESS.Results;
+﻿using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Repositories.Contracts;

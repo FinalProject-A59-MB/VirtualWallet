@@ -1,6 +1,4 @@
-﻿using VirtualWallet.DATA.Models;
-
-namespace VirtualWallet.WEB.Models.ViewModels
+﻿namespace VirtualWallet.WEB.Models.ViewModels
 {
     public class UserViewModel
     {

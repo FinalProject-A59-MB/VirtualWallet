@@ -1,11 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SendGrid.Helpers.Mail;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VirtualWallet.DATA.Models;
+﻿using VirtualWallet.DATA.Models;
 
 namespace VirtualWallet.DATA.Repositories.Contracts
 {

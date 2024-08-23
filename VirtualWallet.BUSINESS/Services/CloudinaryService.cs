@@ -1,6 +1,5 @@
 ﻿using CloudinaryDotNet.Actions;
 using CloudinaryDotNet;
-using VirtualWallet.DATA.Repositories.Contracts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Http;
 using VirtualWallet.BUSINESS.Services.Contracts;
