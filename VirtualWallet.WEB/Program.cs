@@ -86,6 +86,7 @@ builder.Services.AddScoped<ITransactionHandlingService, TransactionHandlingServi
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IWalletService, WalletService>();
 builder.Services.AddScoped<IWalletTransactionService, WalletTransactionService>();
+builder.Services.AddScoped<ICurrencyService, CurrencyService>();
 
 builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
@@ -98,6 +99,9 @@ builder.Services.AddScoped<IDtoMapper, DtoMapper>();
 
 // Attributes
 builder.Services.AddScoped<RequireAuthorizationAttribute>();
+
+
+builder.Services.AddHttpClient<CurrencyService>();
 
 
 builder.Services.AddSwaggerGen(options =>

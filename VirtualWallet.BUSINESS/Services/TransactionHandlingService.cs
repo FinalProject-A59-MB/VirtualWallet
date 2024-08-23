@@ -16,6 +16,7 @@ namespace VirtualWallet.BUSINESS.Services
         private readonly ICardTransactionRepository _cardTransactionRepository;
         private readonly IWalletTransactionRepository _walletTransactionRepository;
         private readonly IPaymentProcessorService _paymentProcessorService;
+        private readonly ICurrencyService _currencyService;
 
         public TransactionHandlingService(
             ApplicationDbContext context,
@@ -23,7 +24,8 @@ namespace VirtualWallet.BUSINESS.Services
             IWalletRepository walletRepository,
             ICardTransactionRepository cardTransactionRepository,
             IWalletTransactionRepository walletTransactionRepository,
-            IPaymentProcessorService paymentProcessorService)
+            IPaymentProcessorService paymentProcessorService, 
+            ICurrencyService currencyService)
         {
             _context = context;
             _cardRepository = cardRepository;
@@ -31,6 +33,7 @@ namespace VirtualWallet.BUSINESS.Services
             _cardTransactionRepository = cardTransactionRepository;
             _walletTransactionRepository = walletTransactionRepository;
             _paymentProcessorService = paymentProcessorService;
+            _currencyService = currencyService;
         }
 
         public async Task<Result<CardTransaction>> ProcessCardToWalletTransactionAsync(Card card, Wallet wallet, decimal amount)
@@ -134,15 +137,28 @@ namespace VirtualWallet.BUSINESS.Services
                 }
 
                 senderWallet.Balance -= amount;
-                recipientWallet.Balance += amount;
+
+                decimal recipientAmount = amount;
+
+                if(recipientWallet.Currency != senderWallet.Currency)
+                {
+                    CurrencyExchangeRatesResponse rates = await _currencyService.GetRatesForCurrencyAsync(senderWallet.Currency);
+
+                    var rate = GetRate(rates, recipientWallet.Currency);
+
+                    recipientAmount = amount * rate;
+                }
+
+                recipientWallet.Balance += recipientAmount;
 
                 var walletTransaction = new WalletTransaction
                 {
                     SenderId = senderWallet.UserId,
                     RecipientId = recipientWallet.UserId,
-                    Amount = amount,
                     CreatedAt = DateTime.UtcNow,
-                    Status = TransactionStatus.Completed
+                    Status = TransactionStatus.Completed,
+                    Currency = recipientWallet.Currency,
+                    Amount = recipientAmount,
                 };
 
                 await _walletTransactionRepository.AddWalletTransactionAsync(walletTransaction);
@@ -159,6 +175,18 @@ namespace VirtualWallet.BUSINESS.Services
 
                 return Result<WalletTransaction>.Failure($"Transaction failed: {ex.Message}");
             }
+        }
+
+        private decimal GetRate(CurrencyExchangeRatesResponse response, CurrencyType currencyType)
+        {
+            string currencyKey = currencyType.ToString(); 
+
+            if (response.Data.TryGetValue(currencyKey, out decimal rate))
+            {
+                return rate;
+            }
+
+            throw new Exception("Currency not found!");
         }
     }
 }

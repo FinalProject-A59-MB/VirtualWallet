@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.WEB.Models;
 using VirtualWallet.WEB.Models.ViewModels;
 
@@ -14,7 +15,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             return View();
         }
