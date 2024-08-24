@@ -4,7 +4,7 @@ using VirtualWallet.DATA.Models;
 
 namespace VirtualWallet.WEB.Controllers.MVC
 {
-    public class WalletTransactionController : Controller
+    public class WalletTransactionController : BaseController
     {
         private readonly ITransactionHandlingService _transactionHandlingService;
 

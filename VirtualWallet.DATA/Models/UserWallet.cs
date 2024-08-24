@@ -13,6 +13,7 @@ namespace VirtualWallet.DATA.Models
 
         public UserWalletRole Role { get; set; }
         public DateTime JoinedDate { get; set; }
+
     }
 
 

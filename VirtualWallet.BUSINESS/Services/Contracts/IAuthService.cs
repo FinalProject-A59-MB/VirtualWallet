@@ -7,6 +7,8 @@ namespace VirtualWallet.BUSINESS.Services.Contracts
     {
         public Task<Result<User>> AuthenticateAsync(string identifier, string password);
 
+        public Task<Result> ResetPasswordAsync(string email, string token, string newPassword);
+
         public string GenerateToken(User user);
 
         public Result<bool> ValidateToken(string token);

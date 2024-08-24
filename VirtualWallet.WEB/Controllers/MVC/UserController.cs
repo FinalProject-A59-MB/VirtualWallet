@@ -5,6 +5,7 @@ using VirtualWallet.DATA.Services.Contracts;
 using VirtualWallet.WEB.Controllers;
 using VirtualWallet.WEB.Models.ViewModels;
 using VirtualWallet.DATA.Models.Enums;
+using VirtualWallet.BUSINESS.Services;
 
 namespace ForumProject.Controllers.MVC
 {
@@ -14,17 +15,20 @@ namespace ForumProject.Controllers.MVC
         private readonly IViewModelMapper _modelMapper;
         private readonly IWalletService _walletService;
         private readonly ICloudinaryService _cloudinaryService;
+        private readonly IAuthService _authService;
 
         public UserController(
             IUserService userService,
             IViewModelMapper modelMapper, 
             IWalletService walletService,
-            ICloudinaryService cloudinaryService)
+            ICloudinaryService cloudinaryService,
+            IAuthService authService)
         {
             _userService = userService;
             _modelMapper = modelMapper;
             _walletService = walletService;
             _cloudinaryService = cloudinaryService;
+            _authService = authService;
         }
 
         [RequireAuthorization]
@@ -45,21 +49,26 @@ namespace ForumProject.Controllers.MVC
 
         [RequireAuthorization]
         [HttpPost]
-        public async Task<IActionResult> UpdateProfile(UserProfileViewModel user, IFormFile profilePicture)
+        public async Task<IActionResult> UpdateProfile(UserProfileViewModel userProfilemodel)
         {
             if (!ModelState.IsValid)
             {
-                return View("EditProfile", user);
+                return View("EditProfile", userProfilemodel);
             }
-            if (profilePicture != null)
+            var username = userProfilemodel.UserName;
+            if (userProfilemodel.file != null)
             {
-                var imageUrl = _cloudinaryService.UploadProfilePicture(profilePicture);
-                user.PhotoUrl = imageUrl;
+                var imageUrl = _cloudinaryService.UploadProfilePicture(userProfilemodel.file);
+                userProfilemodel.PhotoUrl = imageUrl;
             }
-
-            var userProfile = _modelMapper.ToUserProfile(user);
-            await _userService.UpdateUserProfileAsync(userProfile);
-
+            var userProfil = _modelMapper.ToUserProfile(userProfilemodel);
+            var userResult = await _userService.GetUserByIdAsync(userProfilemodel.UserId);
+            var user = userResult.Value;
+            user.UserProfile = userProfil;
+            user.Username = username;
+            await _userService.UpdateUserAsync(user);
+            var token = _authService.GenerateToken(user);
+            HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
             return RedirectToAction("Profile");
         }
 
@@ -128,7 +137,7 @@ namespace ForumProject.Controllers.MVC
             var user = await _userService.GetUserByIdAsync(userId);
             if (user == null || !user.IsSuccess)
             {
-                TempData["ErrorMessage"] = "User not found.";
+                TempData["ErrorMessage"] = user.Error;
                 return RedirectToAction("ManageUsers");
             }
 

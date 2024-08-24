@@ -36,6 +36,7 @@ public class ViewModelMapper : IViewModelMapper
     {
         return new UserProfile
         {
+            
             FirstName = model.FirstName,
             LastName = model.LastName,
             PhoneNumber = model.PhoneNumber,

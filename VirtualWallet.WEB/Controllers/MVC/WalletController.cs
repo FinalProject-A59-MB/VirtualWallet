@@ -5,7 +5,7 @@ using VirtualWallet.WEB.Models.DTOs;
 
 namespace VirtualWallet.WEB.Controllers.MVC
 {
-    public class WalletController : Controller
+    public class WalletController : BaseController
     { 
         private readonly IWalletService _walletService;
         private readonly IDtoMapper _dtoMapper;

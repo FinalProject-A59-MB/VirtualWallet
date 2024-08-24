@@ -2,7 +2,7 @@
 
 namespace VirtualWallet.WEB.Controllers
 {
-    public class ErrorController : Controller
+    public class ErrorController : BaseController
     {
         
         public IActionResult Index(int? statusCode = null, string message = null)

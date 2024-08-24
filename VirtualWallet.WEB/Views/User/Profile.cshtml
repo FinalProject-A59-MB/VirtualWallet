@@ -7,6 +7,13 @@
 
 <div class="card mb-4 w-75 mx-auto">
     <div class="card-body">
+        <div class="d-flex justify-content-between">
+            <h2 class="text-center">Profile</h2>
+            <form asp-controller="Authentication" asp-action="Logout" method="post">
+                <button type="submit" class="btn btn-danger">Logout</button>
+            </form>
+        </div>
+
         <ul class="nav nav-tabs" id="profileTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <a class="nav-link active" id="profile-details-tab" data-bs-toggle="tab" href="#profile-details" role="tab" aria-controls="profile-details" aria-selected="true">Profile Details</a>

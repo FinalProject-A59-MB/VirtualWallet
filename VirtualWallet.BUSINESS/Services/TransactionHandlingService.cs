@@ -1,5 +1,6 @@
 ﻿using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
+using VirtualWallet.BUSINESS.Services.Responses;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Repositories.Contracts;

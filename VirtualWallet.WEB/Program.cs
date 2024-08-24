@@ -132,8 +132,8 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 // Custom middlewares
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-app.UseMiddleware<CurrentUserMiddleware>();
+
+
 
 // Data Seeding
 using (var scope = app.Services.CreateScope())
@@ -150,6 +150,15 @@ app.UseRouting();
 // JWT authentication
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseMiddleware<CurrentUserMiddleware>();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.UseCookiePolicy(new CookiePolicyOptions
+{
+    MinimumSameSitePolicy = SameSiteMode.Lax,
+});
+
 
 // troubleshooting
 app.UseDeveloperExceptionPage();

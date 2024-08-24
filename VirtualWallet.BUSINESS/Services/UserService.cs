@@ -85,6 +85,16 @@ namespace VirtualWallet.DATA.Services
             return Result<User>.Success(user);
         }
 
+        public async Task<Result<User>> GetUserByEmailAsync(string userName)
+        {
+            var user = await _userRepository.GetUserByEmailAsync(userName);
+            if (user == null)
+            {
+                return Result<User>.Failure("User not found.");
+            }
+            return Result<User>.Success(user);
+        }
+
         public async Task<Result<UserProfile>> GetUserProfileAsync(int userId)
         {
             var userProfile = await _userRepository.GetUserProfileAsync(userId);

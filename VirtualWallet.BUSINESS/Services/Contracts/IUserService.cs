@@ -10,6 +10,8 @@ namespace VirtualWallet.DATA.Services.Contracts
 
         public Task<Result<User>> GetUserByUsernameAsync(string userName);
 
+        public Task<Result<User>> GetUserByEmailAsync(string userName);
+
         public Task<Result<User>> RegisterUserAsync(User user);
 
         public Task<Result<UserProfile>> GetUserProfileAsync(int userId);

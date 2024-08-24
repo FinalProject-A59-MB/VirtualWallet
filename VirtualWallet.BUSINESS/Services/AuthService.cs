@@ -9,6 +9,7 @@ using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Helpers;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Repositories.Contracts;
+using VirtualWallet.DATA.Services.Contracts;
 
 namespace VirtualWallet.BUSINESS.Services
 {
@@ -16,11 +17,13 @@ namespace VirtualWallet.BUSINESS.Services
     {
         private readonly IConfiguration _configuration;
         private readonly IUserRepository _userRepository;
+        private readonly IUserService _userService;
 
-        public AuthService(IConfiguration configuration, IUserRepository userRepository)
+        public AuthService(IConfiguration configuration, IUserRepository userRepository, IUserService userService)
         {
             _configuration = configuration;
             _userRepository = userRepository;
+            _userService = userService;
         }
 
         public async Task<Result<User>> AuthenticateAsync(string identifier, string password)
@@ -32,6 +35,32 @@ namespace VirtualWallet.BUSINESS.Services
                 return Result<User>.Failure(ErrorMessages.InvalidCredentials);
 
             return Result<User>.Success(user);
+        }
+
+        public async Task<Result> ResetPasswordAsync(string email, string token, string newPassword)
+        {
+            var validateTokenResult = ValidateToken(token);
+            if (!validateTokenResult.IsSuccess)
+            {
+                return Result.Failure(validateTokenResult.Error);
+            }
+
+            var userResult = await _userService.GetUserByEmailAsync(email);
+            if (!userResult.IsSuccess)
+            {
+                return Result.Failure("Invalid email.");
+            }
+
+            var user = userResult.Value;
+            user.Password = PasswordHasher.HashPassword(newPassword);
+
+            var updateResult = await _userService.UpdateUserAsync(user);
+            if (!updateResult.IsSuccess)
+            {
+                return Result.Failure("Password reset failed.");
+            }
+
+            return Result.Success();
         }
 
         public string GenerateToken(User user)
