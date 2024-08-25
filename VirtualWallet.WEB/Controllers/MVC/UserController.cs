@@ -39,6 +39,30 @@ namespace ForumProject.Controllers.MVC
         }
 
         [RequireAuthorization]
+        public async Task<IActionResult> Dashboard()
+        {
+            var userId = CurrentUser.Id;
+            var user = await _userService.GetUserByIdAsync(userId);
+            var wallets = user.Value.Wallets;
+
+            var dashboardViewModel = new DashboardViewModel
+            {
+                User = _modelMapper.ToUserViewModel(user.Value),
+                TotalBalance = wallets.Sum(w => w.Balance),
+                Wallets = wallets.Select(w => new WalletViewModel
+                {
+                    Currency = w.Currency,
+                    Balance = w.Balance,
+                    Name= w.Name,
+                    Id = w.Id
+                }).ToList()
+            };
+
+            return View(dashboardViewModel);
+        }
+
+
+        [RequireAuthorization]
         public IActionResult EditProfile()
         {
             var profile = _modelMapper.ToUserProfileViewModel(CurrentUser.UserProfile);
@@ -108,9 +132,9 @@ namespace ForumProject.Controllers.MVC
         public async Task<IActionResult> BlockUser(int userId, string reason)
         {
             var user = await _userService.GetUserByIdAsync(userId);
-            if (user == null || !user.IsSuccess)
+            if (!user.IsSuccess)
             {
-                TempData["ErrorMessage"] = "User not found.";
+                TempData["ErrorMessage"] = user.Error;
                 return RedirectToAction("ManageUsers");
             }
 

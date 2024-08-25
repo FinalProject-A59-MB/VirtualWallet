@@ -1,0 +1,14 @@
+﻿@model UserViewModel
+
+<div class="cards-list">
+    @foreach (var card in Model.Cards)
+    {
+        <div class="s">
+            <div class=" ">
+                <h5 class="card-title">Card Information</h5>
+                <h5>@card.CardNumber - @card.Issuer</h5>
+            </div>
+        </div>
+        
+    }
+</div>

@@ -77,7 +77,7 @@ namespace VirtualWallet.DATA.Context
                         Username = $"user{i}a",
                         Password = PasswordHasher.HashPassword("password"),
                         Email = $"user{i}a@example.com",
-                        Role = i % 2 == 0 ? UserRole.VerifiedUser : UserRole.VerificationStaff,
+                        Role = i % 2 == 0 ? UserRole.VerifiedUser : UserRole.Staff,
                         VerificationStatus = UserVerificationStatus.Verified,
                         PhotoIdUrl = "test",
                         FaceIdUrl = "test",

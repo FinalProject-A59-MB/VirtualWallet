@@ -1,0 +1,121 @@
+﻿@model DashboardViewModel
+
+<div class="dashboard-area bg-dark text-white py-4">
+    <div class="container">
+        @* <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card bg-primary text-center p-4">
+                    <img src="@Model.User.UserProfile.PhotoUrl" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 80px; height: 80px;">
+                    <span class="pro-name">@Model.User.UserProfile.FirstName @Model.User.UserProfile.LastName</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-primary text-center p-4">
+                    <div class="amount-content">
+                        <i class="flaticon-028-money display-4"></i>
+                        <span class="pro-name d-block mt-2">Balance: $@Model.Wallets.Sum(w => w.Balance)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-primary text-center p-4">
+                    <div class="amount-content">
+                        <a class="edit-icon float-end" href="@Url.Action("AddBankAccount", "User")">
+                            <i class="ti-pencil-alt text-white"></i>
+                        </a>
+                        <i class="flaticon-043-bank-2 display-4"></i>
+                        <span class="pro-name d-block mt-2">Bank Account</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card bg-primary text-center p-4">
+                    <div class="amount-content">
+                        <a class="edit-icon float-end" href="@Url.Action("ManageCards", "User")">
+                            <i class="ti-pencil-alt text-white"></i>
+                        </a>
+                        <i class="flaticon-050-credit-card-2 display-4"></i>
+                        <span class="pro-name d-block mt-2">Card Number</span>
+                    </div>
+                </div>
+            </div>
+            @foreach (var wallet in Model.Wallets)
+            {
+                <div class="col-md-4">
+                    <div class="card bg-primary text-center p-4">
+                        <div class="currency-text">
+                            <span class="c-country d-block mb-2">@wallet.Currency</span>
+                            <span class="c-money display-4">@wallet.Balance</span>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div> *@
+
+        <div class="row">
+            <div class="col-md-3">
+                <aside class="sidebar">
+                    <div class="dashboard-side p-3 bg-dark rounded shadow-sm">
+                        <ul class="nav flex-column">
+                            @* <li class="nav-item active mb-2">
+                                <a class="nav-link text-white rounded" href="@Url.Action("Dashboard", "User")">
+                                    <i class="ti-dashboard me-2"></i> Dashboard
+                                </a>
+                            </li> *@
+                            <li class="nav-item mb-2">
+                                <a class="nav-link text-white rounded" href="@Url.Action("SendMoney", "Transaction")">
+                                    <i class="ti-new-window me-2"></i> Send Money
+                                </a>
+                            </li>
+                            <li class="nav-item mb-2">
+                                <a class="nav-link text-white rounded" href="@Url.Action("RequestMoney", "Transaction")">
+                                    <i class="ti-receipt me-2"></i> Request Money
+                                </a>
+                            </li>
+                            <li class="nav-item mb-2">
+                                <a class="nav-link text-white rounded" href="#" data-url="@Url.Action("Deposit", "Card")" onclick="loadContent(this)">
+                                    <i class="ti-wallet me-2"></i> Deposit Money
+                                </a>
+                            </li>
+                            <li class="nav-item mb-2">
+                                <a class="nav-link text-white rounded" href="#" data-url="@Url.Action("Withdraw", "Card")" onclick="loadContent(this)">
+                                    <i class="ti-import me-2"></i> Withdraw Money
+                                </a>
+                            </li>
+                            <li class="nav-item mb-2">
+                                <a class="nav-link text-white rounded" href="#" data-url="@Url.Action("Wallets", "Wallet")" onclick="loadContent(this)">
+                                    <i class="ti-pencil-alt me-2"></i> Wallets
+                                </a>
+                            </li>
+                            <li class="nav-item mb-2">
+                                <a class="nav-link text-white rounded" href="#" data-url="@Url.Action("Cards", "Card")" onclick="loadContent(this)">
+                                    <i class="ti-credit-card me-2"></i> Cards
+                                </a>
+                            </li>
+
+                            <li class="nav-item mb-2">
+                                <a class="nav-link text-white rounded" href="@Url.Action("TransactionLog", "Transaction")">
+                                    <i class="ti-layout-list-thumb me-2"></i> Transaction Log
+                                </a>
+                            </li>
+                            <li class="nav-item mb-2">
+                                <a class="nav-link text-white rounded" href="@Url.Action("Settings", "User")">
+                                    <i class="ti-settings me-2"></i> Settings
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </aside>
+            </div>
+
+            <div class="col-md-9">
+                <div id="dashboard-content" class="dashboard-content p-4 rounded shadow-sm">
+                           @* loading partial view based on the link that is cliicked from the dashboard *@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

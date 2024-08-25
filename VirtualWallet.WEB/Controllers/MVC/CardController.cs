@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Services.Contracts;
+using VirtualWallet.WEB.Models.ViewModels;
 
 namespace VirtualWallet.WEB.Controllers.MVC
 {
@@ -93,11 +95,6 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 CurrentUser.MainWallet = wallet;
 
                 var walletResult = await _walletService.AddWalletAsync(wallet);
-                //if (!walletResult.IsSuccess) TODO => UPDATE TO USE RESULT PATTERN
-                //{
-                //    TempData["ErrorMessage"] = walletResult.Error;
-                //    return View("AddCard", model);
-                //}
 
                 CurrentUser.Wallets.Add(wallet);
             }
@@ -132,6 +129,42 @@ namespace VirtualWallet.WEB.Controllers.MVC
             }
 
             return RedirectToAction("Profile", "User");
+        }
+
+        [RequireAuthorization]
+        public async Task<IActionResult> Cards()
+        {
+            var user = CurrentUser;
+            var viewModel = _viewModelMapper.ToUserViewModel(user);
+
+            return PartialView("_UserCardsPartial", viewModel);
+        }
+
+        [HttpGet]
+        public IActionResult Deposit()
+        {
+            var model = new CardTransactionViewModel
+            {
+                ActionTitle = "Deposit Money",
+                FormAction = "Deposit",
+                Wallets = CurrentUser.Wallets,
+                Cards = CurrentUser.Cards
+            };
+
+            return PartialView("_CardTransactionFormPartial", model);
+        }
+        [HttpGet]
+        public IActionResult Withdraw()
+        {
+            var model = new CardTransactionViewModel
+            {
+                ActionTitle = "Withdraw Money",
+                FormAction = "Withdraw",
+                Wallets = CurrentUser.Wallets,
+                Cards = CurrentUser.Cards
+            };
+
+            return PartialView("_CardTransactionFormPartial", model);
         }
     }
 }

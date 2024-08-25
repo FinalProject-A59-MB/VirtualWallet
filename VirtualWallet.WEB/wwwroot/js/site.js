@@ -8,3 +8,12 @@ $(document).ready(function () {
     $('#errorModal').modal({
     }).modal('show');
 });
+
+function loadContent(element) {
+    var url = $(element).data("url");
+    $.get(url, function (data) {
+        $('#dashboard-content').html(data);
+    }).fail(function () {
+        $('#dashboard-content').html('<div class="alert alert-danger">Failed to load content.</div>');
+    });
+}

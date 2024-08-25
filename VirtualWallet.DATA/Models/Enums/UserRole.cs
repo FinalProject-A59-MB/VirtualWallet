@@ -6,7 +6,7 @@
         EmailVerifiedUser, 
         PendingVerification, 
         VerifiedUser, 
-        VerificationStaff, 
+        Staff, 
         Admin,
         Blocked
     }

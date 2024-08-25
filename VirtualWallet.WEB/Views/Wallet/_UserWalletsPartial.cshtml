@@ -1,0 +1,10 @@
+﻿@model UserViewModel
+
+<div class="wallets-list">
+    @foreach (var wallet in Model.Wallets)
+    {
+        <div class="wallet-item">
+            <h5>@wallet.Name - @wallet.Balance @wallet.Currency</h5>
+        </div>
+    }
+</div>

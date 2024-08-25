@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VirtualWallet.DATA.Models;
+using VirtualWallet.DATA.Services;
 using VirtualWallet.DATA.Services.Contracts;
 using VirtualWallet.WEB.Models.DTOs;
+using VirtualWallet.WEB.Models.ViewModels;
 
 namespace VirtualWallet.WEB.Controllers.MVC
 {
@@ -9,11 +11,23 @@ namespace VirtualWallet.WEB.Controllers.MVC
     { 
         private readonly IWalletService _walletService;
         private readonly IDtoMapper _dtoMapper;
+        private readonly IViewModelMapper _viewModelMapper;
 
-        public WalletController(IWalletService walletService, IDtoMapper dtoMapper)
+        public WalletController(IWalletService walletService, IDtoMapper dtoMapper, IViewModelMapper viewModelMapper)
         {
             _walletService = walletService;
             _dtoMapper = dtoMapper;
+            _viewModelMapper = viewModelMapper;
+        }
+
+        [RequireAuthorization]
+        public async Task<IActionResult> Wallets()
+        {
+            var user = CurrentUser;
+
+            var userViewModel = _viewModelMapper.ToUserViewModel(user);
+
+            return PartialView("_UserWalletsPartial", userViewModel);
         }
 
 
