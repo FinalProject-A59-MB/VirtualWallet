@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Services.Contracts;
 using VirtualWallet.WEB.Models.DTOs;
@@ -20,8 +21,8 @@ namespace VirtualWallet.WEB.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Index(int id)
         {
-            Wallet wallet = await _walletService.GetWalletByIdAsync(id);
-            return View(wallet);
+            var wallet = await _walletService.GetWalletByIdAsync(id);
+            return View(wallet.Value);
         }
 
         [HttpGet]

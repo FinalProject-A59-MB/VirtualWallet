@@ -130,11 +130,6 @@ namespace VirtualWallet.BUSINESS.Services
 
             try
             {
-                if (senderWallet.Balance < amount)
-                {
-                    return Result<WalletTransaction>.Failure("Insufficient funds in the sender's wallet.");
-                }
-
                 senderWallet.Balance -= amount;
 
                 decimal recipientAmount = amount;

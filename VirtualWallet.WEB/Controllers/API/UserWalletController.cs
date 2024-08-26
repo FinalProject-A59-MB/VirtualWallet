@@ -16,56 +16,45 @@ namespace VirtualWallet.WEB.Controllers.API
         }
 
 
-        [HttpGet("{userId}")]
+        [HttpGet]
         public async Task<IActionResult> GetUserWalletsByUserId(int userId)
         {
-            var wallets = await _userWalletService.GetUserWalletsByUserIdAsync(userId);
+            var result = await _userWalletService.GetUserWalletsByUserIdAsync(userId);
 
-            if (wallets == null)
+            if (!result.IsSuccess)
             {
-                return NotFound($"User with id {userId} has no wallets.");
+                return NotFound(result.Error);
             }
 
-            return Ok(wallets);
+            return Ok(result);
         }
 
-        [HttpGet("{walletId}")]
+        [HttpGet]
         public async Task<IActionResult> GetUserWalletByWalletId(int walletId)
         {
-            var wallet = await _userWalletService.GetUserWalletByWalletIdAsync(walletId);
+            var result = await _userWalletService.GetUserWalletByWalletIdAsync(walletId);
 
-            if (wallet == null)
+            if (!result.IsSuccess)
             {
-                return NotFound($"Wallet with id {walletId} doesn't exist.");
+                return NotFound(result.Error);
             }
 
-            return Ok(wallet);
+            return Ok(result);
         }
 
-        [HttpPost("")]
-        public async Task<IActionResult> AddUserWallet([FromBody] UserWallet userWallet)
+        [HttpPost]
+        public async Task<IActionResult> AddUserWallet(int walletId, int userId)
         {
-            var user = (User)HttpContext.Items["User"];
+            await _userWalletService.AddUserWalletAsync(walletId, userId);
 
-            userWallet.UserId = user.Id;
-
-            await _userWalletService.AddUserWalletAsync(userWallet);
-
-            return CreatedAtAction(nameof(AddUserWallet), userWallet);
+            return Ok("User added successfully!");
         }
 
-        [HttpDelete("{walletId}")]
-        public async Task<IActionResult> RemoveUserWallet(int walletId)
+        [HttpDelete]
+        public async Task<IActionResult> RemoveUserWallet(int walletId, int userId)
         {
-            var wallet = await _userWalletService.GetUserWalletByWalletIdAsync(walletId);
-
-            if (wallet == null)
-            {
-                return NotFound($"Wallet with ID {walletId} not found.");
-            }
-
-            await _userWalletService.RemoveUserWalletAsync(walletId);
-            return Ok("Wallet removed successfully!");
+            await _userWalletService.RemoveUserWalletAsync(walletId, userId);
+            return Ok("User removed successfully!");
         }
     }
 }

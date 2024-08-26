@@ -1,33 +1,34 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
+using VirtualWallet.DATA.Services.Contracts;
 
 namespace VirtualWallet.WEB.Controllers.MVC
 {
     public class WalletTransactionController : BaseController
     {
-        private readonly ITransactionHandlingService _transactionHandlingService;
+        private readonly IWalletTransactionService _walletTransactionService;
 
-        public WalletTransactionController(ITransactionHandlingService transactionHandlingService)
+        public WalletTransactionController(IWalletTransactionService walletTransactionService)
         {
-            _transactionHandlingService = transactionHandlingService;
+            _walletTransactionService = walletTransactionService;
         }
 
 
         [HttpGet]
         [RequireAuthorization]
-        public IActionResult Add()
+        public IActionResult Deposit()
         {
             return View();
         }
 
         [HttpPost]
         [RequireAuthorization]
-        public async Task<IActionResult> Add(Wallet senderWallet, Wallet recipientWallet, decimal amount)
+        public async Task<IActionResult> Deposit(int senderWalletId, int recipientWalletId, decimal amount)
         {
-            var transaction = await _transactionHandlingService.ProcessWalletToWalletTransactionAsync(senderWallet, recipientWallet, amount);
+            await _walletTransactionService.DepositAsync(senderWalletId, recipientWalletId, amount);
 
-            return RedirectToAction("Index", "Wallet", new { id = senderWallet.Id });
+            return RedirectToAction("Index", "Wallet", new { id = senderWalletId});
         }
     }
 }

@@ -180,6 +180,12 @@
   <data name="InvalidDepositAmount" xml:space="preserve">
     <value>The deposit amount must be greater than zero.</value>
   </data>
+  <data name="InvalidUserInformation" xml:space="preserve">
+    <value>Invalid user information.</value>
+  </data>
+  <data name="InvalidWalletInformation" xml:space="preserve">
+    <value>Invalid wallet information.</value>
+  </data>
   <data name="InvalidWithdrawalAmount" xml:space="preserve">
     <value>The withdrawal amount must be greater than zero.</value>
   </data>
@@ -203,6 +209,9 @@
   </data>
   <data name="UnauthorizedTask" xml:space="preserve">
     <value>You are not authorized to perform this task.</value>
+  </data>
+  <data name="UserIsAlreadyAddedToWallet" xml:space="preserve">
+    <value>User is already added to wallet.</value>
   </data>
   <data name="UsernameTaken" xml:space="preserve">
     <value>Username '{0}' is already taken.</value>
