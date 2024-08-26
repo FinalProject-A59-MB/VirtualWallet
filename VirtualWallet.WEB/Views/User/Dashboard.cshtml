@@ -77,12 +77,12 @@
                             </li>
                             <li class="nav-item mb-2">
                                 <a class="nav-link text-white rounded" href="#" data-url="@Url.Action("Deposit", "Card")" onclick="loadContent(this)">
-                                    <i class="ti-wallet me-2"></i> Deposit Money
+                                    <i class="ti-wallet me-2"></i> Deposit to Wallet
                                 </a>
                             </li>
                             <li class="nav-item mb-2">
                                 <a class="nav-link text-white rounded" href="#" data-url="@Url.Action("Withdraw", "Card")" onclick="loadContent(this)">
-                                    <i class="ti-import me-2"></i> Withdraw Money
+                                    <i class="ti-import me-2"></i> Withdraw from Wallet
                                 </a>
                             </li>
                             <li class="nav-item mb-2">
@@ -113,7 +113,7 @@
 
             <div class="col-md-9">
                 <div id="dashboard-content" class="dashboard-content p-4 rounded shadow-sm">
-                           @* loading partial view based on the link that is cliicked from the dashboard *@
+                    @Html.Raw(Model.PartialViewContent);
                 </div>
             </div>
         </div>

@@ -1,0 +1,75 @@
+﻿@model VirtualWallet.WEB.Models.ViewModels.TransactionLogViewModel
+
+<div class="container">
+    <h2>Transaction Logs</h2>
+
+    <div class="btn-group" role="group" aria-label="Transaction Type">
+        <a href="@Url.Action("CardTransactions", "Card")" class="btn btn-primary @(Model.SelectedTransactionType == "Card" ? "active" : "")">
+            Card Transactions
+        </a>
+        <a href="@Url.Action("WalletTransactions", "Wallet")" class="btn btn-primary @(Model.SelectedTransactionType == "Wallet" ? "active" : "")">
+            Wallet Transactions
+        </a>
+    </div>
+
+    @if (Model.SelectedTransactionType == "Card")
+    {
+        <form method="get" action="@Url.Action("CardTransactions", "Card")" class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search Card Transactions" name="searchQuery" value="@Model.SearchQuery">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var transaction in Model.CardTransactions)
+                    {
+                        <tr>
+                            <td>@transaction.CreatedAt.ToString("MMM dd, yyyy")</td>
+                            <td>@transaction.Amount.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else if (Model.SelectedTransactionType == "Wallet")
+    {
+        <form method="get" action="@Url.Action("WalletTransactions", "Wallet")" class="form-inline my-2 my-lg-0">
+            <input class="form-control mr-sm-2" type="search" placeholder="Search Wallet Transactions" name="searchQuery" value="@Model.SearchQuery">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @* @foreach (var transaction in Model.WalletTransactions)
+                    {
+                        <tr>
+                            <td>@transaction.Date.ToString("MMM dd, yyyy")</td>
+                            <td>@transaction.Description</td>
+                            <td>@transaction.Status</td>
+                            <td>@transaction.Amount.ToString("C")</td>
+                        </tr>
+                    } *@
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

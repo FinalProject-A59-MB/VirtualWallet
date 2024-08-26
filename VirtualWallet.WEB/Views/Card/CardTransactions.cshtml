@@ -1,43 +1,35 @@
-﻿@model CardTransactionViewModel
+﻿@model IEnumerable<CardTransactionViewModel>
 
-<div class="card mb-4 w-50 mx-auto">
-    <div class="card-body">
-        <ul class="nav nav-tabs" id="transactionTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <a class="nav-link active" id="deposit-tab" data-bs-toggle="tab" href="#deposit" role="tab" aria-controls="deposit" aria-selected="true">Deposit</a>
-            </li>
-            <li class="nav-item" role="presentation">
-                <a class="nav-link" id="withdraw-tab" data-bs-toggle="tab" href="#withdraw" role="tab" aria-controls="withdraw" aria-selected="false">Withdraw</a>
-            </li>
-        </ul>
-
-        <div class="tab-content" id="transactionTabsContent">
-            <!-- Deposit Tab -->
-            <div class="tab-pane fade show active" id="deposit" role="tabpanel" aria-labelledby="deposit-tab">
-                <form asp-action="Deposit" method="post">
-                    @Html.HiddenFor(model => model.CardId)
-                    @Html.HiddenFor(model => model.WalletId)
-                    <div class="form-group">
-                        <label asp-for="Amount"></label>
-                        <input asp-for="Amount" class="form-control" />
-                        <span asp-validation-for="Amount" class="text-danger"></span>
+<div class="col-md-9 col-sm-9 col-xs-12">
+    <div class="dashboard-content">
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="send-money-form transection-log">
+                    <div class="form-text">
+                        <h4 class="form-top">Card Transactions Log</h4>
+                        <div class="form-inner table-inner">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                        <th>Status</th>
+                                        <th>Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var transaction in Model)
+                                    {
+                                        <tr>
+                                            <td>@transaction.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                            <td>@transaction.Amount.ToString("C")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary mt-3">Deposit</button>
-                </form>
-            </div>
-
-            <!-- Withdraw Tab -->
-            <div class="tab-pane fade" id="withdraw" role="tabpanel" aria-labelledby="withdraw-tab">
-                <form asp-action="Withdraw" method="post">
-                    @Html.HiddenFor(model => model.CardId)
-                    @Html.HiddenFor(model => model.WalletId)
-                    <div class="form-group">
-                        <label asp-for="Amount"></label>
-                        <input asp-for="Amount" class="form-control" />
-                        <span asp-validation-for="Amount" class="text-danger"></span>
-                    </div>
-                    <button type="submit" class="btn btn-primary mt-3">Withdraw</button>
-                </form>
+                </div>
             </div>
         </div>
     </div>

@@ -14,5 +14,7 @@ namespace VirtualWallet.BUSINESS.Services.Contracts
         public Task<Result> DeleteCardAsync(int cardId);
 
         public Task<Result> UpdateCardAsync(Card card);
+
+        public Task<Result<IEnumerable<CardTransaction>>> GetCardTransactionsByUserIdAsync(int userId);
     }
 }

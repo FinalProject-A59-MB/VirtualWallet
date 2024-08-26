@@ -1,0 +1,48 @@
+﻿@model CardTransactionViewModel
+
+<div class="dashboard-content">
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="send-money-form">
+                <div class="form-text">
+                    <h4 class="form-top">@Model.ActionTitle</h4>
+                    <div class="form-inner">
+                        <form asp-action="@Model.FormAction" method="post">
+                            <input type="hidden" name="ActionTitle" value="@Model.ActionTitle" />
+                            <input type="hidden" name="FormAction" value="@Model.FormAction" />
+                            <div class="col">
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <label for="amount">Type Amount</label>
+                                    <input type="number" value="0" id="amount" name="Amount" class="form-control" />
+                                </div>
+                                <div class="col-md-6 col-sm-6 col-xs-12">
+                                    <label for="wallet">Select Wallet</label>
+                                    <select name="WalletId" id="wallet" class="form-control">
+                                        @foreach (var wallet in ViewBag.Wallets)
+                                        {
+                                            <option value="@wallet.Id">@wallet.Name (@wallet.Currency)</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col mt-3">
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <label for="card">Select Card</label>
+                                        <select name="CardId" id="card" class="form-control">
+                                            @foreach (var card in ViewBag.Cards)
+                                            {
+                                                <option value="@card.Id">@card.CardNumber</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 col-sm-6 col-xs-12">
+                                        <button type="submit" class="btn btn-primary mt-4">Submit</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

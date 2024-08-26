@@ -94,6 +94,12 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(ct => ct.WalletId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        modelBuilder.Entity<CardTransaction>()
+            .HasOne(ct => ct.User)
+            .WithMany()
+            .HasForeignKey(ct => ct.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         modelBuilder.Entity<Card>()
             .HasMany(c => c.CardTransactions)
             .WithOne(ct => ct.Card)

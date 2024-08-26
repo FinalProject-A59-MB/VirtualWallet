@@ -38,29 +38,6 @@ namespace ForumProject.Controllers.MVC
             return View(profile);
         }
 
-        [RequireAuthorization]
-        public async Task<IActionResult> Dashboard()
-        {
-            var userId = CurrentUser.Id;
-            var user = await _userService.GetUserByIdAsync(userId);
-            var wallets = user.Value.Wallets;
-
-            var dashboardViewModel = new DashboardViewModel
-            {
-                User = _modelMapper.ToUserViewModel(user.Value),
-                TotalBalance = wallets.Sum(w => w.Balance),
-                Wallets = wallets.Select(w => new WalletViewModel
-                {
-                    Currency = w.Currency,
-                    Balance = w.Balance,
-                    Name= w.Name,
-                    Id = w.Id
-                }).ToList()
-            };
-
-            return View(dashboardViewModel);
-        }
-
 
         [RequireAuthorization]
         public IActionResult EditProfile()
@@ -273,6 +250,12 @@ namespace ForumProject.Controllers.MVC
             }).ToList();
 
             return View(friendViewModels);
+        }
+
+        [HttpGet]
+        public IActionResult TransactionLog(TransactionLogViewModel model)
+        {
+            return View("TransactionLog", model);
         }
     }
 }

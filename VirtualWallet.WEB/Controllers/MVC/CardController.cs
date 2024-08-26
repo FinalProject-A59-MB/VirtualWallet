@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using VirtualWallet.BUSINESS.Services;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Models.Enums;
@@ -16,26 +17,29 @@ namespace VirtualWallet.WEB.Controllers.MVC
         private readonly IPaymentProcessorService _paymentProcessorService;
         private readonly IViewModelMapper _viewModelMapper;
         private readonly IWalletService _walletService;
+        private readonly ICardTransactionService _cardTransactionService;
 
         public CardController(
             ICardService cardService,
             IUserService userService,
             IPaymentProcessorService paymentProcessorService,
             IViewModelMapper modelMapper,
-            IWalletService walletService)
+            IWalletService walletService,
+            ICardTransactionService cardTransactionService)
         {
             _cardService = cardService;
             _userService = userService;
             _paymentProcessorService = paymentProcessorService;
             _viewModelMapper = modelMapper;
             _walletService = walletService;
+            _cardTransactionService = cardTransactionService;
         }
 
         [HttpGet]
         public IActionResult AddCard(int userId)
         {
             var model = new CardViewModel { UserId = userId };
-            return View(model);
+            return View("AddCard", model);
         }
 
         [HttpPost]
@@ -128,7 +132,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 return RedirectToAction("Profile", "User");
             }
 
-            return RedirectToAction("Profile", "User");
+            return RedirectToAction("Cards", "User");
         }
 
         [RequireAuthorization]
@@ -137,7 +141,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
             var user = CurrentUser;
             var viewModel = _viewModelMapper.ToUserViewModel(user);
 
-            return PartialView("_UserCardsPartial", viewModel);
+            return View("UserCardsPartial", viewModel);
         }
 
         [HttpGet]
@@ -146,25 +150,118 @@ namespace VirtualWallet.WEB.Controllers.MVC
             var model = new CardTransactionViewModel
             {
                 ActionTitle = "Deposit Money",
-                FormAction = "Deposit",
-                Wallets = CurrentUser.Wallets,
-                Cards = CurrentUser.Cards
+                FormAction = "DepositToWallet",
             };
 
-            return PartialView("_CardTransactionFormPartial", model);
+            return View("CardTransactionFormPartial", model);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> DepositToWallet(CardTransactionViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.ActionTitle = "Deposit Money";
+                model.FormAction = "DepositToWallet";
+                return View("CardTransactionFormPartial", model);
+            }
+
+            var result = await _cardTransactionService.DepositAsync(model.CardId, model.WalletId, model.Amount);
+
+            if (result.IsSuccess)
+            {
+                TempData["SuccessMessage"] = "Deposit completed successfully.";
+                return RedirectToAction("Wallets", "Wallet");
+            }
+            else
+            {
+                TempData["ErrorMessage"] = result.Error;
+                return View("CardTransactionFormPartial", model);
+            }
+        }
+
         [HttpGet]
         public IActionResult Withdraw()
         {
             var model = new CardTransactionViewModel
             {
                 ActionTitle = "Withdraw Money",
-                FormAction = "Withdraw",
-                Wallets = CurrentUser.Wallets,
-                Cards = CurrentUser.Cards
+                FormAction = "WithdrawFromWallet",
             };
 
-            return PartialView("_CardTransactionFormPartial", model);
+            return View("CardTransactionFormPartial", model);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> WithdrawFromWallet(CardTransactionViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.ActionTitle = "Withdraw Money";
+                model.FormAction = "WithdrawToWallet";
+                return View("CardTransactionFormPartial", model);
+            }
+
+            var result = await _cardTransactionService.WithdrawAsync(model.CardId, model.WalletId, model.Amount);
+
+            if (result.IsSuccess)
+            {
+                TempData["SuccessMessage"] = "Withdraw completed successfully.";
+                return RedirectToAction("Wallets", "Wallet");
+            }
+            else
+            {
+                TempData["ErrorMessage"] = result.Error;
+                return View("CardTransactionFormPartial", model);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CardTransactions()
+        {
+            var userId = CurrentUser.Id;
+            var transactionsResult = await _cardService.GetCardTransactionsByUserIdAsync(userId);
+
+            if (!transactionsResult.IsSuccess)
+            {
+                TempData["ErrorMessage"] = transactionsResult.Error;
+                return RedirectToAction("Profile", "User");
+            }
+
+            var transactionViewModels = transactionsResult.Value.Select(transaction => new CardTransactionViewModel
+            {
+                CreatedAt = transaction.CreatedAt,
+                Amount = transaction.Amount,
+                WalletId = transaction.WalletId,    
+                CardId = transaction.CardId,
+            }).ToList();
+
+            return View("CardTransactions", transactionViewModels);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CardTransactions(string searchQuery = null)
+        {
+            var userId = CurrentUser.Id;
+            var cardTransactionsResult = await _cardService.GetCardTransactionsByUserIdAsync(userId);
+
+            if (!cardTransactionsResult.IsSuccess)
+            {
+                TempData["ErrorMessage"] = cardTransactionsResult.Error;
+                return RedirectToAction("Profile", "User");
+            }
+
+            var transactionViewModels = cardTransactionsResult.Value.Select(transaction => new CardTransactionViewModel
+            {
+                CreatedAt = transaction.CreatedAt,
+                Amount = transaction.Amount
+            }).ToList();
+
+            return View(transactionViewModels);
+        }
+
+
+
+
     }
 }

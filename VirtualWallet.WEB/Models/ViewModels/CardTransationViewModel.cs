@@ -10,10 +10,7 @@ namespace VirtualWallet.WEB.Models.ViewModels
         public int CardId { get; set; }
         public int WalletId { get; set; }
         public decimal Amount { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public ICollection<Wallet> Wallets { get; set; }
-
-        public ICollection<Card> Cards { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 
 }

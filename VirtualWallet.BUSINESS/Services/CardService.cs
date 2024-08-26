@@ -4,6 +4,7 @@ using VirtualWallet.DATA.Repositories.Contracts;
 using Microsoft.EntityFrameworkCore;
 using VirtualWallet.BUSINESS.Resources;
 using VirtualWallet.BUSINESS.Results;
+using VirtualWallet.DATA.Repositories;
 
 namespace VirtualWallet.BUSINESS.Services
 {
@@ -11,11 +12,13 @@ namespace VirtualWallet.BUSINESS.Services
     {
         private readonly ICardRepository _cardRepository;
         private readonly IPaymentProcessorService _paymentProcessorService;
+        private readonly ICardTransactionRepository _cardTransactionRepository;
 
-        public CardService(ICardRepository cardRepository, IPaymentProcessorService paymentProcessorService)
+        public CardService(ICardRepository cardRepository, IPaymentProcessorService paymentProcessorService, ICardTransactionRepository cardTransactionRepository)
         {
             _cardRepository = cardRepository;
             _paymentProcessorService = paymentProcessorService;
+            _cardTransactionRepository = cardTransactionRepository;
         }
 
         public async Task<Result<Card>> GetCardByIdAsync(int cardId)
@@ -73,6 +76,14 @@ namespace VirtualWallet.BUSINESS.Services
 
             await _cardRepository.UpdateCardAsync(card);
             return Result.Success();
+        }
+
+        public async Task<Result<IEnumerable<CardTransaction>>> GetCardTransactionsByUserIdAsync(int userId)
+        {
+            var transactions = await _cardTransactionRepository.GetTransactionsByUserId(userId).ToListAsync();
+            return transactions.Any()
+                ? Result<IEnumerable<CardTransaction>>.Success(transactions)
+                : Result<IEnumerable<CardTransaction>>.Failure("No Transactions found");
         }
     }
 }

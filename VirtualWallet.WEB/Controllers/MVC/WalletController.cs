@@ -27,7 +27,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
 
             var userViewModel = _viewModelMapper.ToUserViewModel(user);
 
-            return PartialView("_UserWalletsPartial", userViewModel);
+            return View("UserWalletsPartial", userViewModel);
         }
 
 

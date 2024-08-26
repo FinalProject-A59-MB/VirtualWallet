@@ -119,14 +119,6 @@ namespace VirtualWallet.DATA.Migrations
                     b.Property<int>("Currency")
                         .HasColumnType("int");
 
-                    b.Property<string>("Destination")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Origin")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("Status")
                         .HasColumnType("int");
 

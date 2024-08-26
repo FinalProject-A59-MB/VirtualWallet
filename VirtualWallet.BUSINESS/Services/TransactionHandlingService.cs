@@ -51,12 +51,14 @@ namespace VirtualWallet.BUSINESS.Services
 
                 var cardTransaction = new CardTransaction
                 {
+                    User = card.User,
+                    UserId = card.UserId,
                     CardId = card.Id,
                     WalletId = wallet.Id,
                     Amount = amount,
                     CreatedAt = DateTime.UtcNow,
                     TransactionType = TransactionType.Deposit,
-                    Status = TransactionStatus.Completed
+                    Status = TransactionStatus.Completed,
                 };
 
                 await _cardTransactionRepository.AddCardTransactionAsync(cardTransaction);
@@ -98,6 +100,8 @@ namespace VirtualWallet.BUSINESS.Services
 
                 var cardTransaction = new CardTransaction
                 {
+                    UserId = card.UserId,
+                    User = card.User,
                     WalletId = wallet.Id,
                     CardId = card.Id,
                     Amount = amount,

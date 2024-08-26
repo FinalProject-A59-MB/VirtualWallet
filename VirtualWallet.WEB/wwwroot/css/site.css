@@ -21,7 +21,7 @@ body {
     z-index: -1;
 }
 
-/*.bg-dark {
-    background-color: seagreen !important;
-}*/
+.bg-dark {
+    background-color: #553875 !important;
+}
 

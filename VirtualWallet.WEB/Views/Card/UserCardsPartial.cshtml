@@ -1,0 +1,17 @@
+﻿@model UserViewModel
+
+<h3>My Cards</h3>
+<ul class="list-group">
+    @foreach (var card in Model.Cards)
+    {
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            @card.CardNumber - @card.Issuer
+            <form asp-controller="Card" asp-action="DeleteCard" method="get" class="d-inline">
+                <input type="hidden" name="cardId" value="@card.Id" />
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
+        </li>
+    }
+</ul>
+<a href="@Url.Action("AddCard", "Card", new { userId = Model.Id })" class="btn btn-primary mt-3" onclick="loadContent(this)">Add New Card</a>
+
