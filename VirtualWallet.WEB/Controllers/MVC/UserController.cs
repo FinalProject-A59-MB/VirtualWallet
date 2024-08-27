@@ -20,7 +20,7 @@ namespace ForumProject.Controllers.MVC
 
         public UserController(
             IUserService userService,
-            IViewModelMapper modelMapper, 
+            IViewModelMapper modelMapper,
             IWalletService walletService,
             ICloudinaryService cloudinaryService,
             IAuthService authService)
@@ -37,27 +37,27 @@ namespace ForumProject.Controllers.MVC
         {
             UserViewModel profileViewModel;
 
-            if (id.HasValue)
+            if (id.HasValue & id != 0)
             {
-                
+
                 var result = await _userService.GetUserByIdAsync(id.Value);
 
                 if (!result.IsSuccess)
                 {
                     TempData["ErrorMessage"] = result.Error;
-                    return RedirectToAction("NotFound", "Home");
+                    return RedirectToAction("Index", "Home");
                 }
 
-                
+
                 profileViewModel = _modelMapper.ToUserViewModel(result.Value);
             }
             else
             {
-                
+
                 profileViewModel = _modelMapper.ToUserViewModel(CurrentUser);
             }
 
-            
+
             return View(profileViewModel);
         }
 
@@ -170,7 +170,7 @@ namespace ForumProject.Controllers.MVC
 
             if (user.Value.BlockedRecord != null)
             {
-                user.Value.BlockedRecord=null;
+                user.Value.BlockedRecord = null;
             }
 
             await _userService.UpdateUserAsync(user.Value);
@@ -344,6 +344,41 @@ namespace ForumProject.Controllers.MVC
             }
 
             return RedirectToAction("Profile", new { id = userId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DeleteAccount(int id)
+        {
+            var user = await _userService.GetUserByIdAsync(id);
+            if (!user.IsSuccess)
+            {
+                TempData["ErrorMessage"] = user.Error;
+                return RedirectToAction("Profile", new { id = id });
+            }
+
+            var model = new DeleteAccountViewModel
+            {
+                Id = user.Value.Id,
+                Username = user.Value.Username,
+                Email = user.Value.Email
+            };
+
+            return View(model);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var result = await _userService.DeleteUserAsync(id);
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = "An error occurred while trying to delete the account.";
+                return RedirectToAction("DeleteAccount", new { id });
+            }
+
+            TempData["SuccessMessage"] = "Account deleted successfully.";
+            return RedirectToAction("Index", "Home");
         }
 
     }

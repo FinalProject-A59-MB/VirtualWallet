@@ -9,7 +9,7 @@
 
 <div class="container bg-dark-1">
     <div class="card-body">
-        
+
 
         <ul class="nav nav-tabs" id="profileTabs" role="tablist">
             <li class="nav-item" role="presentation">
@@ -58,12 +58,15 @@
                         }
                         @if (Model.Id == ViewBag.UserId || Model.Role == UserRole.Admin.ToString())
                         {
-                            <a href="@Url.Action("ChangeUsername", "User", new { userId = Model.Id })" class="btn btn-secondary btn-sm">Change Username</a>
-                            <a href="@Url.Action("ChangePassword", "User", new { userId = Model.Id })" class="btn btn-secondary btn-sm">Change Password</a>
-                            <form asp-controller="User" asp-action="DeleteAccount" method="post" class="d-inline">
-                                <input type="hidden" name="userId" value="@Model.Id" />
-                                <button type="submit" class="btn btn-danger btn-sm">Delete Account</button>
-                            </form>
+                            <div class="d-flex justify-content-between">
+                                <div>
+
+                                <a href="@Url.Action("ChangeUsername", "User", new { userId = Model.Id })" class="btn btn-secondary btn-sm">Change Username</a>
+                                <a href="@Url.Action("ChangePassword", "User", new { userId = Model.Id })" class="btn btn-secondary btn-sm">Change Password</a>
+                                </div>
+                                <a href="@Url.Action("DeleteAccount", "User", new { id = Model.Id })" class="btn btn-danger btn-sm">Delete Account</a>
+
+                            </div>
                         }
                     </div>
                 </div>
@@ -118,7 +121,7 @@
                         <input type="hidden" name="userId" value="@Model.Id" />
                         <div class="input-group">
                             <input type="text" name="searchTerm" class="form-control" placeholder="Search friends by name or email..." aria-label="Search friends">
-                            <button class="btn btn-outline-secondary" type="submit">Search</button>
+                            <button class="btn btn-secondary" type="submit">Search</button>
                         </div>
                     </form>
 
@@ -143,7 +146,9 @@
                                         <td>
                                             <div class="description-container">
                                                 <!-- Display Mode -->
-                                                @{ var context = @contact.Description ?? "Click to add a description";}
+                                                @{
+                                                    var context = @contact.Description ?? "Click to add a description";
+                                                }
                                                 <span class="description-text" onclick="showEditForm(this)">
                                                     @context
                                                 </span>
@@ -153,7 +158,7 @@
                                                     <form id="descriptionForm-@contact.ContactId" asp-controller="User" asp-action="UpdateFriendDescription" method="post" class="d-flex description-form" style="display: none;" onsubmit="saveDescription(event, @contact.ContactId)">
                                                         <input type="hidden" name="contactId" value="@contact.ContactId" />
                                                         <input type="text" name="description" value="@contact.Description" class="form-control form-control-sm" placeholder="Enter description" maxlength="30" />
-                                                        <button type="submit" class="btn btn-sm btn-outline-primary ms-2">Save</button>
+                                                        <button type="submit" class="btn btn-sm btn-outline-success ms-2">Save</button>
                                                     </form>
                                                 </div>
                                             </div>

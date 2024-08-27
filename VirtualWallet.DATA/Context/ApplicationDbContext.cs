@@ -21,6 +21,8 @@ public class ApplicationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
+        modelBuilder.Entity<User>().HasQueryFilter(u => !u.DeletedAt.HasValue);
         // One-to-One
         modelBuilder.Entity<User>()
             .HasOne(u => u.UserProfile)
@@ -61,20 +63,21 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(rp => rp.RecipientId)
             .OnDelete(DeleteBehavior.Restrict);
 
+
         modelBuilder.Entity<UserContact>()
-           .HasKey(uc => new { uc.UserId, uc.ContactId });
+            .HasKey(uc => new { uc.UserId, uc.ContactId });
 
         modelBuilder.Entity<UserContact>()
             .HasOne(uc => uc.User)
             .WithMany(u => u.Contacts)
             .HasForeignKey(uc => uc.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<UserContact>()
             .HasOne(uc => uc.Contact)
             .WithMany()
             .HasForeignKey(uc => uc.ContactId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<WalletTransaction>()
             .HasOne(wt => wt.Sender)

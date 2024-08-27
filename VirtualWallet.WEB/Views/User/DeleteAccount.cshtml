@@ -1,0 +1,29 @@
+﻿@model DeleteAccountViewModel
+
+@{
+    ViewData["Title"] = "Delete Account";
+}
+
+<div class="d-flex justify-content-center align-items-center">
+    <div class="card mb-4 w-50 mx-auto">
+        <div class="card-body bg-dark-1 text-center">
+            <h4 class="text-danger">
+            Confirm Deletion
+            </h4>
+            <h4 class="mt-4">Are you sure you want to delete the account for <strong>@Model.Username</strong>?</h4>
+            <h4 class="text-warning">This action cannot be undone.</h4>
+
+            <div class="mt-4">
+                <form asp-action="Delete" class="d-inline-block">
+                    <input type="hidden" asp-for="Id" />
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt"></i> Delete Account
+                    </button>
+                </form>
+                <a asp-action="Profile" asp-route-id="@Model.Id" class="btn btn-secondary ms-2">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

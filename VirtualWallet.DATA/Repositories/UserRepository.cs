@@ -70,12 +70,12 @@ namespace VirtualWallet.DATA.Repositories
         public async Task DeleteUserAsync(int userId)
         {
             var user = await GetUserByIdAsync(userId);
-            if (user != null)
-            {
-                _context.Users.Remove(user);
-                await _context.SaveChangesAsync();
-            }
+
+            user.DeletedAt = DateTime.UtcNow;
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
         }
+
 
         public async Task<UserProfile?> GetUserProfileAsync(int userId)
         {
