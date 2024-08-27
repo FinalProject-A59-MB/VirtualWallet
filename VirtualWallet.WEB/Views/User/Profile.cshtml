@@ -2,13 +2,15 @@
 
 @{
     ViewData["Title"] = "Profile";
-    var isAdmin = Model.Role == "Admin";
+    var isProfileOwner = Model.Id == ViewBag.UserId;
+    var isAdmin = User.IsInRole("Admin");
+    var canViewFullProfile = isProfileOwner || isAdmin;
 }
 
-<div class="card mb-4 w-75 mx-auto">
+<div class="container bg-dark-2">
     <div class="card-body">
         <div class="d-flex justify-content-between">
-            <h2 class="text-center">Profile</h2>
+            <h2 class="text-center">Profile of @Model.Username</h2>
             <form asp-controller="Authentication" asp-action="Logout" method="post">
                 <button type="submit" class="btn btn-danger">Logout</button>
             </form>
@@ -16,93 +18,142 @@
 
         <ul class="nav nav-tabs" id="profileTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <a class="nav-link active" id="profile-details-tab" data-bs-toggle="tab" href="#profile-details" role="tab" aria-controls="profile-details" aria-selected="true">Profile Details</a>
+                <a class="nav-link active" id="account-details-tab" data-bs-toggle="tab" href="#account-details" role="tab" aria-controls="account-details" aria-selected="true">Account</a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link" id="wallets-tab" data-bs-toggle="tab" href="#wallets" role="tab" aria-controls="wallets" aria-selected="false">Wallets</a>
+                <a class="nav-link" id="profile-details-tab" data-bs-toggle="tab" href="#profile-details" role="tab" aria-controls="profile-details" aria-selected="false">Profile</a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link" id="cards-tab" data-bs-toggle="tab" href="#cards" role="tab" aria-controls="cards" aria-selected="false">Cards</a>
+                <a class="nav-link" id="friends-tab" data-bs-toggle="tab" href="#friends" role="tab" aria-controls="friends" aria-selected="false">Friends</a>
             </li>
-            @if (isAdmin)
-            {
-                <li class="nav-item" role="presentation">
-                    <a class="nav-link" id="admin-tab" data-bs-toggle="tab" href="#admin" role="tab" aria-controls="admin" aria-selected="false">Admin</a>
-                </li>
-            }
         </ul>
 
         <div class="tab-content" id="profileTabsContent">
-            <!-- Profile Details Tab -->
-            <div class="tab-pane fade show active" id="profile-details" role="tabpanel" aria-labelledby="profile-details-tab">
-                <div class="row">
-                    <div class="col-md-4">
-                        <img src="@Model.UserProfile.PhotoUrl" alt="Profile Picture" class="img-thumbnail" />
-                        <a href="@Url.Action("EditProfile", "User", new { userId = Model.Id })" class="btn btn-secondary btn-block mt-3">Edit Profile</a>
+            <!-- User Account Tab -->
+            <div class="tab-pane fade show active" id="account-details" role="tabpanel" aria-labelledby="account-details-tab">
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <h4>Account Information</h4>
+                        <p><strong>Username:</strong> @Model.Username</p>
+                        <p><strong>Email:</strong> @Model.Email</p>
+                        <p><strong>User Status:</strong> @Model.Role.ToString()</p>
+                        <p><strong>Verification Status:</strong> @Model.VerificationStatus.ToString()</p>
                     </div>
-                    <div class="col-md-8">
-                        <h2><strong>@Model.Username</strong></h2>
+                </div>
+
+                <hr />
+
+                <!-- Account Actions -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <h4>Actions</h4>
+                        @if (Model.Id != ViewBag.UserId)
+                        {
+                            <a href="@Url.Action("SendMoney", "Transaction", new { recipientId = Model.Id })" class="btn btn-primary btn-sm mb-2">Send Money</a>
+                            <a href="@Url.Action("RequestMoney", "Transaction", new { senderId = Model.Id })" class="btn btn-primary btn-sm mb-2">Request Money</a>
+                            <a href="@Url.Action("AddFriend", "User", new { userId = Model.Id })" class="btn btn-success btn-sm mb-2">Add as Friend</a>
+                        }
+                        @if (Model.Role == UserRole.Admin.ToString())
+                        {
+                            <a href="@Url.Action("UnbanUser", "Admin", new { userId = Model.Id })" class="btn btn-warning btn-sm mb-2">Unban User</a>
+                            <a href="@Url.Action("BanUser", "Admin", new { userId = Model.Id })" class="btn btn-danger btn-sm mb-2">Ban User</a>
+                        }
+                        @if (Model.Id == ViewBag.UserId || Model.Role == UserRole.Admin.ToString())
+                        {
+                            <a href="@Url.Action("ChangeUsername", "User", new { userId = Model.Id })" class="btn btn-secondary btn-sm">Change Username</a>
+                            <a href="@Url.Action("ChangePassword", "User", new { userId = Model.Id })" class="btn btn-secondary btn-sm">Change Password</a>
+                            <form asp-controller="User" asp-action="DeleteAccount" method="post" class="d-inline">
+                                <input type="hidden" name="userId" value="@Model.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm">Delete Account</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Profile Tab -->
+            <div class="tab-pane fade" id="profile-details" role="tabpanel" aria-labelledby="profile-details-tab">
+                <div class="row mt-4">
+                    <!-- Left Column: User Image (always visible) -->
+                    <div class="col-md-4 d-flex flex-column align-items-center">
+                        <img src="@Model.UserProfile.PhotoUrl" alt="Profile Picture" class="img-thumbnail mb-3" />
+                        @if (canViewFullProfile)
+                        {
+                            <a href="@Url.Action("EditProfile", "User", new { userId = Model.Id })" class="btn btn-secondary btn-block">Edit Profile</a>
+                        }
+                    </div>
+
+                    <!-- Middle Column: Personal Information (always visible) -->
+                    <div class="col-md-4">
+                        <h4>Personal Information</h4>
                         <p><strong>First Name:</strong> @Model.UserProfile.FirstName</p>
                         <p><strong>Last Name:</strong> @Model.UserProfile.LastName</p>
-                        <p><strong>Email:</strong> @Model.Email</p>
                         <p><strong>Date of Birth:</strong> @Model.UserProfile.DateOfBirth.ToString("MMMM dd, yyyy")</p>
-                        <p><strong>Phone Number:</strong> @Model.UserProfile.PhoneNumber</p>
-                        <p><strong>Address:</strong></p>
-                        <p><strong>Country:</strong> @Model.UserProfile.Country</p>
-                        <p><strong>State:</strong> @Model.UserProfile.State</p>
-                        <p><strong>City:</strong> @Model.UserProfile.City</p>
-                        <p><strong>Street:</strong> @Model.UserProfile.Street</p>
-                        <p><strong>Postal Code:</strong> @Model.UserProfile.PostalCode</p>
+                        @if (canViewFullProfile)
+                        {
+                            <p><strong>Phone Number:</strong> @Model.UserProfile.PhoneNumber</p>
+                        }
+                    </div>
+
+                    @if (canViewFullProfile)
+                    {
+                        <!-- Right Column: Address Details (only visible to profile owner or admin) -->
+                        <div class="col-md-4">
+                            <h4>Address Details</h4>
+                            <p><strong>Street:</strong> @Model.UserProfile.Street</p>
+                            <p><strong>City:</strong> @Model.UserProfile.City</p>
+                            <p><strong>State:</strong> @Model.UserProfile.State</p>
+                            <p><strong>Country:</strong> @Model.UserProfile.Country</p>
+                            <p><strong>Postal Code:</strong> @Model.UserProfile.PostalCode</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Friends Tab -->
+            <div class="tab-pane fade" id="friends" role="tabpanel" aria-labelledby="friends-tab">
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <h4>Friends List</h4>
+                        <form class="d-flex mb-3" asp-controller="User" asp-action="SearchFriends" method="get">
+                            <input class="form-control me-2" type="search" name="searchTerm" placeholder="Search in friends..." aria-label="Search" />
+                            <button class="btn btn-outline-success" type="submit">Search</button>
+                        </form>
+                        <ul class="list-group">
+                            @foreach (var friend in Model.Contacts)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>@friend.Contact.Username</span>
+                                    <div>
+                                        <a href="@Url.Action("SendMoney", "Transaction", new { recipientId = friend.ContactId })" class="btn btn-primary btn-sm">Send Money</a>
+                                        <a href="@Url.Action("RequestMoney", "Transaction", new { senderId = friend.ContactId })" class="btn btn-primary btn-sm">Request Money</a>
+                                        <a href="@Url.Action("Unfriend", "User", new { friendId = friend.ContactId })" class="btn btn-danger btn-sm">Unfriend</a>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+
+                <hr />
+
+                <!-- Wallet Transactions -->
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <h4>Last 10 Wallet Transactions</h4>
+                        <ul class="list-group">
+                            @* @foreach (var transaction in Model.WalletTransactions.Take(10))
+                            {
+                                <li class="list-group-item">
+                                    @transaction.Description - @transaction.Amount @transaction.Currency - @transaction.TransactionDate.ToString("MM/dd/yyyy")
+                                </li>
+                            } *@
+                            <li>to be implemented</li>
+                        </ul>
+                        <a href="@Url.Action("WalletTransactions", "Transaction", new { userId = Model.Id })" class="btn btn-outline-primary mt-3">View All Transactions</a>
                     </div>
                 </div>
             </div>
-
-            <!-- Wallets Tab -->
-            <div class="tab-pane fade" id="wallets" role="tabpanel" aria-labelledby="wallets-tab">
-                <h3>My Wallets</h3>
-                <ul class="list-group">
-                    @foreach (var wallet in Model.Wallets)
-                    {
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            <span>
-                                @wallet.Name - @wallet.Balance @wallet.Currency @wallet.WalletType
-                            </span>
-                            <a href="@Url.Action("CardTransactions", "CardTransaction", new { walletId = wallet.Id })" class="btn btn-success btn-sm">
-                                + Add Money
-                            </a>
-                        </li>
-                    }
-                </ul>
-            </div>
-
-
-            <!-- Cards Tab -->
-            <div class="tab-pane fade" id="cards" role="tabpanel" aria-labelledby="cards-tab">
-                <h3>My Cards</h3>
-                <ul class="list-group">
-                    @foreach (var card in Model.Cards)
-                    {
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            @card.CardNumber - @card.Issuer
-                            <form asp-controller="Card" asp-action="DeleteCard" method="get" class="d-inline">
-                                <input type="hidden" name="cardId" value="@card.Id" />
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                            </form>
-                        </li>
-                    }
-                </ul>
-                <a href="@Url.Action("AddCard", "Card", new { userId = Model.Id })" class="btn btn-primary mt-3">Add New Card</a>
-            </div>
-
-            <!-- Admin Tab (Visible only for Admins) -->
-            @if (isAdmin)
-            {
-                <div class="tab-pane fade" id="admin" role="tabpanel" aria-labelledby="admin-tab">
-                    <h3>Admin Section</h3>
-                    <a href="@Url.Action("UnverifiedUsers", "User")" class="btn btn-warning">Review Unverified Users</a>
-                    <!-- Other Admin related actions -->
-                </div>
-            }
         </div>
     </div>
 </div>

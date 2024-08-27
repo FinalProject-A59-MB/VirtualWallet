@@ -9,7 +9,7 @@
                 <div class="hero-content">
                     <h2 class="display-4 text-white">Seamlessly Manage Your Finances</h2>
                     <p class="lead text-white">Fast, secure, and easy-to-use financial solutions for all your needs.</p>
-                    <a href="signup.html" class="btn btn-primary btn-lg">Get Started</a>
+                    <a href="@Url.Action("Register", "Authentication")" class="btn btn-primary btn-lg mb-2">Get Started</a>
                 </div>
             </div>
         </div>
@@ -17,7 +17,7 @@
 </div>
 <!-- End hero -->
 <!-- Start how-it-works -->
-<div class="how-it-works-area py-5 bg-light">
+<div class="how-it-works-area py-5 bg-dark">
     <div class="container">
         <div class="row">
             <div class="col-md-4">
@@ -52,7 +52,7 @@
 </div>
 
 <!-- End how-it-works -->
-<!-- Start why-choose-us -->
+<!-- Start why-choose-us -->@* 
 <div class="why-choose-us-area py-5 bg-dark text-white">
     <div class="container">
         <div class="row">
@@ -91,8 +91,9 @@
         </div>
     </div>
 </div>
-<!-- End why-choose-us -->
-<div class="testimonials-area py-5 bg-light">
+<!-- End why-choose-us --> *@
+<!-- Start testimonials -->
+<div id="testimonialCarousel" class="carousel slide testimonials-area py-5 bg-dark" data-bs-ride="carousel">
     <div class="container">
         <div class="row">
             <div class="col-md-12 text-center">
@@ -100,29 +101,56 @@
                 <p>Hear from our satisfied customers and see why they trust us.</p>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="testimonial-box text-center">
-                    <p>"Great service! It’s so easy to send money and pay bills. Highly recommend!"</p>
-                    <h5>John Doe</h5>
-                    <span>Entrepreneur</span>
+        <div class="carousel-inner">
+            <!-- First Slide -->
+            <div class="carousel-item active">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="testimonial-box text-center">
+                            <p>"Great service! It’s so easy to send money and pay bills. Highly recommend!"</p>
+                            <h5>John Doe</h5>
+                            <span>Entrepreneur</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="testimonial-box text-center">
-                    <p>"A seamless experience from start to finish. Customer support is excellent!"</p>
-                    <h5>Jane Smith</h5>
-                    <span>Freelancer</span>
+            <!-- Second Slide -->
+            <div class="carousel-item">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="testimonial-box text-center">
+                            <p>"A seamless experience from start to finish. Customer support is excellent!"</p>
+                            <h5>Jane Smith</h5>
+                            <span>Freelancer</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="testimonial-box text-center">
-                    <p>"The security and speed of transactions are unmatched. I feel safe using this platform."</p>
-                    <h5>Emily Johnson</h5>
-                    <span>Digital Marketer</span>
+            <!-- Third Slide -->
+            <div class="carousel-item">
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="testimonial-box text-center">
+                            <p>"The security and speed of transactions are unmatched. I feel safe using this platform."</p>
+                            <h5>Emily Johnson</h5>
+                            <span>Digital Marketer</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- Controls -->
+        <a class="carousel-control-prev" href="#testimonialCarousel" role="button" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#testimonialCarousel" role="button" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </a>
     </div>
 </div>
+
+<!-- End testimonials -->
 

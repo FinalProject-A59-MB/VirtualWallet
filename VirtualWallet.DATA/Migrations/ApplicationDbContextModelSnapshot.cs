@@ -502,7 +502,7 @@ namespace VirtualWallet.DATA.Migrations
                     b.HasOne("VirtualWallet.DATA.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("VirtualWallet.DATA.Models.Wallet", "Wallet")

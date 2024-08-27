@@ -30,6 +30,7 @@ public class ViewModelMapper : IViewModelMapper
             UserProfile = ToUserProfile(model.UserProfile),
             Cards = model.Cards?.Select(ToCard).ToList(),
             Wallets = model.Wallets?.Select(ToWallet).ToList(),
+            Contacts = model.Contacts,
         };
     }
     public UserProfile ToUserProfile(UserProfileViewModel model)
@@ -66,7 +67,9 @@ public class ViewModelMapper : IViewModelMapper
             UserProfile = ToUserProfileViewModel(user.UserProfile),
             Cards = user.Cards?.Select(ToCardViewModel).ToList(),
             Wallets = user.Wallets?.Select(ToWalletViewModel).ToList(),
-            MainWallet = user.MainWallet==null ? null:ToWalletViewModel(user.MainWallet),
+            MainWallet = user.MainWallet == null ? null : ToWalletViewModel(user.MainWallet),
+            VerificationStatus = user.VerificationStatus,
+            Contacts = user.Contacts,
         };
     }
 
@@ -116,6 +119,7 @@ public class ViewModelMapper : IViewModelMapper
             CardHolderName = card.CardHolderName,
             Cvv = card.Cvv,
             CardType = card.CardType,
+            Issuer = card.Issuer,
         };
     }
 

@@ -10,6 +10,9 @@ window.onload = function () {
     const output = document.getElementById('output');
     const ccicon = document.getElementById('ccicon');
     const ccsingle = document.getElementById('ccsingle');
+    const issuerElement = document.getElementById('issuerInput2');
+    const issuerValue = issuerElement ? issuerElement.innerText.toLowerCase() : '';
+
     
 
     let cctype = null;
@@ -142,6 +145,7 @@ window.onload = function () {
                 input.setAttribute('class', 'darkcolor ' + basecolor + 'dark');
             });
     };
+    
 
 
     //pop in the appropriate card icon when detected
@@ -209,6 +213,69 @@ window.onload = function () {
         }
     });
 
+    function updateCardAppearanceFromIssuer(issuer) {
+        const issuerInput = document.getElementById('issuerInput');
+
+        switch (issuer) {
+            case 'american express':
+                ccicon.innerHTML = amex;
+                ccsingle.innerHTML = amex_single;
+                swapColor('green');
+                issuerInput.value = 'American Express';
+                break;
+            case 'visa':
+                ccicon.innerHTML = visa;
+                ccsingle.innerHTML = visa_single;
+                swapColor('lime');
+                issuerInput.value = 'Visa';
+                break;
+            case 'diners':
+                ccicon.innerHTML = diners;
+                ccsingle.innerHTML = diners_single;
+                swapColor('orange');
+                issuerInput.value = 'Diners';
+                break;
+            case 'discover':
+                ccicon.innerHTML = discover;
+                ccsingle.innerHTML = discover_single;
+                swapColor('purple');
+                issuerInput.value = 'Discover';
+                break;
+            case 'jcb':
+            case 'jcb15':
+                ccicon.innerHTML = jcb;
+                ccsingle.innerHTML = jcb_single;
+                swapColor('red');
+                issuerInput.value = 'JCB';
+                break;
+            case 'maestro':
+                ccicon.innerHTML = maestro;
+                ccsingle.innerHTML = maestro_single;
+                swapColor('yellow');
+                issuerInput.value = 'Maestro';
+                break;
+            case 'mastercard':
+                ccicon.innerHTML = mastercard;
+                ccsingle.innerHTML = mastercard_single;
+                swapColor('lightblue');
+                issuerInput.value = 'MasterCard';
+                break;
+            case 'unionpay':
+                ccicon.innerHTML = unionpay;
+                ccsingle.innerHTML = unionpay_single;
+                swapColor('cyan');
+                issuerInput.value = 'UnionPay';
+                break;
+            default:
+                ccicon.innerHTML = '';
+                ccsingle.innerHTML = '';
+                swapColor('grey');
+                issuerInput.value = '';
+                break;
+        }
+    }
+
+    updateCardAppearanceFromIssuer(issuerValue);
 
 
     // CREDIT CARD IMAGE JS
@@ -274,5 +341,7 @@ window.onload = function () {
     securitycode.addEventListener('focus', function () {
         document.querySelector('.creditcard').classList.add('flipped');
     });
+
+
 };
 

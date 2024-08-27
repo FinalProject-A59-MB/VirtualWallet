@@ -166,6 +166,24 @@ namespace VirtualWallet.DATA.Services
             return Result.Success();
         }
 
+        public async Task<Result<IEnumerable<User>>> SearchUsersAsync(string searchTerm)
+        {
+            if (string.IsNullOrEmpty(searchTerm))
+            {
+                return Result<IEnumerable<User>>.Failure("Search term cannot be empty.");
+            }
+
+            var users = await _userRepository.SearchUsersAsync(searchTerm);
+
+            if (users == null || !users.Any())
+            {
+                return Result<IEnumerable<User>>.Failure("No users found matching the search criteria.");
+            }
+
+            return Result<IEnumerable<User>>.Success(users);
+        }
+
+
 
     }
 }

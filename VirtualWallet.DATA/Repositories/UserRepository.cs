@@ -129,6 +129,13 @@ namespace VirtualWallet.DATA.Repositories
             return await _context.UserContacts
                 .AnyAsync(uc => uc.UserId == userId && uc.ContactId == contactId);
         }
+
+        public async Task<IEnumerable<User>> SearchUsersAsync(string searchTerm)
+        {
+            return await _context.Users
+                .Where(u => u.Username.Contains(searchTerm) || u.Email.Contains(searchTerm))
+                .ToListAsync();
+        }
     }
 }
 

@@ -1,0 +1,37 @@
+﻿@model UserViewModel
+
+<div class="container my-4">
+    <h3 class="mb-4">My Cards</h3>
+    <div class="text-right mb-4">
+        <a href="@Url.Action("AddCard", "Card", new { userId = Model.Id })" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Add New Card
+        </a>
+    </div>
+    <div class="row">
+        @foreach (var card in Model.Cards)
+        {
+            <div class="col-md-4 bg-dark align-items-center border border-secondary rounded-2 p-3 m-2">
+                <!-- Basic Card Details -->
+                <div class="card-details">
+                    <h5 class="text-white">@card.Name</h5>
+                    <p class="text-white">Card Number: @card.CardNumber</p>
+                    <p class="text-white">Expiry: @card.ExpirationDate.ToString("MM/yyyy")</p>
+                    <p class="text-white">Issuer: @card.Issuer</p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="mt-4">
+                    <!-- View Transactions Button -->
+                    <a href="@Url.Action("TransactionHistory", "Transaction", new { cardId = card.Id })" class="btn btn-outline-secondary btn-sm">View Transactions</a>
+
+                    <!-- Delete Button -->
+                    <form asp-controller="Card" asp-action="DeleteCard" method="get" class="d-inline">
+                        <input type="hidden" name="cardId" value="@card.Id" />
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+

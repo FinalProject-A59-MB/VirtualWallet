@@ -1,10 +1,26 @@
 ﻿@model UserViewModel
 
-<div class="wallets-list">
-    @foreach (var wallet in Model.Wallets)
-    {
-        <div class="wallet-item">
-            <h5>@wallet.Name - @wallet.Balance @wallet.Currency</h5>
-        </div>
-    }
+<div class="container my-4">
+    <h3 class="mb-4">My Wallets</h3>
+    <div class="text-right mb-4">
+        <a href="@Url.Action("AddWallet", "Wallet")" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Add New Wallet
+        </a>
+    </div>
+    <div class="row">
+        @foreach (var wallet in Model.Wallets)
+        {
+            <div class="col-md-4 bg-dark align-items-center border border-secondary rounded-2 p-3 m-2">
+                <div class="wallet-details">
+                    <h5 class="text-white">@wallet.Name</h5>
+                    <h6 class="text-white">@wallet.Balance @wallet.Currency</h6>
+                    <p class="text-white">Wallet Type: @wallet.WalletType</p>
+                </div>
+                <div class="mt-4">
+                    <a href="@Url.Action("WalletProfile", "Wallet", new { id = wallet.Id })" class="btn btn-primary btn-sm">View Wallet</a>
+                    <a href="@Url.Action("TransactionHistory", "Transaction", new { walletId = wallet.Id })" class="btn btn-outline-secondary btn-sm">View Transactions</a>
+                </div>
+            </div>
+        }
+    </div>
 </div>

@@ -5,113 +5,115 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - VirtualWallet.WEB</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/VirtualWallet.WEB.styles.css" asp-append-version="true" />
+    
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-dark">
+<body class="bg-dark-2">
     <header>
         <!-- Main Navigation -->
-        <nav class="navbar navbar-expand-sm navbar-light border-bottom box-shadow mb-3 bg-dark">
+        <nav class="navbar navbar-expand-sm navbar-light border-bottom box-shadow bg-dark-2">
             <div class="container-fluid">
-                <!-- Left-aligned Brand and Navbar Links -->
-                <div class="d-flex align-items-center">
-                    <!-- Brand Section -->
-                    <a class="navbar-brand text-white fw-bold me-4" asp-area="" asp-controller="Home" asp-action="Index">VaulTora</a>
+                <!-- Left-aligned Brand -->
+                <a class="navbar-brand text-white fw-bold" asp-area="" asp-controller="Home" asp-action="Index">VaulTora</a>
 
-                    <!-- Navbar Links -->
-                    <div class="collapse navbar-collapse" id="navbar-main">
-                        <ul class="navbar-nav">
-                            <li class="nav-item">
-                                <a class="nav-link text-white" href="@Url.Action("Index", "Home")">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white" href="@Url.Action("About", "Home")">About us</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-white" href="contact.html">Contacts</a>
-                            </li>
-                            @if (ViewBag.IsAuthenticated)
-                            {
-                                <li class="nav-item dropdown">
-                                    <a class="nav-link dropdown-toggle text-white" href="#" id="dashboardDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Dashboard
-                                    </a>
-                                    <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dashboardDropdown">
-                                        <li>
-                                            <a class="dropdown-item" href="@Url.Action("SendMoney", "Transaction")">
-                                                <i class="ti-new-window me-2"></i> Send Money
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="@Url.Action("RequestMoney", "Transaction")">
-                                                <i class="ti-receipt me-2"></i> Request Money
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="@Url.Action("Deposit", "Card")">
-                                                <i class="ti-wallet me-2"></i> Deposit to Wallet
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="@Url.Action("Withdraw", "Card")">
-                                                <i class="ti-import me-2"></i> Withdraw from Wallet
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="@Url.Action("Wallets", "Wallet")">
-                                                <i class="ti-pencil-alt me-2"></i> Wallets
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="@Url.Action("Cards", "Card")">
-                                                <i class="ti-credit-card me-2"></i> Cards
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="@Url.Action("CardTransactions", "Card")">
-                                                <i class="ti-credit-card me-2"></i> Card Transactions
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="@Url.Action("WalletTransactions", "Wallet")">
-                                                <i class="ti-credit-card me-2"></i> Wallet Transactions
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" href="@Url.Action("Profile", "User")">
-                                                <i class="ti-settings me-2"></i> Profile
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            }
-                            @if (!ViewBag.IsAuthenticated)
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-white" asp-area="" asp-controller="Authentication" asp-action="Login">Login</a>
-                                </li>
-                            }
-                        </ul>
-                    </div>
+                <!-- Right-aligned Navbar Links -->
+                <div class="d-flex align-items-center ms-auto">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="@Url.Action("Index", "Home")">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="@Url.Action("About", "Home")">About us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="contact.html">Contacts</a>
+                        </li>
+                    </ul>
+                    @if (ViewBag.IsAuthenticated)
+                    {
+                        <button class="btn btn-outline-light ms-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#dashboardOffcanvas" aria-controls="dashboardOffcanvas">
+                            Dashboard
+                        </button>
+                    }
+                    @if (!ViewBag.IsAuthenticated)
+                    {
+                        <a class="nav-link text-white" asp-area="" asp-controller="Authentication" asp-action="Login">Login</a>
+                    }
+                    
                 </div>
-
-                <!-- Right-aligned Search Bar -->
-                <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
-                </form>
             </div>
         </nav>
-        <!-- End Main Navigation -->
     </header>
+    <!-- Offcanvas Sidebar -->
+    <div class="offcanvas offcanvas-end bg-dark text-white" tabindex="-1" id="dashboardOffcanvas" aria-labelledby="dashboardOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="dashboardOffcanvasLabel">Dashboard</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <form class="d-flex mb-4" asp-controller="User" asp-action="SearchUsers" method="get">
+                <input class="form-control me-2" type="search" name="searchTerm" placeholder="Username / Email" aria-label="Search" />
+                <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i> Search</button>
+            </form>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="@Url.Action("SendMoney", "Transaction")">
+                        <i class="bi bi-box-arrow-up-right me-2"></i> Send Money
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="@Url.Action("RequestMoney", "Transaction")">
+                        <i class="bi bi-receipt me-2"></i> Request Money
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="@Url.Action("Deposit", "Card")">
+                        <i class="bi bi-wallet me-2"></i> Deposit to Wallet
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="@Url.Action("Withdraw", "Card")">
+                        <i class="bi bi-arrow-down-circle me-2"></i> Withdraw from Wallet
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="@Url.Action("Wallets", "Wallet")">
+                        <i class="bi bi-wallet-fill"></i> Wallets
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="@Url.Action("Cards", "User")">
+                        <i class="bi bi-credit-card me-2"></i> Cards
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="@Url.Action("CardTransactions", "Card")">
+                        <i class="bi bi-credit-card-2-back me-2"></i> Card Transactions
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="@Url.Action("WalletTransactions", "Wallet")">
+                        <i class="bi bi-credit-card me-2"></i> Wallet Transactions
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="@Url.Action("Profile", "User")">
+                        <i class="bi bi-person me-2"></i> Profile
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
 
 
 
-
-
-
-    <div class="container bg-dark">
-        <main role="main" class="pb-3">
+    
+    <div class="bg-dark">
+        <main role="main" class="p-3">
+            <!-- Start Error Modal -->
             @if (TempData["ErrorMessage"] != null && !string.IsNullOrEmpty(TempData["ErrorMessage"].ToString()))
             {
                 <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
@@ -132,7 +134,8 @@
                     </div>
                 </div>
             }
-
+            <!-- End Error Modal -->
+            <!-- Start SuccessMessage Modal -->
             @if (TempData["SuccessMessage"] != null && !string.IsNullOrEmpty(TempData["SuccessMessage"].ToString()))
             {
                 <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
@@ -153,13 +156,33 @@
                     </div>
                 </div>
             }
-
-
+            <!-- End SuccessMessage Modal -->
+            @if (TempData["InfoMessage"] != null && !string.IsNullOrEmpty(TempData["InfoMessage"].ToString()))
+            {
+                <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="errorModalLabel">Info</h5>
+                            </div>
+                            <div class="modal-body">
+                                <div class="alert alert-info">
+                                    @TempData["InfoMessage"]
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            <!-- End SuccessMessage Modal -->
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="border-top footer text-muted bg-dark-2">
         <div class="container">
             &copy; 2024 - VirtualWallet.WEB - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>

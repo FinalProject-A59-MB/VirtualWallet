@@ -6,6 +6,7 @@ using VirtualWallet.WEB.Controllers;
 using VirtualWallet.WEB.Models.ViewModels;
 using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.BUSINESS.Services;
+using VirtualWallet.BUSINESS.Results;
 
 namespace ForumProject.Controllers.MVC
 {
@@ -32,11 +33,34 @@ namespace ForumProject.Controllers.MVC
         }
 
         [RequireAuthorization]
-        public async Task<IActionResult> Profile()
+        public async Task<IActionResult> Profile(int? id)
         {
-            var profile = _modelMapper.ToUserViewModel(CurrentUser);
-            return View(profile);
+            UserViewModel profileViewModel;
+
+            if (id.HasValue)
+            {
+                
+                var result = await _userService.GetUserByIdAsync(id.Value);
+
+                if (!result.IsSuccess)
+                {
+                    TempData["ErrorMessage"] = result.Error;
+                    return RedirectToAction("NotFound", "Home");
+                }
+
+                
+                profileViewModel = _modelMapper.ToUserViewModel(result.Value);
+            }
+            else
+            {
+                
+                profileViewModel = _modelMapper.ToUserViewModel(CurrentUser);
+            }
+
+            
+            return View(profileViewModel);
         }
+
 
 
         [RequireAuthorization]
@@ -256,6 +280,46 @@ namespace ForumProject.Controllers.MVC
         public IActionResult TransactionLog(TransactionLogViewModel model)
         {
             return View("TransactionLog", model);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> SearchUsers(string searchTerm)
+        {
+            if (string.IsNullOrEmpty(searchTerm))
+            {
+                return View(Enumerable.Empty<UserViewModel>());
+            }
+
+            var result = await _userService.SearchUsersAsync(searchTerm);
+
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+                return View(Enumerable.Empty<UserViewModel>());
+            }
+
+            var userViewModels = result.Value.Select(u => new UserViewModel
+            {
+                Id = u.Id,
+                Username = u.Username,
+                Email = u.Email,
+            });
+
+            return View(userViewModels);
+        }
+
+        [RequireAuthorization]
+        public async Task<IActionResult> Cards()
+        {
+            if (!CurrentUser.Cards.Any())
+            {
+                TempData["InfoMessage"] = "Currently you do not have any cards. You will first need to add a card.";
+                return RedirectToAction("AddCard", "Card", new { userId = CurrentUser.Id });
+            }
+            var viewModel = _modelMapper.ToUserViewModel(CurrentUser);
+
+            return View("UserCardsPartial", viewModel);
         }
     }
 }

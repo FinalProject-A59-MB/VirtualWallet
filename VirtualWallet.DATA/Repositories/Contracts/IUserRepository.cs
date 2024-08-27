@@ -36,5 +36,7 @@ namespace VirtualWallet.DATA.Repositories.Contracts
         public Task RemoveContactAsync(UserContact userContact);
 
         public Task<bool> IsContactExistsAsync(int userId, int contactId);
+
+        public Task<IEnumerable<User>> SearchUsersAsync(string searchTerm);
     }
 }

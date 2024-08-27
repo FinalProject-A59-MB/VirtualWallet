@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
 html {
   font-size: 14px;
 }
@@ -22,6 +24,19 @@ body {
 }
 
 .bg-dark {
-    background-color: #553875 !important;
+    background-color: #2e2f58 !important;
+}
+
+.bg-dark-1 {
+    background-color: #2e2f58 !important;
+}
+
+.bg-dark-2 {
+    background-color: #161731 !important;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    color: #cfcfcf !important;
 }
 

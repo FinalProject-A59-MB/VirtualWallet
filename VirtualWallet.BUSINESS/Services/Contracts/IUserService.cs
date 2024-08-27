@@ -27,5 +27,7 @@ namespace VirtualWallet.DATA.Services.Contracts
         public  Task<List<User>> GetFriendsAsync(int userId);
 
         public  Task<Result> RemoveFriendAsync(int userId, int contactId);
+
+        public Task<Result<IEnumerable<User>>> SearchUsersAsync(string searchTerm);
     }
 }

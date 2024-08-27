@@ -185,7 +185,7 @@ namespace VirtualWallet.DATA.Migrations
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_CardTransactions_Wallets_WalletId",
                         column: x => x.WalletId,

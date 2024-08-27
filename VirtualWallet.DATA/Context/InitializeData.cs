@@ -63,7 +63,7 @@ namespace VirtualWallet.DATA.Context
                             PostalCode = $"1000{i}",
                             Country = "Country",
                             PhoneNumber = $"+12345678{i}0",
-                            PhotoUrl = "test",
+                            
                         }
                     };
                     users.Add(user);
@@ -92,7 +92,7 @@ namespace VirtualWallet.DATA.Context
                             PostalCode = $"1000{i}",
                             Country = "Country",
                             PhoneNumber = $"+12345678{i}0",
-                            PhotoUrl = "test",
+                            
                         }
                     };
                     users.Add(user);
@@ -121,7 +121,6 @@ namespace VirtualWallet.DATA.Context
                             PostalCode = $"1000{i}",
                             Country = "Country",
                             PhoneNumber = $"+12345678{i}0",
-                            PhotoUrl = "test",
                         }
                     };
                     users.Add(user);
@@ -150,7 +149,6 @@ namespace VirtualWallet.DATA.Context
                             PostalCode = $"1000{i}",
                             Country = "Country",
                             PhoneNumber = $"+12345678{i}0",
-                            PhotoUrl = "test",
                         }
                     };
                     users.Add(user);

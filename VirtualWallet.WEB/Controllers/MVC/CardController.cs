@@ -138,11 +138,18 @@ namespace VirtualWallet.WEB.Controllers.MVC
         [RequireAuthorization]
         public async Task<IActionResult> Cards()
         {
-            var user = CurrentUser;
-            var viewModel = _viewModelMapper.ToUserViewModel(user);
+            var viewModel = _viewModelMapper.ToUserViewModel(CurrentUser);
 
             return View("UserCardsPartial", viewModel);
         }
+
+        public async Task<IActionResult> ViewCard(int cardId)
+        {
+            var card = await _cardService.GetCardByIdAsync(cardId);
+            var cardModel = _viewModelMapper.ToCardViewModel(card.Value);
+            return View("_CardPartial", cardModel);
+        }
+
 
         [HttpGet]
         public IActionResult Deposit()
