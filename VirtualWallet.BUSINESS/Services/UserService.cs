@@ -129,39 +129,105 @@ namespace VirtualWallet.DATA.Services
             return Result.Success();
         }
 
-        public async Task<Result> AddFriendAsync(int userId, int contactId)
+        public async Task<Result> SendFriendRequestAsync(int userId, int contactId)
         {
-            if (await _userRepository.IsContactExistsAsync(userId, contactId))
+            var existingRequest = await _userRepository.GetUserContactAsync(userId, contactId);
+
+            if (existingRequest != null)
             {
-                return Result.Failure("This user is already in your friend list.");
+                return Result.Failure("Friend request already sent or you are already friends.");
             }
 
-            var userContact = new UserContact
+            
+            var senderContact = new UserContact
             {
                 UserId = userId,
                 ContactId = contactId,
-                AddedDate = DateTime.UtcNow
+                SenderId = userId,
+                AddedDate = DateTime.UtcNow,
+                Status = FriendRequestStatus.Pending
             };
 
-            await _userRepository.AddContactAsync(userContact);
+            
+            var receiverContact = new UserContact
+            {
+                UserId = contactId,
+                ContactId = userId,
+                SenderId = userId,
+                AddedDate = DateTime.UtcNow,
+                Status = FriendRequestStatus.Pending
+            };
+
+            await _userRepository.AddContactAsync(senderContact);
+            await _userRepository.AddContactAsync(receiverContact);
 
             return Result.Success();
         }
 
-        public async Task<List<User>> GetFriendsAsync(int userId)
+        public async Task<Result> AcceptFriendRequestAsync(int userId, int contactId)
         {
-            return await _userRepository.GetUserContactsAsync(userId);
-        }
+            // Fetch the original friend request
+            var friendRequest = await _userRepository.GetUserContactAsync(contactId, userId);
 
-        public async Task<Result> RemoveFriendAsync(int userId, int contactId)
-        {
-            var userContact = await _userRepository.GetUserContactAsync(userId, contactId);
-            if (userContact == null)
+            if (friendRequest == null || friendRequest.Status != FriendRequestStatus.Pending)
             {
-                return Result.Failure("Contact not found in your friend list.");
+                return Result.Failure("Friend request not found.");
             }
 
-            await _userRepository.RemoveContactAsync(userContact);
+            // Mark the original friend request as accepted
+            friendRequest.Status = FriendRequestStatus.Accepted;
+            await _userRepository.UpdateContactAsync(friendRequest);
+
+            // Check if the reciprocal friend request already exists
+            var reciprocalFriendRequest = await _userRepository.GetUserContactAsync(userId, contactId);
+
+            if (reciprocalFriendRequest == null)
+            {
+                // If it doesn't exist, create a new reciprocal friend request
+                reciprocalFriendRequest = new UserContact
+                {
+                    UserId = userId,
+                    ContactId = contactId,
+                    SenderId = contactId,
+                    AddedDate = DateTime.UtcNow,
+                    Status = FriendRequestStatus.Accepted
+                };
+
+                await _userRepository.AddContactAsync(reciprocalFriendRequest);
+            }
+            else
+            {
+                // If it does exist, update its status to accepted
+                reciprocalFriendRequest.Status = FriendRequestStatus.Accepted;
+                await _userRepository.UpdateContactAsync(reciprocalFriendRequest);
+            }
+
+            return Result.Success();
+        }
+
+
+        public async Task<Result<IEnumerable<UserContact>>> GetPendingFriendRequestsAsync(int userId)
+        {
+            var requests = await _userRepository.GetPendingFriendRequestsAsync(userId);
+            return Result<IEnumerable<UserContact>>.Success(requests);
+        }
+
+        public async Task<Result<IEnumerable<User>>> GetFriendsAsync(int userId)
+        {
+            var friends = await _userRepository.GetUserContactsAsync(userId);
+            return Result<IEnumerable<User>>.Success(friends);
+        }
+
+        public async Task<Result> DenyFriendRequestAsync(int userId, int contactId)
+        {
+            var friendRequest = await _userRepository.GetUserContactAsync(contactId, userId);
+
+            if (friendRequest == null || friendRequest.Status != FriendRequestStatus.Pending)
+            {
+                return Result.Failure("Friend request not found.");
+            }
+
+            await _userRepository.RemoveContactAsync(friendRequest);
 
             return Result.Success();
         }
@@ -182,6 +248,22 @@ namespace VirtualWallet.DATA.Services
 
             return Result<IEnumerable<User>>.Success(users);
         }
+
+        public async Task<Result> UpdateContact(int userId, int contactId, string description)
+        {
+            var contact = await _userRepository.GetUserContactAsync(userId, contactId);
+
+            if (contact == null)
+            {
+                return Result.Failure("Contact not found.");
+            }
+
+            contact.Description = description;
+            await _userRepository.UpdateContactAsync(contact);
+
+            return Result.Success();
+        }
+
 
 
 

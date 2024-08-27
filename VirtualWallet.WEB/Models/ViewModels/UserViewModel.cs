@@ -16,6 +16,4 @@ namespace VirtualWallet.WEB.Models.ViewModels
         public WalletViewModel? MainWallet { get; set; }
         public ICollection<UserContact>? Contacts {  get; set; }
     }
-
-
 }

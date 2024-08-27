@@ -7,14 +7,9 @@
     var canViewFullProfile = isProfileOwner || isAdmin;
 }
 
-<div class="container bg-dark-2">
+<div class="container bg-dark-1">
     <div class="card-body">
-        <div class="d-flex justify-content-between">
-            <h2 class="text-center">Profile of @Model.Username</h2>
-            <form asp-controller="Authentication" asp-action="Logout" method="post">
-                <button type="submit" class="btn btn-danger">Logout</button>
-            </form>
-        </div>
+        
 
         <ul class="nav nav-tabs" id="profileTabs" role="tablist">
             <li class="nav-item" role="presentation">
@@ -51,7 +46,10 @@
                         {
                             <a href="@Url.Action("SendMoney", "Transaction", new { recipientId = Model.Id })" class="btn btn-primary btn-sm mb-2">Send Money</a>
                             <a href="@Url.Action("RequestMoney", "Transaction", new { senderId = Model.Id })" class="btn btn-primary btn-sm mb-2">Request Money</a>
-                            <a href="@Url.Action("AddFriend", "User", new { userId = Model.Id })" class="btn btn-success btn-sm mb-2">Add as Friend</a>
+                            <form asp-controller="User" asp-action="SendFriendRequest" method="post" class="d-inline">
+                                <input type="hidden" name="contactId" value="@Model.Id" />
+                                <button type="submit" class="btn btn-success btn-sm mb-2">Add as Friend</button>
+                            </form>
                         }
                         @if (Model.Role == UserRole.Admin.ToString())
                         {
@@ -112,48 +110,99 @@
 
             <!-- Friends Tab -->
             <div class="tab-pane fade" id="friends" role="tabpanel" aria-labelledby="friends-tab">
-                <div class="row mt-4">
-                    <div class="col-md-12">
-                        <h4>Friends List</h4>
-                        <form class="d-flex mb-3" asp-controller="User" asp-action="SearchFriends" method="get">
-                            <input class="form-control me-2" type="search" name="searchTerm" placeholder="Search in friends..." aria-label="Search" />
-                            <button class="btn btn-outline-success" type="submit">Search</button>
-                        </form>
-                        <ul class="list-group">
-                            @foreach (var friend in Model.Contacts)
-                            {
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>@friend.Contact.Username</span>
-                                    <div>
-                                        <a href="@Url.Action("SendMoney", "Transaction", new { recipientId = friend.ContactId })" class="btn btn-primary btn-sm">Send Money</a>
-                                        <a href="@Url.Action("RequestMoney", "Transaction", new { senderId = friend.ContactId })" class="btn btn-primary btn-sm">Request Money</a>
-                                        <a href="@Url.Action("Unfriend", "User", new { friendId = friend.ContactId })" class="btn btn-danger btn-sm">Unfriend</a>
-                                    </div>
-                                </li>
-                            }
-                        </ul>
-                    </div>
+                <div class="col-md-12">
+                    <h4 class="mt-4">Friends List</h4>
+
+                    <!-- Search Form -->
+                    <form asp-controller="User" asp-action="SearchFriends" method="get" class="mb-3">
+                        <input type="hidden" name="userId" value="@Model.Id" />
+                        <div class="input-group">
+                            <input type="text" name="searchTerm" class="form-control" placeholder="Search friends by name or email..." aria-label="Search friends">
+                            <button class="btn btn-outline-secondary" type="submit">Search</button>
+                        </div>
+                    </form>
+
+                    <!-- Friends List Table -->
+                    @if (Model.Contacts != null && Model.Contacts.Any())
+                    {
+                        <table class="table table-dark table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Status</th>
+                                    <th>Description</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var contact in Model.Contacts)
+                                {
+                                    <tr>
+                                        <td>@contact.Contact.Username</td>
+                                        <td>@contact.Status.ToString()</td>
+                                        <td>
+                                            <div class="description-container">
+                                                <!-- Display Mode -->
+                                                @{ var context = @contact.Description ?? "Click to add a description";}
+                                                <span class="description-text" onclick="showEditForm(this)">
+                                                    @context
+                                                </span>
+
+                                                <!-- Edit Mode (Hidden by Default) -->
+                                                <div class="description-form" style="display: none;">
+                                                    <form id="descriptionForm-@contact.ContactId" asp-controller="User" asp-action="UpdateFriendDescription" method="post" class="d-flex description-form" style="display: none;" onsubmit="saveDescription(event, @contact.ContactId)">
+                                                        <input type="hidden" name="contactId" value="@contact.ContactId" />
+                                                        <input type="text" name="description" value="@contact.Description" class="form-control form-control-sm" placeholder="Enter description" maxlength="30" />
+                                                        <button type="submit" class="btn btn-sm btn-outline-primary ms-2">Save</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+
+
+
+                                        </td>
+                                        <td>
+                                            @if (contact.Status == FriendRequestStatus.Pending && contact.Sender.Id == contact.ContactId)
+                                            {
+                                                <form asp-controller="User" asp-action="AcceptFriendRequest" method="post" class="d-inline">
+                                                    <input type="hidden" name="contactId" value="@contact.SenderId" />
+                                                    <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                                                </form>
+                                                <form asp-controller="User" asp-action="DenyFriendRequest" method="post" class="d-inline">
+                                                    <input type="hidden" name="contactId" value="@contact.ContactId" />
+                                                    <button type="submit" class="btn btn-danger btn-sm">Deny</button>
+                                                </form>
+                                            }
+                                            @if (contact.Status == FriendRequestStatus.Accepted)
+                                            {
+                                                <form asp-controller="Wallet" asp-action="SendMoney" method="post" class="d-inline">
+                                                    <input type="hidden" name="contactId" value="@contact.ContactId" />
+                                                    <button type="submit" class="btn btn-success btn-sm">+ Send Money</button>
+                                                </form>
+                                                <form asp-controller="Wallet" asp-action="ReceiveMoney" method="post" class="d-inline">
+                                                    <input type="hidden" name="contactId" value="@contact.ContactId" />
+                                                    <button type="submit" class="btn btn-warning btn-sm">- Request Money</button>
+                                                </form>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <p>No friends found.</p>
+                    }
                 </div>
+
 
                 <hr />
-
-                <!-- Wallet Transactions -->
-                <div class="row mt-4">
-                    <div class="col-md-12">
-                        <h4>Last 10 Wallet Transactions</h4>
-                        <ul class="list-group">
-                            @* @foreach (var transaction in Model.WalletTransactions.Take(10))
-                            {
-                                <li class="list-group-item">
-                                    @transaction.Description - @transaction.Amount @transaction.Currency - @transaction.TransactionDate.ToString("MM/dd/yyyy")
-                                </li>
-                            } *@
-                            <li>to be implemented</li>
-                        </ul>
-                        <a href="@Url.Action("WalletTransactions", "Transaction", new { userId = Model.Id })" class="btn btn-outline-primary mt-3">View All Transactions</a>
-                    </div>
-                </div>
+                <p>Recruit a friend TODO</p>
             </div>
+
         </div>
     </div>
 </div>
+
+

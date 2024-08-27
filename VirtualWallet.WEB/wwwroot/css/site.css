@@ -23,9 +23,9 @@ body {
     z-index: -1;
 }
 
-.bg-dark {
+/*.bg-dark {
     background-color: #2e2f58 !important;
-}
+}*/
 
 .bg-dark-1 {
     background-color: #2e2f58 !important;
@@ -35,8 +35,19 @@ body {
     background-color: #161731 !important;
 }
 
+.bg-dark-3 {
+    background-color: #21314d !important;
+}
+
 body {
     font-family: 'Roboto', sans-serif;
     color: #cfcfcf !important;
 }
 
+/*.btn-outline-success {
+    background-color: #0f3511 !important;
+}*/
+
+.nav-link {
+    color: white;
+}

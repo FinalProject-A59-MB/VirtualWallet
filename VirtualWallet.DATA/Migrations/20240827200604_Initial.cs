@@ -74,7 +74,10 @@ namespace VirtualWallet.DATA.Migrations
                 {
                     UserId = table.Column<int>(type: "int", nullable: false),
                     ContactId = table.Column<int>(type: "int", nullable: false),
-                    AddedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    AddedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    SenderId = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -339,6 +342,11 @@ namespace VirtualWallet.DATA.Migrations
                 column: "ContactId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserContacts_SenderId",
+                table: "UserContacts",
+                column: "SenderId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserProfiles_UserId",
                 table: "UserProfiles",
                 column: "UserId",
@@ -399,6 +407,14 @@ namespace VirtualWallet.DATA.Migrations
                 principalTable: "Users",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_UserContacts_Users_SenderId",
+                table: "UserContacts",
+                column: "SenderId",
+                principalTable: "Users",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_UserContacts_Users_UserId",

@@ -50,7 +50,7 @@ namespace ForumProject.Controllers.MVC
 
             if (!authResult.IsSuccess)
             {
-                ModelState.AddModelError("CustomError", authResult.Error);
+                TempData["ErrorMessage"] = authResult.Error;
                 return View(model);
             }
 

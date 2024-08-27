@@ -3,47 +3,54 @@
 @{
     ViewData["Title"] = "Login";
 }
-<div class="card mb-4 w-50 mx-auto">
-    <div class="card-body">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <h2 class="text-center">Login</h2>
-
-                    <form asp-action="Login" method="post">
-                        <div class="form-group">
-                            <label asp-for="UsernameOrEmail" class="control-label">Username or Email</label>
-                            <input asp-for="UsernameOrEmail" class="form-control" />
-                            <span asp-validation-for="UsernameOrEmail" class="text-danger"></span>
+<div class="login-area area-padding fix">
+    <div class="login-overlay"></div>
+    <div class="d-table w-100 h-100">
+        <div class="d-table-cell align-middle">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-6 col-sm-8 col-xs-12">
+                        <div class="login-form bg-dark-1 p-4 rounded shadow">
+                            <h4 class="login-title text-center mb-4">LOGIN</h4>
+                            <form asp-action="Login" method="post" id="loginForm" class="log-form">
+                                <div class="mb-3">
+                                    <input asp-for="UsernameOrEmail" class="form-control" placeholder="Username or Email" required />
+                                    <span asp-validation-for="UsernameOrEmail" class="text-danger"></span>
+                                </div>
+                                <div class="mb-3">
+                                    <input asp-for="Password" class="form-control" type="password" placeholder="Password" required />
+                                    <span asp-validation-for="Password" class="text-danger"></span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="rememberMe">
+                                        <label class="form-check-label" for="rememberMe">Remember me</label>
+                                    </div>
+                                    <a class="text-muted" href="@Url.Action("ForgotPassword", "Authentication")">Forgot password?</a>
+                                </div>
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-outline-secondary w-100">Login</button>
+                                    <span asp-validation-for="CustomError" class="text-danger mt-2 d-block"></span>
+                                </div>
+                                <div class="text-center mt-4">
+                                    <div class="separator text-center"><span>Or with</span></div>
+                                    <div class="sign-icon mt-3">
+                                        <ul class="list-inline">
+                                            <li class="list-inline-item">
+                                                <a class="btn btn-outline-danger" href="@Url.Action("GoogleLogin", "Authentication")">
+                                                    <i class="fab fa-google"></i> Google
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="text-center mt-4">
+                                    <div class="acc-not">Don't have an account? <a href="@Url.Action("Register", "Authentication")">Sign up</a></div>
+                                    <a href="@Url.Action("Index", "Home")" class="d-block mt-2">Cancel</a>
+                                </div>
+                            </form>
                         </div>
-                        <div class="form-group">
-                            <label asp-for="Password" class="control-label"></label>
-                            <input asp-for="Password" class="form-control" type="password" />
-                            <span asp-validation-for="Password" class="text-danger"></span>
-                        </div>
-                        <div class="form-group text-center">
-                            <span asp-validation-for="CustomError" class="text-danger"></span>
-                        </div>
-                        <div class="form-group text-center">
-                            <button type="submit" class="btn btn-primary">Login</button>
-                        </div>
-                        <div class="text-center">
-                            <a href="@Url.Action("ForgotPassword", "Authentication")">Forgot your password?</a>
-                        </div>
-                 
-                        <div class="form-group text-center">
-                            <a href="@Url.Action("GoogleLogin", "Authentication")" class="btn btn-danger mt-3">
-                                <i class="fab fa-google"></i> Login with Google
-                            </a>
-                        </div>
-
-                        <div class="text-center mt-3">
-                            <a href="@Url.Action("Register", "Authentication")">Don't have an account?</a>
-                        </div>
-                        <div class="text-center">
-                            <a href="@Url.Action("Index", "Home")">Cancel</a>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>

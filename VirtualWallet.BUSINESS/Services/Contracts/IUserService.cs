@@ -22,12 +22,14 @@ namespace VirtualWallet.DATA.Services.Contracts
 
         public Task<Result> DeleteUserAsync(int userId);
 
-        public  Task<Result> AddFriendAsync(int userId, int contactId);
+        public Task<Result> SendFriendRequestAsync(int userId, int contactId);
+        public Task<Result> AcceptFriendRequestAsync(int userId, int contactId);
+        public Task<Result> DenyFriendRequestAsync(int userId, int contactId);
 
-        public  Task<List<User>> GetFriendsAsync(int userId);
-
-        public  Task<Result> RemoveFriendAsync(int userId, int contactId);
+        public Task<Result<IEnumerable<UserContact>>> GetPendingFriendRequestsAsync(int userId);
 
         public Task<Result<IEnumerable<User>>> SearchUsersAsync(string searchTerm);
+
+        public Task<Result> UpdateContact(int userId, int contactId, string description);
     }
 }

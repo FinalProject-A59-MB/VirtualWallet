@@ -304,9 +304,20 @@ namespace VirtualWallet.DATA.Migrations
                     b.Property<DateTime>("AddedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.HasKey("UserId", "ContactId");
 
                     b.HasIndex("ContactId");
+
+                    b.HasIndex("SenderId");
 
                     b.ToTable("UserContacts");
                 });
@@ -568,6 +579,12 @@ namespace VirtualWallet.DATA.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("VirtualWallet.DATA.Models.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("VirtualWallet.DATA.Models.User", "User")
                         .WithMany("Contacts")
                         .HasForeignKey("UserId")
@@ -575,6 +592,8 @@ namespace VirtualWallet.DATA.Migrations
                         .IsRequired();
 
                     b.Navigation("Contact");
+
+                    b.Navigation("Sender");
 
                     b.Navigation("User");
                 });

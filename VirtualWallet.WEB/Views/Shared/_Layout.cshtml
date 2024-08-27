@@ -54,11 +54,22 @@
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
-            <form class="d-flex mb-4" asp-controller="User" asp-action="SearchUsers" method="get">
-                <input class="form-control me-2" type="search" name="searchTerm" placeholder="Username / Email" aria-label="Search" />
-                <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i> Search</button>
-            </form>
+            <div>
+                
+            </div>
+            
             <ul class="nav flex-column">
+                <li>
+                    <form class="d-flex mb-4" asp-controller="User" asp-action="SearchUsers" method="get">
+                    <input class="form-control me-2" type="search" name="searchTerm" placeholder="Username / Email" aria-label="Search" />
+                        <button class="btn btn-outline-success" type="submit"><i class="bi bi-search"></i></button>
+                </form>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="@Url.Action("Profile", "User")">
+                        <i class="bi bi-person me-2"></i> Profile
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link text-white" href="@Url.Action("SendMoney", "Transaction")">
                         <i class="bi bi-box-arrow-up-right me-2"></i> Send Money
@@ -94,16 +105,18 @@
                         <i class="bi bi-credit-card-2-back me-2"></i> Card Transactions
                     </a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item mb-5">
                     <a class="nav-link text-white" href="@Url.Action("WalletTransactions", "Wallet")">
                         <i class="bi bi-credit-card me-2"></i> Wallet Transactions
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="@Url.Action("Profile", "User")">
-                        <i class="bi bi-person me-2"></i> Profile
-                    </a>
+                
+                <li class="nav-item d-flex justify-content-center">
+                    <form asp-controller="Authentication" asp-action="Logout" method="post" class="w-100">
+                        <button type="submit" class="btn btn-outline-danger w-100">Logout</button>
+                    </form>
                 </li>
+
             </ul>
         </div>
     </div>
@@ -112,7 +125,7 @@
 
     
     <div class="bg-dark">
-        <main role="main" class="p-3">
+        <main role="main" class="pt-3 pb-3">
             <!-- Start Error Modal -->
             @if (TempData["ErrorMessage"] != null && !string.IsNullOrEmpty(TempData["ErrorMessage"].ToString()))
             {
@@ -120,16 +133,15 @@
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="errorModalLabel">Error</h5>
+                                <h5 class="modal-title text-danger" id="errorModalLabel">Error</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body">
                                 <div class="alert alert-danger">
                                     @TempData["ErrorMessage"]
                                 </div>
                             </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -142,15 +154,13 @@
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="errorModalLabel">Success</h5>
+                                <h5 class="modal-title text-success" id="errorModalLabel">Success</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body">
                                 <div class="alert alert-success">
                                     @TempData["SuccessMessage"]
                                 </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>
@@ -163,15 +173,13 @@
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="errorModalLabel">Info</h5>
+                                <h5 class="modal-title text-secondary" id="errorModalLabel">Info</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body">
                                 <div class="alert alert-info">
                                     @TempData["InfoMessage"]
                                 </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                             </div>
                         </div>
                     </div>

@@ -154,6 +154,11 @@ namespace VirtualWallet.WEB.Controllers.MVC
         [HttpGet]
         public IActionResult Deposit()
         {
+            if (!CurrentUser.Cards.Any())
+            {
+                TempData["InfoMessage"] = "Currently you do not have any cards. You will first need to add a card.";
+                return RedirectToAction("AddCard", "Card");
+            }
             var model = new CardTransactionViewModel
             {
                 ActionTitle = "Deposit Money",
@@ -175,6 +180,8 @@ namespace VirtualWallet.WEB.Controllers.MVC
 
             var result = await _cardTransactionService.DepositAsync(model.CardId, model.WalletId, model.Amount);
 
+            
+
             if (result.IsSuccess)
             {
                 TempData["SuccessMessage"] = "Deposit completed successfully.";
@@ -190,6 +197,11 @@ namespace VirtualWallet.WEB.Controllers.MVC
         [HttpGet]
         public IActionResult Withdraw()
         {
+            if (!CurrentUser.Cards.Any())
+            {
+                TempData["InfoMessage"] = "Currently you do not have any cards. You will first need to add a card.";
+                return RedirectToAction("AddCard", "Card");
+            }
             var model = new CardTransactionViewModel
             {
                 ActionTitle = "Withdraw Money",

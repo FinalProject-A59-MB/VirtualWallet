@@ -226,28 +226,26 @@ namespace ForumProject.Controllers.MVC
         }
         [RequireAuthorization]
         [HttpPost]
-        public async Task<IActionResult> AddFriend(int contactId)
+        public async Task<IActionResult> SendFriendRequest(int contactId)
         {
             var userId = CurrentUser.Id;
-
-            var result = await _userService.AddFriendAsync(userId, contactId);
+            var result = await _userService.SendFriendRequestAsync(userId, contactId);
 
             if (!result.IsSuccess)
             {
                 TempData["ErrorMessage"] = result.Error;
-                return RedirectToAction("Profile");
+                return RedirectToAction("Profile", new { id = contactId });
             }
 
-            return RedirectToAction("Profile");
+            TempData["SuccessMessage"] = "Friend request sent!";
+            return RedirectToAction("Profile", new { id = contactId });
         }
 
-        [RequireAuthorization]
         [HttpPost]
-        public async Task<IActionResult> RemoveFriend(int contactId)
+        public async Task<IActionResult> AcceptFriendRequest(int contactId)
         {
             var userId = CurrentUser.Id;
-
-            var result = await _userService.RemoveFriendAsync(userId, contactId);
+            var result = await _userService.AcceptFriendRequestAsync(userId, contactId);
 
             if (!result.IsSuccess)
             {
@@ -258,22 +256,34 @@ namespace ForumProject.Controllers.MVC
             return RedirectToAction("Profile");
         }
 
-        [RequireAuthorization]
-        [HttpGet]
-        public async Task<IActionResult> GetFriends()
+        [HttpPost]
+        public async Task<IActionResult> DenyFriendRequest(int contactId)
         {
             var userId = CurrentUser.Id;
+            var result = await _userService.DenyFriendRequestAsync(userId, contactId);
 
-            var friends = await _userService.GetFriendsAsync(userId);
-
-            var friendViewModels = friends.Select(f => new UserViewModel
+            if (!result.IsSuccess)
             {
-                Id = f.Id,
-                Username = f.Username,
-                Email = f.Email
-            }).ToList();
+                TempData["ErrorMessage"] = result.Error;
+                return RedirectToAction("Profile");
+            }
 
-            return View(friendViewModels);
+            return RedirectToAction("Profile");
+        }
+
+
+        public async Task<IActionResult> PendingFriendRequests()
+        {
+            var userId = CurrentUser.Id;
+            var result = await _userService.GetPendingFriendRequestsAsync(userId);
+
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+                return RedirectToAction("Profile");
+            }
+
+            return View(result.Value);
         }
 
         [HttpGet]
@@ -321,5 +331,20 @@ namespace ForumProject.Controllers.MVC
 
             return View("UserCardsPartial", viewModel);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateFriendDescription(int contactId, string description)
+        {
+            var userId = CurrentUser.Id;
+            var result = await _userService.UpdateContact(userId, contactId, description);
+
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+            }
+
+            return RedirectToAction("Profile", new { id = userId });
+        }
+
     }
 }

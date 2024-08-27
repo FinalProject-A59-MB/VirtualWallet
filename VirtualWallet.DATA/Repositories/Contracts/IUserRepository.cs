@@ -28,7 +28,7 @@ namespace VirtualWallet.DATA.Repositories.Contracts
         public Task<IEnumerable<BlockedRecord>> GetBlockedRecordsAsync(int userId);
 
         public Task AddContactAsync(UserContact userContact);
-
+        public Task UpdateContactAsync(UserContact userContact);
         public Task<List<User>> GetUserContactsAsync(int userId);
 
         public Task<UserContact> GetUserContactAsync(int userId, int contactId);
@@ -38,5 +38,7 @@ namespace VirtualWallet.DATA.Repositories.Contracts
         public Task<bool> IsContactExistsAsync(int userId, int contactId);
 
         public Task<IEnumerable<User>> SearchUsersAsync(string searchTerm);
+
+        public Task<IEnumerable<UserContact>> GetPendingFriendRequestsAsync(int userId);
     }
 }

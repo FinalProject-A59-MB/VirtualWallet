@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VirtualWallet.DATA.Models;
+using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Repositories.Contracts;
 
 namespace VirtualWallet.DATA.Repositories
@@ -20,7 +21,9 @@ namespace VirtualWallet.DATA.Repositories
                 .Include(u => u.Cards)
                 .Include(u => u.BlockedRecord)
                 .Include(u => u.Wallets)
-                .Include(u => u.MainWallet);
+                .Include(u => u.MainWallet)
+                .Include(u=>u.Contacts)
+                .ThenInclude(uc => uc.Contact);
         }
 
         public IQueryable<User> GetAllUsers()
@@ -104,6 +107,12 @@ namespace VirtualWallet.DATA.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task UpdateContactAsync(UserContact userContact)
+        {
+            _context.UserContacts.Update(userContact);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<List<User>> GetUserContactsAsync(int userId)
         {
             return await _context.UserContacts
@@ -136,6 +145,16 @@ namespace VirtualWallet.DATA.Repositories
                 .Where(u => u.Username.Contains(searchTerm) || u.Email.Contains(searchTerm))
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<UserContact>> GetPendingFriendRequestsAsync(int userId)
+        {
+            return await _context.UserContacts
+                .Where(uc => uc.ContactId == userId && uc.Status == FriendRequestStatus.Pending)
+                .Include(uc => uc.Sender) // Include sender details
+                .ToListAsync();
+        }
+
+
     }
 }
 
