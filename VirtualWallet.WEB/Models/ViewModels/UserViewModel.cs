@@ -9,6 +9,7 @@ namespace VirtualWallet.WEB.Models.ViewModels
         public string Username { get; set; }
         public string Email { get; set; }
         public string Role { get; set; }
+        public decimal? TotalBalance { get; set; }
         public UserVerificationStatus VerificationStatus { get; set; }
         public UserProfileViewModel UserProfile { get; set; }
         public ICollection<CardViewModel> Cards { get; set; }

@@ -57,6 +57,8 @@ namespace ForumProject.Controllers.MVC
                 profileViewModel = _modelMapper.ToUserViewModel(CurrentUser);
             }
 
+            profileViewModel.TotalBalance = profileViewModel.Wallets.Select(x => x.Balance).Sum();
+
 
             return View(profileViewModel);
         }
