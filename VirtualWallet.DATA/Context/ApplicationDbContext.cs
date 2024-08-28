@@ -21,29 +21,32 @@ public class ApplicationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-
+        // Global Query Filter on User
         modelBuilder.Entity<User>().HasQueryFilter(u => !u.DeletedAt.HasValue);
-        // One-to-One
+
+        // Apply matching query filters to related entities
+        modelBuilder.Entity<BlockedRecord>().HasQueryFilter(br => !br.User.DeletedAt.HasValue);
+        modelBuilder.Entity<CardTransaction>().HasQueryFilter(ct => !ct.User.DeletedAt.HasValue);
+
+        // One-to-One Relationships
         modelBuilder.Entity<User>()
             .HasOne(u => u.UserProfile)
             .WithOne(p => p.User)
             .HasForeignKey<UserProfile>(p => p.UserId);
 
         modelBuilder.Entity<User>()
-        .HasOne(u => u.MainWallet)
-        .WithOne(w => w.User)
-        .HasForeignKey<User>(u => u.MainWalletId)
-        .OnDelete(DeleteBehavior.Restrict);
+            .HasOne(u => u.MainWallet)
+            .WithOne(w => w.User)
+            .HasForeignKey<User>(u => u.MainWalletId)
+            .OnDelete(DeleteBehavior.Restrict);
 
-
-        // One-to-Many
-
+        // One-to-Many Relationships
         modelBuilder.Entity<User>()
-          .HasOne(u => u.BlockedRecord)
-          .WithMany()
-          .HasForeignKey(u => u.BlockedRecordId)
-          .OnDelete(DeleteBehavior.Restrict);
-
+            .HasOne(u => u.BlockedRecord)
+            .WithMany()
+            .HasForeignKey(u => u.BlockedRecordId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .IsRequired(false);
 
         modelBuilder.Entity<BlockedRecord>()
             .HasOne(br => br.User)
@@ -63,7 +66,6 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(rp => rp.RecipientId)
             .OnDelete(DeleteBehavior.Restrict);
 
-
         modelBuilder.Entity<UserContact>()
             .HasKey(uc => new { uc.UserId, uc.ContactId });
 
@@ -71,30 +73,19 @@ public class ApplicationDbContext : DbContext
             .HasOne(uc => uc.User)
             .WithMany(u => u.Contacts)
             .HasForeignKey(uc => uc.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<UserContact>()
             .HasOne(uc => uc.Contact)
             .WithMany()
             .HasForeignKey(uc => uc.ContactId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
+
 
         modelBuilder.Entity<WalletTransaction>()
             .HasOne(wt => wt.Sender)
             .WithMany(u => u.WalletTransactions)
             .HasForeignKey(wt => wt.SenderId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<WalletTransaction>()
-            .HasOne(wt => wt.Recipient)
-            .WithMany()
-            .HasForeignKey(wt => wt.RecipientId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Wallet>()
-            .HasMany(w => w.CardTransactions)
-            .WithOne(ct => ct.Wallet)
-            .HasForeignKey(ct => ct.WalletId)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<CardTransaction>()
@@ -109,7 +100,7 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(ct => ct.CardId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Many-to-Many
+        // Many-to-Many Relationships
         modelBuilder.Entity<UserWallet>()
             .HasKey(uw => new { uw.UserId, uw.WalletId });
 
@@ -125,7 +116,7 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(uw => uw.WalletId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Configure precision and scale for decimal properties
+        // Precision and Scale for Decimal
         modelBuilder.Entity<CardTransaction>()
             .Property(ct => ct.Amount)
             .HasColumnType("decimal(18,2)");
@@ -148,5 +139,6 @@ public class ApplicationDbContext : DbContext
 
         base.OnModelCreating(modelBuilder);
     }
+
 
 }

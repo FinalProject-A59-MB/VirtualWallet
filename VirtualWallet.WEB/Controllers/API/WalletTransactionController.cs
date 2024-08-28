@@ -57,9 +57,10 @@ namespace VirtualWallet.WEB.Controllers.API
         [HttpPost]
         public async Task<IActionResult> Add(WalletTransaction walletTransaction)
         {
-            await _walletTransactionService.AddWalletTransactionAsync(walletTransaction);
+            throw new NotImplementedException();
+            //await _walletTransactionService.AddWalletTransactionAsync(walletTransaction);
 
-            return Ok();
+            //return Ok();
         }
     }
 }

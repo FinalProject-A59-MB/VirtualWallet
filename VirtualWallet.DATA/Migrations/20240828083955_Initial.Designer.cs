@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace VirtualWallet.DATA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240827200604_Initial")]
+    [Migration("20240828083955_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -521,7 +521,7 @@ namespace VirtualWallet.DATA.Migrations
                     b.HasOne("VirtualWallet.DATA.Models.Wallet", "Wallet")
                         .WithMany("CardTransactions")
                         .HasForeignKey("WalletId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Card");
@@ -644,7 +644,7 @@ namespace VirtualWallet.DATA.Migrations
                     b.HasOne("VirtualWallet.DATA.Models.Wallet", "Recipient")
                         .WithMany()
                         .HasForeignKey("RecipientId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("VirtualWallet.DATA.Models.Wallet", "Sender")

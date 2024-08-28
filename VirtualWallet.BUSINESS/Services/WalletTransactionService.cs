@@ -39,7 +39,7 @@ namespace VirtualWallet.DATA.Services
                 return Result<WalletTransaction>.Failure(ErrorMessages.InvalidDepositAmount);
 
             var transaction = await _transactionHandlingService.ProcessWalletToWalletTransactionAsync(senderWallet, recipientWallet, amount);
-            return Result<WalletTransaction>.Success(transaction);
+            return Result<WalletTransaction>.Success(transaction.Value);
         }
 
         public async Task<Result<WalletTransaction>> GetTransactionByIdAsync(int id)

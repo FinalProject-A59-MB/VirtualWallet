@@ -519,7 +519,7 @@ namespace VirtualWallet.DATA.Migrations
                     b.HasOne("VirtualWallet.DATA.Models.Wallet", "Wallet")
                         .WithMany("CardTransactions")
                         .HasForeignKey("WalletId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Card");
@@ -642,7 +642,7 @@ namespace VirtualWallet.DATA.Migrations
                     b.HasOne("VirtualWallet.DATA.Models.Wallet", "Recipient")
                         .WithMany()
                         .HasForeignKey("RecipientId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("VirtualWallet.DATA.Models.Wallet", "Sender")

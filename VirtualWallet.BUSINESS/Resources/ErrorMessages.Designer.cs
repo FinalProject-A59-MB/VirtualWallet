@@ -250,6 +250,24 @@ namespace VirtualWallet.BUSINESS.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid user information..
+        /// </summary>
+        public static string InvalidUserInformation {
+            get {
+                return ResourceManager.GetString("InvalidUserInformation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid wallet information..
+        /// </summary>
+        public static string InvalidWalletInformation {
+            get {
+                return ResourceManager.GetString("InvalidWalletInformation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The withdrawal amount must be greater than zero..
         /// </summary>
         public static string InvalidWithdrawalAmount {
@@ -322,6 +340,15 @@ namespace VirtualWallet.BUSINESS.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to User is already added to wallet..
+        /// </summary>
+        public static string UserIsAlreadyAddedToWallet {
+            get {
+                return ResourceManager.GetString("UserIsAlreadyAddedToWallet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Username &apos;{0}&apos; is already taken..
         /// </summary>
         public static string UsernameTaken {
@@ -345,30 +372,6 @@ namespace VirtualWallet.BUSINESS.Resources {
         public static string WalletNotFound {
             get {
                 return ResourceManager.GetString("WalletNotFound", resourceCulture);
-            }
-        }
-
-        public static string InvalidWalletInformation
-        {
-            get
-            {
-                return ResourceManager.GetString("InvalidWalletInformation", resourceCulture);
-            }
-        }
-
-        public static string InvalidUserInformation
-        {
-            get
-            {
-                return ResourceManager.GetString("InvalidUserInformation", resourceCulture);
-            }
-        }
-
-        public static string UserIsAlreadyAddedToWallet
-        { 
-            get
-            {
-                return ResourceManager.GetString("UserIsAlreadyAddedToWallet", resourceCulture);
             }
         }
     }

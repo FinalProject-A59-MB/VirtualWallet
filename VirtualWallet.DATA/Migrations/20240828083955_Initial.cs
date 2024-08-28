@@ -194,7 +194,7 @@ namespace VirtualWallet.DATA.Migrations
                         column: x => x.WalletId,
                         principalTable: "Wallets",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -287,7 +287,7 @@ namespace VirtualWallet.DATA.Migrations
                         column: x => x.RecipientId,
                         principalTable: "Wallets",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_WalletTransactions_Wallets_SenderId",
                         column: x => x.SenderId,
