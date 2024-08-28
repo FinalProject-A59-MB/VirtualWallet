@@ -135,7 +135,7 @@ namespace VirtualWallet.DATA.Services
 
             if (existingRequest != null)
             {
-                return Result.Failure("Friend request already sent or you are already friends.");
+                return Result.Failure("Friend request already sent.");
             }
 
             
@@ -264,6 +264,56 @@ namespace VirtualWallet.DATA.Services
             return Result.Success();
         }
 
+        public async Task<Result> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
+        {
+            var userResult = await GetUserByIdAsync(userId);
+            if (!userResult.IsSuccess)
+            {
+                return Result.Failure("User not found.");
+            }
+
+            var user = userResult.Value;
+
+            if (!PasswordHasher.VerifyPassword(currentPassword, user.Password))
+            {
+                return Result.Failure("Current password is incorrect.");
+            }
+
+            var hashedNewPassword = PasswordHasher.HashPassword(newPassword);
+
+            user.Password = hashedNewPassword;
+            await _userRepository.UpdateUserAsync(user);
+
+            return Result.Success();
+        }
+
+
+        public async Task<Result> ChangeEmailAsync(int userId, string newEmail, string currentPassword)
+        {
+            var userResult = await GetUserByIdAsync(userId);
+            if (!userResult.IsSuccess)
+            {
+                return Result.Failure("User not found.");
+            }
+
+            var user = userResult.Value;
+
+            if (!PasswordHasher.VerifyPassword(currentPassword, user.Password))
+            {
+                return Result.Failure("Current password is incorrect.");
+            }
+
+            var existingUser = await _userRepository.GetUserByEmailAsync(newEmail);
+            if (existingUser != null && existingUser.Id != userId)
+            {
+                return Result.Failure("Email is already in use by another account.");
+            }
+
+            user.Email = newEmail;
+            await _userRepository.UpdateUserAsync(user);
+
+            return Result.Success();
+        }
 
 
 

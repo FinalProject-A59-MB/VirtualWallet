@@ -177,6 +177,19 @@ public class ViewModelMapper : IViewModelMapper
         };
     }
 
+    public UserVerificationViewModel ToUserVerificationViewModel(User u)
+    {
+        return new UserVerificationViewModel
+        {
+            UserId = u.Id,
+            Username = u.Username,
+            PhotoIdUrl = u.PhotoIdUrl,
+            LicenseIdUrl = u.FaceIdUrl,
+            VerificationStatus = u.VerificationStatus
+        };
+    }
+
+
 
 }
 

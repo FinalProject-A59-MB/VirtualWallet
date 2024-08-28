@@ -58,7 +58,7 @@ function saveDescription(event, contactId) {
     });
 }
 
-
+// showing the desctription form for contacts
 function showEditForm(element) {
     const container = element.closest('.description-container');
     const form = container.querySelector('.description-form');
@@ -68,3 +68,52 @@ function showEditForm(element) {
     text.style.display = 'none';
     form.style.display = 'flex';
 }
+
+
+// toggle only 1 form (change email/password)
+document.addEventListener("DOMContentLoaded", function () {
+
+    let emailState = 0;
+    let passwordState = 0;
+
+    const emailButton = document.querySelector('[data-bs-target="#changeEmailForm"]');
+    const passwordButton = document.querySelector('[data-bs-target="#changePasswordForm"]');
+    const changeEmailForm = document.querySelector("#changeEmailForm");
+    const changePasswordForm = document.querySelector("#changePasswordForm");
+
+    emailButton.addEventListener("click", function () {
+        if (emailState === 0) {
+            // Turn on the email form
+            changeEmailForm.classList.add("show");
+            emailState = 1;
+
+            // Turn off the password form if it is on
+            if (passwordState === 1) {
+                changePasswordForm.classList.remove("show");
+                passwordState = 0;
+            }
+        } else {
+            // Turn off the email form
+            changeEmailForm.classList.remove("show");
+            emailState = 0;
+        }
+    });
+
+    passwordButton.addEventListener("click", function () {
+        if (passwordState === 0) {
+            // Turn on the password form
+            changePasswordForm.classList.add("show");
+            passwordState = 1;
+
+            // Turn off the email form if it is on
+            if (emailState === 1) {
+                changeEmailForm.classList.remove("show");
+                emailState = 0;
+            }
+        } else {
+            // Turn off the password form
+            changePasswordForm.classList.remove("show");
+            passwordState = 0;
+        }
+    });
+});

@@ -35,7 +35,6 @@ namespace VirtualWallet.DATA.Context
                         PostalCode = "12345",
                         Country = "Adminland",
                         PhoneNumber = "+1234567890",
-                        PhotoUrl = "test",
                     }
                 };
                 users.Add(adminUser);

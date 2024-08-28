@@ -31,5 +31,8 @@ namespace VirtualWallet.DATA.Services.Contracts
         public Task<Result<IEnumerable<User>>> SearchUsersAsync(string searchTerm);
 
         public Task<Result> UpdateContact(int userId, int contactId, string description);
+
+        Task<Result> ChangePasswordAsync(int userId, string currentPassword, string newPassword);
+        Task<Result> ChangeEmailAsync(int userId, string newEmail, string currentPassword);
     }
 }

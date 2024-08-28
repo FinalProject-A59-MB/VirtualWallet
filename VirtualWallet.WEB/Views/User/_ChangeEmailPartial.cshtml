@@ -1,0 +1,24 @@
+﻿@model ChangeEmailViewModel
+
+<div class="card bg-dark-1 text-white shadow">
+    <div class="card-body">
+        <form asp-action="ChangeEmail" method="post">
+            <div class="mb-1">
+                <input asp-for="CurrentEmail" class="form-control" type="email" readonly />
+            </div>
+            <div class="mb-1">
+                <input asp-for="NewEmail" class="form-control" type="email" placeholder="New Email" />
+                <span asp-validation-for="NewEmail" class="text-danger"></span>
+            </div>
+
+            <div class="mb-1">
+                <input asp-for="CurrentPassword" class="form-control" type="password" placeholder="Current Password" />
+                <span asp-validation-for="CurrentPassword" class="text-danger"></span>
+            </div>
+            <input asp-for="UserId" hidden class="form-control" />
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-success">Change Email</button>
+            </div>
+        </form>
+    </div>
+</div>

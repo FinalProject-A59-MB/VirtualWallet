@@ -4,44 +4,48 @@
     ViewData["Title"] = "User Search";
 }
 
-<div class="container my-4">
-    <h3 class="mb-4">Search Users</h3>
+<div class="container my-4 bg-dark-1 p-5 rounded-3 shadow animate__animated animate__fadeIn">
+    <h3 class="text-center text-light mb-4">Search Users</h3>
 
-    <form asp-action="SearchUsers" method="get" class="form-inline mb-4">
-        <input type="text" name="searchTerm" class="form-control mr-2" placeholder="Search by Username or Email" />
-        <button type="submit" class="btn btn-primary">Search</button>
+    <form asp-action="SearchUsers" method="get" class="d-flex justify-content-center mb-4">
+        <input type="text" name="searchTerm" class="form-control me-2 w-50" placeholder="Search by Username or Email" />
+        <button type="submit" class="btn btn-outline-success">Search</button>
     </form>
 
     @if (Model != null && Model.Any())
     {
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var user in Model)
-                {
-                    <tr>
-                        <td>@user.Username</td>
-                        <td>@user.Email</td>
-                        <td>
-                            <a href="@Url.Action("Profile", "User", new { id = user.Id })" class="btn btn-info btn-sm">View Profile</a>
-                            <form asp-action="DeleteUser" method="post" class="d-inline">
-                                <input type="hidden" name="userId" value="@user.Id" />
-                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                            </form>
-                        </td>
+        <div class="table-responsive">
+            <table class="table table-dark table-hover table-bordered">
+                <thead>
+                    <tr class="text-center">
+                        <th scope="col">Username</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Status</th>
+                        <th scope="col" style="width: 250px;">Actions</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr class="text-center text-xl-center">
+                            <td class="text-center">@user.Username</td>
+                            <td>@user.Email</td>
+                            <td>@user.VerificationStatus</td>
+                            <td class="d-flex justify-content-center gap-2">
+                                <a href="@Url.Action("Profile", "User", new { id = user.Id })" class="btn btn-outline-info btn-sm">View Profile</a>
+                                <form asp-action="DeleteUser" method="post" class="d-inline">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     }
     else if (Model != null)
     {
-        <p>No users found matching your search criteria.</p>
+        <p class="text-center text-light">No users found matching your search criteria.</p>
     }
 </div>

@@ -7,6 +7,7 @@ using VirtualWallet.WEB.Models.ViewModels;
 using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.BUSINESS.Services;
 using VirtualWallet.BUSINESS.Results;
+using VirtualWallet.WEB.Helpers;
 
 namespace ForumProject.Controllers.MVC
 {
@@ -36,7 +37,7 @@ namespace ForumProject.Controllers.MVC
         public async Task<IActionResult> Profile(int? id)
         {
             UserViewModel profileViewModel;
-
+            
             if (id.HasValue & id != 0)
             {
 
@@ -56,7 +57,6 @@ namespace ForumProject.Controllers.MVC
 
                 profileViewModel = _modelMapper.ToUserViewModel(CurrentUser);
             }
-
             profileViewModel.TotalBalance = profileViewModel.Wallets.Select(x => x.Balance).Sum();
 
 
@@ -100,6 +100,92 @@ namespace ForumProject.Controllers.MVC
         }
 
         [RequireAuthorization]
+        public IActionResult ChangePassword(int userId)
+        {
+            var model = new ChangePasswordViewModel
+            {
+                UserId = userId,
+            };
+
+            return View(model);
+        }
+
+        [RequireAuthorization]
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .ToList();
+
+                string errorMessage = string.Join("\n", errors);
+
+                TempData["ErrorMessage"] = errorMessage;
+
+                return RedirectToAction("Profile", "User");
+            }
+
+
+            var userId = CurrentUser.Id;
+            var result = await _userService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword);
+
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+                return RedirectToAction("Profile", "User");
+            }
+
+            TempData["SuccessMessage"] = "Password changed successfully.";
+            return RedirectToAction("Profile", "User");
+        }
+
+
+        [RequireAuthorization]
+        public IActionResult ChangeEmail(int userId)
+        {
+
+            var model = new ChangeEmailViewModel
+            {
+                UserId = userId,
+            };
+
+            return View(model);
+        }
+
+        [RequireAuthorization]
+        [HttpPost]
+        public async Task<IActionResult> ChangeEmail(ChangeEmailViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .ToList();
+
+                string errorMessage = string.Join("\n", errors);
+
+                TempData["ErrorMessage"] = errorMessage;
+                return RedirectToAction("Profile", "User");
+            }
+
+            var userId = CurrentUser.Id;
+            var result = await _userService.ChangeEmailAsync(userId, model.NewEmail, model.CurrentPassword);
+
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+                return RedirectToAction("Profile", "User");
+            }
+
+            TempData["SuccessMessage"] = "Email changed successfully.";
+            return RedirectToAction("Profile", "User");
+        }
+
+        [RequireAuthorization]
         public IActionResult UploadVerification()
         {
             return View();
@@ -127,9 +213,6 @@ namespace ForumProject.Controllers.MVC
 
             return RedirectToAction("Profile", "User");
         }
-
-
-
 
         [RequireAuthorization]
         public async Task<IActionResult> BlockUser(int userId, string reason)
@@ -187,14 +270,8 @@ namespace ForumProject.Controllers.MVC
             var users = await _userService.GetUsers();
             var unverifiedUsers = users.Value
                 .Where(u => u.VerificationStatus == UserVerificationStatus.PendingVerification)
-                .Select(u => new UserVerificationViewModel
-                {
-                    UserId = u.Id,
-                    Username = u.Username,
-                    PhotoIdUrl = u.PhotoIdUrl,
-                    LicenseIdUrl = u.FaceIdUrl,
-                    VerificationStatus = u.VerificationStatus
-                }).ToList();
+                .Select(_modelMapper.ToUserVerificationViewModel).ToList();
+
 
             return View(unverifiedUsers);
         }
@@ -235,7 +312,7 @@ namespace ForumProject.Controllers.MVC
 
             if (!result.IsSuccess)
             {
-                TempData["ErrorMessage"] = result.Error;
+                TempData["InfoMessage"] = result.Error;
                 return RedirectToAction("Profile", new { id = contactId });
             }
 
@@ -311,12 +388,7 @@ namespace ForumProject.Controllers.MVC
                 return View(Enumerable.Empty<UserViewModel>());
             }
 
-            var userViewModels = result.Value.Select(u => new UserViewModel
-            {
-                Id = u.Id,
-                Username = u.Username,
-                Email = u.Email,
-            });
+            var userViewModels = result.Value.Select(_modelMapper.ToUserViewModel);
 
             return View(userViewModels);
         }

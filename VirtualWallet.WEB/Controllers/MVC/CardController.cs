@@ -239,7 +239,13 @@ namespace VirtualWallet.WEB.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> CardTransactions([FromQuery] CardTransactionQueryParameters filterParameters)
         {
+
             var cards = await _cardService.GetUserCardsAsync(CurrentUser.Id);
+            if (!cards.IsSuccess)
+            {
+                TempData["InfoMessage"] = "Currently you do not have any cards. You will first need to add a card.";
+                return RedirectToAction("AddCard", "Card");
+            }
             ViewBag.Cards = cards.Value.Select(_viewModelMapper.ToCardViewModel).ToList();
             var totalCount = await _cardService.GetTotalCountAsync(filterParameters);
 
