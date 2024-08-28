@@ -357,7 +357,12 @@ namespace ForumProject.Controllers.MVC
                 TempData["ErrorMessage"] = user.Error;
                 return RedirectToAction("Profile", new { id = id });
             }
-
+            var totalAmmout = user.Value.Wallets.Select(w => w.Balance).Sum();
+            if (totalAmmout > 0)
+            {
+                TempData["ErrorMessage"] = "There are still funds in your wallets.\nPlease Withdraw all funds from your wallets before you can proceed.";
+                return RedirectToAction("Profile", new { id = id });
+            }
             var model = new DeleteAccountViewModel
             {
                 Id = user.Value.Id,
@@ -375,7 +380,7 @@ namespace ForumProject.Controllers.MVC
             var result = await _userService.DeleteUserAsync(id);
             if (!result.IsSuccess)
             {
-                TempData["ErrorMessage"] = "An error occurred while trying to delete the account.";
+                TempData["ErrorMessage"] = result.Error;
                 return RedirectToAction("DeleteAccount", new { id });
             }
 

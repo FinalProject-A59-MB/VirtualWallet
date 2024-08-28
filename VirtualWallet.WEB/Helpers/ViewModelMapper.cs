@@ -103,7 +103,8 @@ public class ViewModelMapper : IViewModelMapper
             ExpirationDate = model.ExpirationDate,
             Cvv = model.Cvv,
             PaymentProcessorToken = model.PaymentProcessorToken,
-            CardType = model.CardType
+            CardType = model.CardType,
+            Currency = model.Currency
         };
     }
 
@@ -146,6 +147,36 @@ public class ViewModelMapper : IViewModelMapper
             Currency = model.Currency
         };
     }
+
+    public CardTransaction ToCardTransaction(CardTransactionViewModel model)
+    {
+        return new CardTransaction
+        {
+            Id = model.Id,
+            CreatedAt = model.CreatedAt,
+            Amount = model.Amount,
+            WalletId = model.WalletId,
+            CardId = model.CardId,
+            Card = model.Card,
+            Wallet = model.Wallet,
+        };
+    }
+
+    public CardTransactionViewModel ToCardTransactionViewModel(CardTransaction transaction)
+    {
+        return new CardTransactionViewModel
+        {
+            Id = transaction.Id,
+            CreatedAt = transaction.CreatedAt,
+            Amount = transaction.Amount,
+            WalletId = transaction.WalletId,
+            CardId = transaction.CardId,
+            Card = transaction.Card,
+            Wallet = transaction.Wallet,
+
+        };
+    }
+
 
 }
 

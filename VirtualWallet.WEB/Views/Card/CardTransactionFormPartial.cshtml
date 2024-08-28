@@ -1,45 +1,51 @@
 ﻿@model CardTransactionViewModel
+<div class="transaction-area area-padding fix">
+    <div class="transaction-overlay"></div>
+    <div class="d-table w-100 h-100">
+        <div class="d-table-cell align-middle">
+            <div class="container w-50">
+                <div class="row justify-content-center">
+                    <div class="col-md-8 col-sm-10 col-xs-12">
+                        <div class="transaction-form bg-dark-1 p-5 rounded shadow animate__animated animate__fadeIn">
+                            <h4 class="transaction-title text-center mb-4">@Model.ActionTitle</h4>
+                            <form asp-action="@Model.FormAction" method="post">
+                                <input type="hidden" name="ActionTitle" value="@Model.ActionTitle" />
+                                <input type="hidden" name="FormAction" value="@Model.FormAction" />
 
-<div class="dashboard-content">
-    <div class="row">
-        <div class="col-md-12 col-sm-12 col-xs-12">
-            <div class="send-money-form">
-                <div class="form-text">
-                    <h4 class="form-top">@Model.ActionTitle</h4>
-                    <div class="form-inner">
-                        <form asp-action="@Model.FormAction" method="post">
-                            <input type="hidden" name="ActionTitle" value="@Model.ActionTitle" />
-                            <input type="hidden" name="FormAction" value="@Model.FormAction" />
-                            <div class="col">
-                                <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <label for="amount">Type Amount</label>
-                                    <input type="number" value="0" id="amount" name="Amount" class="form-control" />
+                                <div class="mb-4">
+                                    <label for="amount" class="form-label">Amount</label>
+                                    <input type="number" value="0" id="amount" name="Amount" class="form-control" placeholder="Enter amount" required />
                                 </div>
-                                <div class="col-md-6 col-sm-6 col-xs-12">
-                                    <label for="wallet">Select Wallet</label>
-                                    <select name="WalletId" id="wallet" class="form-control">
+
+                                <div class="mb-4">
+                                    <label for="wallet" class="form-label">Select Wallet</label>
+                                    <select name="WalletId" id="wallet" class="form-select" required>
                                         @foreach (var wallet in ViewBag.Wallets)
                                         {
                                             <option value="@wallet.Id">@wallet.Name (@wallet.Currency)</option>
                                         }
                                     </select>
                                 </div>
-                                <div class="col mt-3">
-                                    <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <label for="card">Select Card</label>
-                                        <select name="CardId" id="card" class="form-control">
-                                            @foreach (var card in ViewBag.Cards)
-                                            {
-                                                <option value="@card.Id">@card.CardNumber</option>
-                                            }
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6 col-sm-6 col-xs-12">
-                                        <button type="submit" class="btn btn-primary mt-4">Submit</button>
-                                    </div>
+
+                                <div class="mb-4">
+                                    <label for="card" class="form-label">Select Card</label>
+                                    <select name="CardId" id="card" class="form-select" required>
+                                        @foreach (var card in ViewBag.Cards)
+                                        {
+                                            <option value="@card.Id">@card.CardNumber</option>
+                                        }
+                                    </select>
                                 </div>
-                            </div>
-                        </form>
+
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-outline-success w-100">Submit</button>
+                                </div>
+
+                                <div class="text-center mt-4">
+                                    <a href="@Url.Action("Profile", "User", new { id = ViewBag.UserId })" class="btn btn-outline-secondary w-50">Back to Profile</a>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

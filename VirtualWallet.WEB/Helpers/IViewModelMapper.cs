@@ -20,4 +20,8 @@ public interface IViewModelMapper
 
     public WalletViewModel ToWalletViewModel(Wallet wallet);
     public Wallet ToWallet(WalletViewModel model);
+
+    public CardTransactionViewModel ToCardTransactionViewModel(CardTransaction transaction);
+
+    public CardTransaction ToCardTransaction(CardTransactionViewModel model);
 }

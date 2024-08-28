@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Repositories.Contracts;
 
@@ -59,5 +60,67 @@ namespace VirtualWallet.DATA.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<ICollection<CardTransaction>> FilterByAsync(CardTransactionQueryParameters filterParameters)
+        {
+            var transactions = _context.CardTransactions.AsQueryable();
+
+            if (filterParameters.CardId!=0)
+            {
+                transactions = transactions.Where(t => t.CardId==filterParameters.CardId);
+            }
+            if (0!=filterParameters.Amount)
+            {
+                transactions = transactions.Where(t => t.Amount== filterParameters.Amount);
+            }
+            if (filterParameters.CreatedAfter.HasValue)
+            {
+                transactions = transactions.Where(t => t.CreatedAt >= filterParameters.CreatedAfter.Value);
+            }
+            if (filterParameters.CreatedBefore.HasValue)
+            {
+                transactions = transactions.Where(t => t.CreatedAt <= filterParameters.CreatedBefore.Value);
+            }
+
+            var sortPropertyMapping = new Dictionary<string, Expression<Func<CardTransaction, object>>>()
+                {
+                    { "CreatedAt", t => t.CreatedAt },
+                    { "Amount", t => t.Amount }
+                };
+
+            if (!string.IsNullOrEmpty(filterParameters.SortBy) && sortPropertyMapping.ContainsKey(filterParameters.SortBy))
+            {
+                transactions = filterParameters.SortOrder.ToLower() == "asc"
+                    ? transactions.OrderBy(sortPropertyMapping[filterParameters.SortBy])
+                    : transactions.OrderByDescending(sortPropertyMapping[filterParameters.SortBy]);
+            }
+
+            var skip = (filterParameters.PageNumber - 1) * filterParameters.PageSize;
+
+            return await transactions.Skip(skip).Take(filterParameters.PageSize).ToListAsync();
+        }
+
+
+        public async Task<int> GetTotalCountAsync(CardTransactionQueryParameters filterParameters)
+        {
+            var transactions = _context.CardTransactions.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(filterParameters.Last4Digits))
+            {
+                transactions = transactions.Where(t => t.CardId.ToString().EndsWith(filterParameters.Last4Digits));
+            }
+            if (filterParameters.CreatedAfter.HasValue)
+            {
+                transactions = transactions.Where(t => t.CreatedAt >= filterParameters.CreatedAfter.Value);
+            }
+            if (filterParameters.CreatedBefore.HasValue)
+            {
+                transactions = transactions.Where(t => t.CreatedAt <= filterParameters.CreatedBefore.Value);
+            }
+
+            return await transactions.CountAsync();
+        }
+
+
     }
 }

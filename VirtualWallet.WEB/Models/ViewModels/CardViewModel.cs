@@ -32,6 +32,8 @@ public class CardViewModel
     public string Cvv { get; set; }
     public string? PaymentProcessorToken { get; set; }
 
+    public CurrencyType Currency { get; set; }
+
     public string? CustomError { get; set; }
 
     // Method to convert "MM/YY" string to DateTime

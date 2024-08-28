@@ -85,5 +85,21 @@ namespace VirtualWallet.BUSINESS.Services
                 ? Result<IEnumerable<CardTransaction>>.Success(transactions)
                 : Result<IEnumerable<CardTransaction>>.Failure("No Transactions found");
         }
+
+        public async Task<Result<IEnumerable<CardTransaction>>> FilterByAsync(CardTransactionQueryParameters filterParameters)
+        {   var result = await _cardRepository.FilterByAsync(filterParameters);
+
+            return result.Any()
+                ? Result<IEnumerable<CardTransaction>>.Success(result)
+                : Result<IEnumerable<CardTransaction>>.Failure("No Transactions found");
+        }
+
+        public async Task<Result<int>> GetTotalCountAsync(CardTransactionQueryParameters filterParameters)
+        {   var result = await _cardRepository.GetTotalCountAsync(filterParameters);
+            return result!=0
+                ? Result<int>.Success(result)
+                : Result<int>.Failure("No Transactions found");
+        }
+
     }
 }

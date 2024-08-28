@@ -52,3 +52,7 @@ body {
 .nav-link {
     color: white;
 }
+
+.animate__extra-slow {
+    --animate-duration: 20s; /* Change this value to make it slower or faster */
+}

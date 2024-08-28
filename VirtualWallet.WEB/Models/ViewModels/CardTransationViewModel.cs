@@ -8,7 +8,11 @@ namespace VirtualWallet.WEB.Models.ViewModels
         public string FormAction { get; set; }
         public int Id { get; set; }
         public int CardId { get; set; }
+
+        public Card? Card { get; set; }
         public int WalletId { get; set; }
+
+        public Wallet? Wallet { get; set; }
         public decimal Amount { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }

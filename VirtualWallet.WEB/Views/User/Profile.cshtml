@@ -125,7 +125,7 @@
                                 <button type="submit" class="btn btn-success btn-sm mb-2 me-2">Add as Friend</button>
                             </form>
                         }
-                        @if (Model.Role == UserRole.Admin.ToString())
+                        @if (Model.Role == UserRole.Admin.ToString() && Model.Id != ViewBag.UserId)
                         {
                             <a href="@Url.Action("UnbanUser", "Admin", new { userId = Model.Id })" class="btn btn-warning btn-sm mb-2 me-2">Unban User</a>
                             <a href="@Url.Action("BanUser", "Admin", new { userId = Model.Id })" class="btn btn-danger btn-sm mb-2 me-2">Ban User</a>

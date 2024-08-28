@@ -13,5 +13,9 @@ namespace VirtualWallet.DATA.Repositories.Contracts
         public Task UpdateCardAsync(Card card);
 
         public Task RemoveCardAsync(int cardId);
+
+        public Task<int> GetTotalCountAsync(CardTransactionQueryParameters filterParameters);
+
+        public Task<ICollection<CardTransaction>> FilterByAsync(CardTransactionQueryParameters filterParameters);
     }
 }

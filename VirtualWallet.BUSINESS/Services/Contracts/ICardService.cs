@@ -16,5 +16,9 @@ namespace VirtualWallet.BUSINESS.Services.Contracts
         public Task<Result> UpdateCardAsync(Card card);
 
         public Task<Result<IEnumerable<CardTransaction>>> GetCardTransactionsByUserIdAsync(int userId);
+
+        public Task<Result<IEnumerable<CardTransaction>>> FilterByAsync(CardTransactionQueryParameters filterParameters);
+
+        public Task<Result<int>> GetTotalCountAsync(CardTransactionQueryParameters filterParameters);
     }
 }

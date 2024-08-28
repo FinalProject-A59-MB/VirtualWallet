@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
@@ -236,49 +237,30 @@ namespace VirtualWallet.WEB.Controllers.MVC
         }
 
         [HttpGet]
-        public async Task<IActionResult> CardTransactions()
+        public async Task<IActionResult> CardTransactions([FromQuery] CardTransactionQueryParameters filterParameters)
         {
-            var userId = CurrentUser.Id;
-            var transactionsResult = await _cardService.GetCardTransactionsByUserIdAsync(userId);
+            var cards = await _cardService.GetUserCardsAsync(CurrentUser.Id);
+            ViewBag.Cards = cards.Value.Select(_viewModelMapper.ToCardViewModel).ToList();
+            var totalCount = await _cardService.GetTotalCountAsync(filterParameters);
 
-            if (!transactionsResult.IsSuccess)
+            ViewBag.TotalCount = totalCount.Value;
+            ViewBag.PageSize = filterParameters.PageSize;
+            ViewBag.PageNumber = filterParameters.PageNumber;
+            ViewBag.FilterParameters = filterParameters;
+
+            var transactions = await _cardService.FilterByAsync(filterParameters);
+            if (!transactions.IsSuccess)
             {
-                TempData["ErrorMessage"] = transactionsResult.Error;
-                return RedirectToAction("Profile", "User");
+                var transactionViewModels2 = new List<CardTransactionViewModel>();
+                return View(transactionViewModels2);
             }
 
-            var transactionViewModels = transactionsResult.Value.Select(transaction => new CardTransactionViewModel
-            {
-                CreatedAt = transaction.CreatedAt,
-                Amount = transaction.Amount,
-                WalletId = transaction.WalletId,    
-                CardId = transaction.CardId,
-            }).ToList();
+            var transactionViewModels = transactions.Value.Select(_viewModelMapper.ToCardTransactionViewModel).ToList();
 
-            return View("CardTransactions", transactionViewModels);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> CardTransactions(string searchQuery = null)
-        {
-            var userId = CurrentUser.Id;
-            var cardTransactionsResult = await _cardService.GetCardTransactionsByUserIdAsync(userId);
-
-            if (!cardTransactionsResult.IsSuccess)
-            {
-                TempData["ErrorMessage"] = cardTransactionsResult.Error;
-                return RedirectToAction("Profile", "User");
-            }
-
-            var transactionViewModels = cardTransactionsResult.Value.Select(transaction => new CardTransactionViewModel
-            {
-                CreatedAt = transaction.CreatedAt,
-                Amount = transaction.Amount
-            }).ToList();
+            
 
             return View(transactionViewModels);
         }
-
 
 
 
