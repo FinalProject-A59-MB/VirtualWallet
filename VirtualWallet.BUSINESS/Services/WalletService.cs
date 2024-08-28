@@ -1,4 +1,9 @@
-﻿using VirtualWallet.DATA.Models;
+﻿using Microsoft.AspNetCore.Cors.Infrastructure;
+using VirtualWallet.BUSINESS.Resources;
+using VirtualWallet.BUSINESS.Results;
+using VirtualWallet.DATA.Models;
+using VirtualWallet.DATA.Models.Enums;
+using VirtualWallet.DATA.Repositories;
 using VirtualWallet.DATA.Repositories.Contracts;
 using VirtualWallet.DATA.Services.Contracts;
 
@@ -7,43 +12,85 @@ namespace VirtualWallet.DATA.Services
     public class WalletService : IWalletService
     {
         private readonly IWalletRepository _walletRepository;
+        private readonly IUserService _userService;
 
-        public WalletService(IWalletRepository walletRepository)
+        public WalletService(IWalletRepository walletRepository,
+            IUserService userService)
         {
             _walletRepository = walletRepository;
+            _userService = userService;
         }
-        public async Task<int> AddWalletAsync(Wallet wallet)
+        public async Task<Result<int>> AddWalletAsync(Wallet wallet)
         {
+            if (wallet == null)
+            {
+                return Result<int>.Failure(ErrorMessages.InvalidWalletInformation);
+            }
+
             var newWalletId = await _walletRepository.AddWalletAsync(wallet);
 
-            return newWalletId;
+            return newWalletId != 0
+                ? Result<int>.Success(newWalletId)
+                : Result<int>.Failure(ErrorMessages.InvalidWalletInformation);
         }
 
-        public Task<Wallet> GetWalletByIdAsync(int id)
+        public async Task<Result<Wallet>> GetWalletByIdAsync(int id)
         {
-            return _walletRepository.GetWalletByIdAsync(id);
+            var wallet =  await _walletRepository.GetWalletByIdAsync(id);
+
+            return wallet != null
+                ? Result<Wallet>.Success(wallet)
+                : Result<Wallet>.Failure(ErrorMessages.InvalidWalletInformation);
         }
 
-        public Task<Wallet> GetWalletByNameAsync(string walletName)
+        public async Task<Result<Wallet>> GetWalletByNameAsync(string walletName)
         {
-            return _walletRepository.GetWalletByNameAsync(walletName);
+            var wallet = await _walletRepository.GetWalletByNameAsync(walletName);
+
+            return wallet != null
+                ? Result<Wallet>.Success(wallet)
+                : Result<Wallet>.Failure(ErrorMessages.InvalidWalletInformation);
         }
 
-        public Task<IEnumerable<Wallet>> GetWalletsByUserIdAsync(int userId)
+        public async Task<Result<IEnumerable<Wallet>>> GetWalletsByUserIdAsync(int userId)
         {
-            return _walletRepository.GetWalletsByUserIdAsync(userId);
+            var wallets = await _walletRepository.GetWalletsByUserIdAsync(userId);
+
+            return wallets != null
+                ? Result<IEnumerable<Wallet>>.Success(wallets)
+                : Result<IEnumerable<Wallet>>.Failure(ErrorMessages.InvalidWalletInformation);
         }
 
-        public Task RemoveWalletAsync(int walletId)
+        public async Task<Result> RemoveWalletAsync(int walletId)
         {
-            return _walletRepository.RemoveWalletAsync(walletId);
+            var walletResult = await GetWalletByIdAsync(walletId);
+
+            if (!walletResult.IsSuccess)
+            {
+                return Result.Failure(ErrorMessages.WalletNotFound);
+            }
+
+            await _walletRepository.RemoveWalletAsync(walletId);
+            return Result.Success();
         }
 
-        public Task UpdateWalletAsync(Wallet wallet)
+        public async Task<Result> UpdateWalletAsync(Wallet wallet)
         {
-            return _walletRepository.UpdateWalletAsync(wallet);
-        }
+            if (wallet == null)
+            {
+                return Result.Failure(ErrorMessages.InvalidWalletInformation);
+            }
 
+            var walletResult = await GetWalletByIdAsync(wallet.Id);
+
+            if (!walletResult.IsSuccess)
+            {
+                return Result.Failure(ErrorMessages.WalletNotFound);
+            }
+
+            await _walletRepository.UpdateWalletAsync(wallet);
+            return Result.Success();
+        }
 
     }
 }

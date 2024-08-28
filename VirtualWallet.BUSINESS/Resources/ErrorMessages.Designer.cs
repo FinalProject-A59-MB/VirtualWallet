@@ -347,5 +347,29 @@ namespace VirtualWallet.BUSINESS.Resources {
                 return ResourceManager.GetString("WalletNotFound", resourceCulture);
             }
         }
+
+        public static string InvalidWalletInformation
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidWalletInformation", resourceCulture);
+            }
+        }
+
+        public static string InvalidUserInformation
+        {
+            get
+            {
+                return ResourceManager.GetString("InvalidUserInformation", resourceCulture);
+            }
+        }
+
+        public static string UserIsAlreadyAddedToWallet
+        { 
+            get
+            {
+                return ResourceManager.GetString("UserIsAlreadyAddedToWallet", resourceCulture);
+            }
+        }
     }
 }
