@@ -102,9 +102,9 @@ namespace VirtualWallet.DATA.Context
                 {
                     var user = new User
                     {
-                        Username = $"user{i}a",
+                        Username = $"user{i}b",
                         Password = PasswordHasher.HashPassword("password"),
-                        Email = $"user{i}a@example.com",
+                        Email = $"user{i}b@example.com",
                         Role = i % 2 == 0 ? UserRole.PendingVerification : UserRole.RegisteredUser,
                         VerificationStatus = UserVerificationStatus.NotVerified,
                         PhotoIdUrl = "test",
@@ -130,9 +130,9 @@ namespace VirtualWallet.DATA.Context
                 {
                     var user = new User
                     {
-                        Username = $"user{i}b",
+                        Username = $"user{i}c",
                         Password = PasswordHasher.HashPassword("password"),
-                        Email = $"user{i}b@example.com",
+                        Email = $"user{i}c@example.com",
                         Role = i % 2 == 0 ? UserRole.VerifiedUser : UserRole.RegisteredUser,
                         VerificationStatus = UserVerificationStatus.Verified,
                         PhotoIdUrl = "test",

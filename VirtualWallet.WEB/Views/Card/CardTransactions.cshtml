@@ -25,12 +25,13 @@
                     <div class="card-body">
                         <h4 class="mb-4">Card Transactions Log</h4>
                         <div class="table-responsive">
-                            <table class="table table-dark table-hover">
+                            <table class="table table-dark table-hover table-bordered text-center">
                                 <thead>
                                     <tr>
                                         <th scope="col">Card#</th>
                                         <th scope="col">Date</th>
                                         <th scope="col">Amount</th>
+                                        <th scope="col">Type</th>
                                         <th scope="col">To Wallet</th>
                                     </tr>
                                 </thead>
@@ -43,6 +44,7 @@
                                                 <td>@transaction.Card.CardNumber</td>
                                                 <td>@transaction.CreatedAt.ToString("MMM dd, yyyy")</td>
                                                 <td>@transaction.Card.Currency @transaction.Amount</td>
+                                                <td>@transaction.Type.ToString()</td>
                                                 <td>@transaction.Wallet.Name</td>
                                             </tr>
                                         }
@@ -50,12 +52,13 @@
                                     else
                                     {
                                         <tr>
-                                            <td colspan="4" class="text-center">No transactions found.</td>
+                                            <td colspan="5" class="text-center">No transactions found.</td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
                         </div>
+
                     </div>
                 </div>
 

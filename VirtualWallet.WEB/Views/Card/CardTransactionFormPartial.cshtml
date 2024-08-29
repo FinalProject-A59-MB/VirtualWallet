@@ -1,4 +1,5 @@
 ﻿@model CardTransactionViewModel
+
 <div class="transaction-area area-padding fix">
     <div class="transaction-overlay"></div>
     <div class="d-table w-100 h-100">
@@ -11,6 +12,7 @@
                             <form asp-action="@Model.FormAction" method="post">
                                 <input type="hidden" name="ActionTitle" value="@Model.ActionTitle" />
                                 <input type="hidden" name="FormAction" value="@Model.FormAction" />
+                                <input type="hidden" name="Type" value="@Model.Type" />
 
                                 <div class="mb-4">
                                     <label for="amount" class="form-label">Amount</label>

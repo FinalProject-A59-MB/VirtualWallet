@@ -100,7 +100,7 @@ public class ViewModelMapper : IViewModelMapper
             CardHolderName = model.CardHolderName,
             CardNumber = model.CardNumber,
             Issuer = model.Issuer,
-            ExpirationDate = model.ExpirationDate,
+            ExpirationDate = DateTime.ParseExact(model.ExpirationDate, "MM/yy", null),
             Cvv = model.Cvv,
             PaymentProcessorToken = model.PaymentProcessorToken,
             CardType = model.CardType,
@@ -116,11 +116,12 @@ public class ViewModelMapper : IViewModelMapper
             Name = card.Name,
             UserId = card.UserId,
             CardNumber = card.CardNumber,
-            ExpirationDate = card.ExpirationDate,
+            ExpirationDate = card.ExpirationDate.ToString("MM/yy"),
             CardHolderName = card.CardHolderName,
             Cvv = card.Cvv,
             CardType = card.CardType,
             Issuer = card.Issuer,
+            Currency = card.Currency,
         };
     }
 
@@ -159,6 +160,7 @@ public class ViewModelMapper : IViewModelMapper
             CardId = model.CardId,
             Card = model.Card,
             Wallet = model.Wallet,
+            TransactionType = model.Type
         };
     }
 
@@ -173,6 +175,7 @@ public class ViewModelMapper : IViewModelMapper
             CardId = transaction.CardId,
             Card = transaction.Card,
             Wallet = transaction.Wallet,
+            Type = transaction.TransactionType
 
         };
     }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services;
@@ -56,7 +57,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 CardHolderName = model.CardHolderName,
                 CardNumber = model.CardNumber,
                 Cvv = model.Cvv,
-                ExpirationDate = model.ExpirationDate,
+                ExpirationDate = DateTime.ParseExact(model.ExpirationDate, "MM/yy", null),
                 Issuer = model.Issuer
             };
 
@@ -67,16 +68,18 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 TempData["ErrorMessage"] = tokenResult.Error;
                 return View("AddCard", model);
             }
-
+            var currency = await _paymentProcessorService.GetCardCurrency(tokenResult.Value);
             var card = new Card
             {
                 CardHolderName = model.CardHolderName,
                 CardNumber = model.CardNumber,
                 Issuer = model.Issuer,
-                ExpirationDate = model.ExpirationDate,
+                ExpirationDate = DateTime.ParseExact(model.ExpirationDate, "MM/yy", null),
                 Cvv = model.Cvv,
                 PaymentProcessorToken = tokenResult.Value,
-                CardType = model.CardType
+                CardType = model.CardType,
+                Currency = currency.Value
+
             };
 
             var addCardResult = await _cardService.AddCardAsync(CurrentUser, card);
@@ -164,6 +167,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
             {
                 ActionTitle = "Deposit Money",
                 FormAction = "DepositToWallet",
+                Type = TransactionType.Deposit,
             };
 
             return View("CardTransactionFormPartial", model);
@@ -176,6 +180,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
             {
                 model.ActionTitle = "Deposit Money";
                 model.FormAction = "DepositToWallet";
+                model.Type = TransactionType.Deposit;
                 return View("CardTransactionFormPartial", model);
             }
 
@@ -207,6 +212,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
             {
                 ActionTitle = "Withdraw Money",
                 FormAction = "WithdrawFromWallet",
+                Type = TransactionType.Withdrawal,
             };
 
             return View("CardTransactionFormPartial", model);
@@ -219,6 +225,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
             {
                 model.ActionTitle = "Withdraw Money";
                 model.FormAction = "WithdrawToWallet";
+                model.Type = TransactionType.Withdrawal;
                 return View("CardTransactionFormPartial", model);
             }
 

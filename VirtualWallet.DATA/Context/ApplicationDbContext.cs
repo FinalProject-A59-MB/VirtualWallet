@@ -21,10 +21,8 @@ public class ApplicationDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Global Query Filter on User
+        // Global Query Filters
         modelBuilder.Entity<User>().HasQueryFilter(u => !u.DeletedAt.HasValue);
-
-        // Apply matching query filters to related entities
         modelBuilder.Entity<BlockedRecord>().HasQueryFilter(br => !br.User.DeletedAt.HasValue);
         modelBuilder.Entity<CardTransaction>().HasQueryFilter(ct => !ct.User.DeletedAt.HasValue);
 

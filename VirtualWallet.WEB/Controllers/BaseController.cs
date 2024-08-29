@@ -25,7 +25,7 @@ namespace VirtualWallet.WEB.Controllers
                 ViewBag.Username = "Guest";
                 ViewBag.UserRole = "Anonymous";
                 ViewBag.IsAuthenticated = false;
-                
+                ViewBag.Wallets = null;
             }
 
             base.OnActionExecuting(context);
