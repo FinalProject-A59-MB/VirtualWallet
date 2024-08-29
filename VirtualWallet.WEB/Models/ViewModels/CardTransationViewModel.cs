@@ -5,8 +5,8 @@ namespace VirtualWallet.WEB.Models.ViewModels
 {
     public class CardTransactionViewModel
     {
-        public string ActionTitle { get; set; }
-        public string FormAction { get; set; }
+        public string? ActionTitle { get; set; }
+        public string? FormAction { get; set; }
         public int Id { get; set; }
         public int CardId { get; set; }
         public Card? Card { get; set; }

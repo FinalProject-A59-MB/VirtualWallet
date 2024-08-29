@@ -9,6 +9,7 @@ using VirtualWallet.DATA.Models.Enums;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace VirtualWallet.BUSINESS.Services
 {
@@ -120,7 +121,7 @@ namespace VirtualWallet.BUSINESS.Services
 
             var result = new Dictionary<string, decimal>
                 {
-                    { "amountToWithdraw", amountInTargetCurrency - feeAmount }, // Amount after deducting the fee
+                    { "amountToWithdraw", amountInTargetCurrency - feeAmount }, 
                     { "feeAmount", feeAmount }
                 };
 
@@ -137,6 +138,16 @@ namespace VirtualWallet.BUSINESS.Services
             if (parameters.CardId > 0)
             {
                 query = query.Where(t => t.Card.Id == parameters.CardId);
+            }
+
+            if (!string.IsNullOrEmpty(parameters.CardNumber))
+            {
+                query = query.Where(t => t.Card.CardNumber == parameters.CardNumber);
+            }
+
+            if (!string.IsNullOrEmpty(parameters.Wallet))
+            {
+                query = query.Where(t => t.Wallet.Name == parameters.Wallet);
             }
 
             if (parameters.Amount > 0)
@@ -187,6 +198,16 @@ namespace VirtualWallet.BUSINESS.Services
             if (filterParameters.CardId > 0)
             {
                 transactions = transactions.Where(t => t.Card.Id == filterParameters.CardId);
+            }
+
+            if (!string.IsNullOrEmpty(filterParameters.CardNumber))
+            {
+                transactions = transactions.Where(t => t.Card.CardNumber == filterParameters.CardNumber);
+            }
+
+            if (!string.IsNullOrEmpty(filterParameters.Wallet))
+            {
+                transactions = transactions.Where(t => t.Wallet.Name == filterParameters.Wallet);
             }
 
             if (filterParameters.Amount > 0)

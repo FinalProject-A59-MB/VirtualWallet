@@ -10,6 +10,9 @@ namespace VirtualWallet.DATA.Models
 {
     public class CardTransactionQueryParameters
     {
+        public string? CardNumber { get; set; }
+
+        public string? Wallet { get; set; }
         public int CardId { get; set; }
         public decimal Amount {  get; set; }
         public DateTime? CreatedAfter { get; set; }

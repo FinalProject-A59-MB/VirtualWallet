@@ -166,11 +166,49 @@ namespace VirtualWallet.WEB.Controllers.MVC
             var model = new CardTransactionViewModel
             {
                 ActionTitle = "Deposit Money",
-                FormAction = "DepositToWallet",
+                FormAction = "ConfirmDeposit",
                 Type = TransactionType.Deposit,
             };
 
             return View("CardTransactionFormPartial", model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ConfirmDeposit(CardTransactionViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.ActionTitle = "Deposit Money";
+                model.FormAction = "ConfirmDeposit";
+                model.Type = TransactionType.Deposit;
+                return View("CardTransactionFormPartial", model);
+            }
+
+            var card = await _cardService.GetCardByIdAsync(model.CardId);
+            var wallet = await _walletService.GetWalletByIdAsync(model.WalletId);
+            var walletCurrency = wallet.Value.Currency;
+            var cardCurrency = card.Value.Currency;
+
+            var amountToDeposit = model.Amount;
+            decimal fee = 0;
+            if (cardCurrency != walletCurrency)
+            {
+                var feeResult = await _cardTransactionService.CalculateFeeAsync(model.Amount, card.Value.Currency, wallet.Value.Currency);
+                if (!feeResult.IsSuccess)
+                {
+                    TempData["ErrorMessage"] = feeResult.Error;
+                    return View("CardTransactionFormPartial", model);
+                }
+                var exchangeResult = feeResult.Value;
+                amountToDeposit = decimal.Parse(exchangeResult.Keys.FirstOrDefault());
+                fee = exchangeResult.Values.FirstOrDefault();
+            }
+
+            model.Fee = fee;
+            model.Amount = amountToDeposit;
+            model.Wallet = wallet.Value;
+            model.Card = card.Value;
+            return View("ConfirmDeposit", model);
         }
 
         [HttpPost]
@@ -185,8 +223,6 @@ namespace VirtualWallet.WEB.Controllers.MVC
             }
 
             var result = await _cardTransactionService.DepositAsync(model.CardId, model.WalletId, model.Amount);
-
-            
 
             if (result.IsSuccess)
             {
@@ -211,7 +247,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
             var model = new CardTransactionViewModel
             {
                 ActionTitle = "Withdraw Money",
-                FormAction = "WithdrawFromWallet",
+                FormAction = "ConfirmWithdraw",
                 Type = TransactionType.Withdrawal,
             };
 
@@ -219,12 +255,51 @@ namespace VirtualWallet.WEB.Controllers.MVC
         }
 
         [HttpPost]
+        public async Task<IActionResult> ConfirmWithdraw(CardTransactionViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.ActionTitle = "Withdraw Money";
+                model.FormAction = "ConfirmWithdraw";
+                model.Type = TransactionType.Withdrawal;
+                return View("CardTransactionFormPartial", model);
+            }
+            var card = await _cardService.GetCardByIdAsync(model.CardId);
+            var wallet = await _walletService.GetWalletByIdAsync(model.WalletId);
+            var walletCurrency = wallet.Value.Currency;
+            var cardCurrency = card.Value.Currency;
+
+            var amountToWithdraw = model.Amount;
+            decimal fee = 0;
+            if (cardCurrency != walletCurrency) {
+                var feeResult = await _cardTransactionService.CalculateFeeAsync(model.Amount, wallet.Value.Currency, card.Value.Currency);
+                if (!feeResult.IsSuccess)
+                {
+                    TempData["ErrorMessage"] = feeResult.Error;
+                    return View("CardTransactionFormPartial", model);
+                }
+                var exchangeResult = feeResult.Value;
+                amountToWithdraw = decimal.Parse(exchangeResult.Keys.FirstOrDefault());
+                fee = exchangeResult.Values.FirstOrDefault();
+            }
+            
+            
+
+            model.Fee = fee;
+            model.Amount = amountToWithdraw;
+            model.Wallet = wallet.Value;
+            model.Card = card.Value;
+            return View("ConfirmWithdraw", model);
+        }
+
+
+        [HttpPost]
         public async Task<IActionResult> WithdrawFromWallet(CardTransactionViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 model.ActionTitle = "Withdraw Money";
-                model.FormAction = "WithdrawToWallet";
+                model.FormAction = "WithdrawFromWallet";
                 model.Type = TransactionType.Withdrawal;
                 return View("CardTransactionFormPartial", model);
             }
