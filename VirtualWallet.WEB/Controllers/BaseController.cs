@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VirtualWallet.DATA.Models;
 using Microsoft.AspNetCore.Mvc.Filters;
+using VirtualWallet.BUSINESS.Results;
 
 namespace VirtualWallet.WEB.Controllers
 {
@@ -10,6 +11,20 @@ namespace VirtualWallet.WEB.Controllers
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
+            if (HttpContext.Items.ContainsKey("AuthorizationResult"))
+            {
+                var result = HttpContext.Items["AuthorizationResult"] as Result;
+
+                if (result != null && !result.IsSuccess)
+                {
+                    // Set the error message to TempData and redirect
+                    TempData["ErrorMessage"] = result.Error;
+
+                    // Redirect to a common error handling page or any desired action
+                    context.Result = RedirectToAction("Index", "Home");
+                }
+            }
+
             if (CurrentUser != null)
             {
                 ViewBag.UserId = CurrentUser.Id;

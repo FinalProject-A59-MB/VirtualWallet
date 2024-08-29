@@ -1,0 +1,133 @@
+﻿@{
+    ViewData["Title"] = "Frequently Asked Questions";
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h2 class="text-center text-light mb-4">Frequently Asked Questions</h2>
+
+            <div class="accordion accordion-flush" id="faqAccordion">
+
+                <div class="accordion-item bg-dark-3 mb-3 rounded">
+                    <h2 class="accordion-header" id="faqHeadingOne">
+                        <button class="accordion-button bg-dark-3 text-light collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseOne" aria-expanded="true" aria-controls="faqCollapseOne">
+                            <i class="fas fa-wallet me-2"></i> What is Virtual Wallet?
+                        </button>
+                    </h2>
+                    <div id="faqCollapseOne" class="accordion-collapse collapse" aria-labelledby="faqHeadingOne" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-light">
+                            <img src="~/images/wallet-icon.png" alt="Virtual Wallet" class="float-start me-3" style="max-height: 100px;">
+                            Virtual Wallet is a secure and user-friendly platform that allows you to manage your finances, including adding credit/debit cards, performing transactions, and managing your wallet with ease. Whether you're sending money to friends, receiving payments, or managing your daily expenses, Virtual Wallet is your all-in-one financial solution.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item bg-dark-3 mb-3 rounded">
+                    <h2 class="accordion-header" id="faqHeadingTwo">
+                        <button class="accordion-button bg-dark-3 text-light collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseTwo" aria-expanded="false" aria-controls="faqCollapseTwo">
+                            <i class="fas fa-user-plus me-2"></i> How do I create an account?
+                        </button>
+                    </h2>
+                    <div id="faqCollapseTwo" class="accordion-collapse collapse" aria-labelledby="faqHeadingTwo" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-light">
+                            <img src="~/images/register-icon.png" alt="Register" class="float-start me-3" style="max-height: 100px;">
+                            To create an account, click on the "Register" button on the homepage. You will need to provide a valid username, email, phone number, and create a password. All fields must meet our validation criteria to ensure security. We also offer multi-factor authentication (MFA) to add an extra layer of security to your account.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item bg-dark-3 mb-3 rounded">
+                    <h2 class="accordion-header" id="faqHeadingThree">
+                        <button class="accordion-button bg-dark-3 text-light collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseThree" aria-expanded="false" aria-controls="faqCollapseThree">
+                            <i class="fas fa-lock me-2"></i> How does Multi-Factor Authentication work?
+                        </button>
+                    </h2>
+                    <div id="faqCollapseThree" class="accordion-collapse collapse" aria-labelledby="faqHeadingThree" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-light">
+                            <img src="~/images/mfa-icon.png" alt="MFA" class="float-end ms-3" style="max-height: 100px;">
+                            Multi-Factor Authentication (MFA) adds an extra layer of protection by requiring not only your password and username but also something that only you have access to, such as a one-time passcode sent to your mobile device. This ensures that even if someone has your password, they cannot access your account without the additional verification step.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item bg-dark-3 mb-3 rounded">
+                    <h2 class="accordion-header" id="faqHeadingFour">
+                        <button class="accordion-button bg-dark-3 text-light collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseFour" aria-expanded="false" aria-controls="faqCollapseFour">
+                            <i class="fas fa-exchange-alt me-2"></i> Can I send and receive money from other users?
+                        </button>
+                    </h2>
+                    <div id="faqCollapseFour" class="accordion-collapse collapse" aria-labelledby="faqHeadingFour" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-light">
+                            <img src="~/images/transfer-icon.png" alt="Transfer Money" class="float-start me-3" style="max-height: 100px;">
+                            Yes! Virtual Wallet allows you to send and receive money from other users at no cost. This makes it easy and free to transfer money between friends, family, or colleagues. You can also request payments from other users, making it convenient for group activities or shared expenses.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item bg-dark-3 mb-3 rounded">
+                    <h2 class="accordion-header" id="faqHeadingFive">
+                        <button class="accordion-button bg-dark-3 text-light collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseFive" aria-expanded="false" aria-controls="faqCollapseFive">
+                            <i class="fas fa-hand-holding-usd me-2"></i> Are there any fees for transactions?
+                        </button>
+                    </h2>
+                    <div id="faqCollapseFive" class="accordion-collapse collapse" aria-labelledby="faqHeadingFive" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-light">
+                            <img src="~/images/fee-icon.png" alt="Fees" class="float-end ms-3" style="max-height: 100px;">
+                            Sending and receiving money between users is free. However, if you withdraw funds from your wallet to a card with a different currency, a small service fee will apply. The fee covers the currency exchange process and ensures that you get the best possible rate for your transactions.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item bg-dark-3 mb-3 rounded">
+                    <h2 class="accordion-header" id="faqHeadingSix">
+                        <button class="accordion-button bg-dark-3 text-light collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseSix" aria-expanded="false" aria-controls="faqCollapseSix">
+                            <i class="fas fa-user-shield me-2"></i> What are the role levels in the Virtual Wallet system?
+                        </button>
+                    </h2>
+                    <div id="faqCollapseSix" class="accordion-collapse collapse" aria-labelledby="faqHeadingSix" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-light">
+                            <ul>
+                                <li><i class="fas fa-level-up-alt me-2"></i><strong>Level 0:</strong> Not Logged In</li>
+                                <li><i class="fas fa-level-up-alt me-2"></i><strong>Level 1:</strong> RegisteredUser, EmailVerifiedUser, PendingVerification, Blocked</li>
+                                <li><i class="fas fa-level-up-alt me-2"></i><strong>Level 2:</strong> VerifiedUser</li>
+                                <li><i class="fas fa-level-up-alt me-2"></i><strong>Level 3:</strong> Staff</li>
+                                <li><i class="fas fa-level-up-alt me-2"></i><strong>Level 4:</strong> Admin</li>
+                            </ul>
+                            These roles determine your access levels and permissions within the platform, ensuring that only authorized users can perform certain actions.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item bg-dark-3 mb-3 rounded">
+                    <h2 class="accordion-header" id="faqHeadingSeven">
+                        <button class="accordion-button bg-dark-3 text-light collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseSeven" aria-expanded="false" aria-controls="faqCollapseSeven">
+                            <i class="fas fa-credit-card me-2"></i> How do transactions work in Virtual Wallet?
+                        </button>
+                    </h2>
+                    <div id="faqCollapseSeven" class="accordion-collapse collapse" aria-labelledby="faqHeadingSeven" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-light">
+                            <img src="~/images/transaction-icon.png" alt="Transactions" class="float-start me-3" style="max-height: 100px;">
+                            Transactions in Virtual Wallet include both card and wallet transactions. You can withdraw funds from your wallet to a card, deposit funds from a card to your wallet, and manage your transactions effortlessly. For currency conversions, a small service fee may apply, ensuring that your transactions are processed efficiently and securely.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item bg-dark-3 mb-3 rounded">
+                    <h2 class="accordion-header" id="faqHeadingEight">
+                        <button class="accordion-button bg-dark-3 text-light collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseEight" aria-expanded="false" aria-controls="faqCollapseEight">
+                            <i class="fas fa-question-circle me-2"></i> Have more questions?
+                        </button>
+                    </h2>
+                    <div id="faqCollapseEight" class="accordion-collapse collapse" aria-labelledby="faqHeadingEight" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body text-light">
+                            If you have any more questions, feel free to <a href="@Url.Action("Contact", "Home")" class="text-warning">contact us</a>. Our support team is here to assist you with any concerns or inquiries you may have.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+

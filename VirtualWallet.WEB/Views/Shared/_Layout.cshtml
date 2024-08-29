@@ -29,8 +29,12 @@
                         <li class="nav-item">
                             <a class="nav-link text-white" href="@Url.Action("About", "Home")">About us</a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link text-white" href="contact.html">Contacts</a>
+                            <a class="nav-link text-white" href="@Url.Action("FAQ", "Home")">FAQ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href="@Url.Action("Contacts", "Home")">Contacts</a>
                         </li>
                     </ul>
                     @if (ViewBag.IsAuthenticated)

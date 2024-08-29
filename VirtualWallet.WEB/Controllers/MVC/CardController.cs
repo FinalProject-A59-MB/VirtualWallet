@@ -11,7 +11,6 @@ using VirtualWallet.WEB.Models.ViewModels;
 
 namespace VirtualWallet.WEB.Controllers.MVC
 {
-    [HandleServiceResult]
     public class CardController : BaseController
     {
         private readonly ICardService _cardService;

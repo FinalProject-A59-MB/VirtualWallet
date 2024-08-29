@@ -18,6 +18,11 @@ namespace VirtualWallet.WEB.Controllers.MVC
             return View();
         }
 
+        public async Task<IActionResult> FAQ()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();

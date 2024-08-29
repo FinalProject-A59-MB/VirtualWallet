@@ -11,6 +11,7 @@ using VirtualWallet.WEB.Helpers;
 
 namespace ForumProject.Controllers.MVC
 {
+    [RequireAuthorization(minRequiredRoleLevel: 1)]
     public class UserController : BaseController
     {
         private readonly IUserService _userService;
@@ -39,7 +40,6 @@ namespace ForumProject.Controllers.MVC
             _cardTransactionService = cardTransactionService;
         }
 
-        [RequireAuthorization]
         public async Task<IActionResult> Profile(int? id)
         {
             UserViewModel profileViewModel;
@@ -70,8 +70,6 @@ namespace ForumProject.Controllers.MVC
         }
 
 
-
-        [RequireAuthorization]
         public IActionResult EditProfile()
         {
             var profile = _modelMapper.ToUserProfileViewModel(CurrentUser.UserProfile);
@@ -80,7 +78,6 @@ namespace ForumProject.Controllers.MVC
             return View(profile);
         }
 
-        [RequireAuthorization]
         [HttpPost]
         public async Task<IActionResult> UpdateProfile(UserProfileViewModel userProfilemodel)
         {
@@ -105,7 +102,6 @@ namespace ForumProject.Controllers.MVC
             return RedirectToAction("Profile");
         }
 
-        [RequireAuthorization]
         public IActionResult ChangePassword(int userId)
         {
             var model = new ChangePasswordViewModel
@@ -116,7 +112,6 @@ namespace ForumProject.Controllers.MVC
             return View(model);
         }
 
-        [RequireAuthorization]
         [HttpPost]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
@@ -149,7 +144,6 @@ namespace ForumProject.Controllers.MVC
         }
 
 
-        [RequireAuthorization]
         public IActionResult ChangeEmail(int userId)
         {
 
@@ -161,7 +155,6 @@ namespace ForumProject.Controllers.MVC
             return View(model);
         }
 
-        [RequireAuthorization]
         [HttpPost]
         public async Task<IActionResult> ChangeEmail(ChangeEmailViewModel model)
         {
@@ -191,13 +184,11 @@ namespace ForumProject.Controllers.MVC
             return RedirectToAction("Profile", "User");
         }
 
-        [RequireAuthorization]
         public IActionResult UploadVerification()
         {
             return View();
         }
 
-        [RequireAuthorization]
         [HttpPost]
         public async Task<IActionResult> UploadVerificationDocuments(VerificationViewModel model)
         {
@@ -276,7 +267,7 @@ namespace ForumProject.Controllers.MVC
 
 
 
-        [RequireAuthorization]
+        [RequireAuthorization(minRequiredRoleLevel: 4)]
         [HttpGet]
         public async Task<IActionResult> UnblockUser(int userId)
         {
@@ -296,7 +287,7 @@ namespace ForumProject.Controllers.MVC
             return View("UnblockUser", model);
         }
 
-        [RequireAuthorization]
+        [RequireAuthorization(minRequiredRoleLevel: 4)]
         [HttpPost]
         public async Task<IActionResult> UnblockUser(BlockUserViewModel model)
         {
@@ -329,7 +320,7 @@ namespace ForumProject.Controllers.MVC
 
 
 
-
+        [RequireAuthorization(minRequiredRoleLevel: 3)]
         [HttpGet]
         public async Task<IActionResult> UnverifiedUsers()
         {
@@ -343,7 +334,7 @@ namespace ForumProject.Controllers.MVC
         }
 
 
-
+        [RequireAuthorization(minRequiredRoleLevel: 3)]
         [HttpPost]
         public async Task<IActionResult> VerifyUser(int userId)
         {
@@ -357,6 +348,7 @@ namespace ForumProject.Controllers.MVC
             return RedirectToAction("UnverifiedUsers");
         }
 
+        [RequireAuthorization(minRequiredRoleLevel: 3)]
         [HttpPost]
         public async Task<IActionResult> DenyUserVerification(int userId)
         {
@@ -369,7 +361,8 @@ namespace ForumProject.Controllers.MVC
 
             return RedirectToAction("UnverifiedUsers");
         }
-        [RequireAuthorization]
+
+        [RequireAuthorization(minRequiredRoleLevel: 2)]
         [HttpPost]
         public async Task<IActionResult> SendFriendRequest(int contactId)
         {
@@ -386,6 +379,7 @@ namespace ForumProject.Controllers.MVC
             return RedirectToAction("Profile", new { id = contactId });
         }
 
+        [RequireAuthorization(minRequiredRoleLevel: 2)]
         [HttpPost]
         public async Task<IActionResult> AcceptFriendRequest(int contactId)
         {
@@ -401,6 +395,7 @@ namespace ForumProject.Controllers.MVC
             return RedirectToAction("Profile");
         }
 
+        [RequireAuthorization(minRequiredRoleLevel: 2)]
         [HttpPost]
         public async Task<IActionResult> DenyFriendRequest(int contactId)
         {
@@ -416,7 +411,7 @@ namespace ForumProject.Controllers.MVC
             return RedirectToAction("Profile");
         }
 
-
+        [RequireAuthorization(minRequiredRoleLevel: 3)]
         public async Task<IActionResult> PendingFriendRequests()
         {
             var userId = CurrentUser.Id;
@@ -431,13 +426,15 @@ namespace ForumProject.Controllers.MVC
             return View(result.Value);
         }
 
+
+        [RequireAuthorization(minRequiredRoleLevel: 2)]
         [HttpGet]
         public IActionResult TransactionLog(TransactionLogViewModel model)
         {
             return View("TransactionLog", model);
         }
 
-
+        [RequireAuthorization(minRequiredRoleLevel: 2)]
         [HttpGet]
         public async Task<IActionResult> SearchUsers(string searchTerm)
         {
@@ -459,8 +456,7 @@ namespace ForumProject.Controllers.MVC
             return View(userViewModels);
         }
 
-
-        [RequireAuthorization]
+        [RequireAuthorization(minRequiredRoleLevel: 2)]
         public async Task<IActionResult> Cards()
         {
             if (!CurrentUser.Cards.Any())
@@ -473,6 +469,7 @@ namespace ForumProject.Controllers.MVC
             return View("UserCardsPartial", viewModel);
         }
 
+        [RequireAuthorization(minRequiredRoleLevel: 2)]
         [HttpPost]
         public async Task<IActionResult> UpdateFriendDescription(int contactId, string description)
         {
@@ -487,6 +484,7 @@ namespace ForumProject.Controllers.MVC
             return RedirectToAction("Profile", new { id = userId });
         }
 
+        [RequireAuthorization(minRequiredRoleLevel: 1)]
         [HttpGet]
         public async Task<IActionResult> DeleteAccount(int id)
         {
@@ -512,6 +510,7 @@ namespace ForumProject.Controllers.MVC
             return View(model);
         }
 
+        [RequireAuthorization(minRequiredRoleLevel: 1)]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -528,6 +527,7 @@ namespace ForumProject.Controllers.MVC
         }
 
 
+        [RequireAuthorization(minRequiredRoleLevel: 4)]
         [HttpGet]
         public async Task<IActionResult> AdminPanel(UserQueryParameters userParameters, TransactionQueryParameters walletTransactionParameters, CardTransactionQueryParameters cardTransactionParameters)
         {

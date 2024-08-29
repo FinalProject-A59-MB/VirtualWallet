@@ -192,7 +192,7 @@ namespace ForumProject.Controllers.MVC
 
             if (!registerResult.IsSuccess)
             {
-                ModelState.AddModelError("CustomError", registerResult.Error);
+                TempData["ErrorMessage"] = registerResult.Error;
                 return View(model);
             }
 
