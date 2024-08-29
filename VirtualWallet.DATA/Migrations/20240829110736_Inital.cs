@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace VirtualWallet.DATA.Migrations
 {
-    public partial class Initial : Migration
+    public partial class Inital : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -172,7 +172,8 @@ namespace VirtualWallet.DATA.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     WalletId = table.Column<int>(type: "int", nullable: false),
                     CardId = table.Column<int>(type: "int", nullable: false),
-                    TransactionType = table.Column<int>(type: "int", nullable: false)
+                    TransactionType = table.Column<int>(type: "int", nullable: false),
+                    Fee = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -277,7 +278,10 @@ namespace VirtualWallet.DATA.Migrations
                     Destination = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SenderId = table.Column<int>(type: "int", nullable: false),
                     RecipientId = table.Column<int>(type: "int", nullable: false),
-                    Category = table.Column<int>(type: "int", nullable: false)
+                    Category = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    SortBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SortOrder = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {

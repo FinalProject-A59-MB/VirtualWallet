@@ -26,9 +26,9 @@
                     .ThenInclude(uc => uc.Contact);
             }
 
-            public IQueryable<User> GetAllUsers()
+            public async Task<IEnumerable<User>> GetAllUsers()
             {
-                return GetUsersWithDetails();
+                return await GetUsersWithDetails().ToListAsync();
             }
 
             public async Task<User?> GetUserByIdAsync(int id)
@@ -48,6 +48,15 @@
                 return await GetUsersWithDetails()
                     .FirstOrDefaultAsync(u => u.Username == username);
             }
+
+            public async Task<IEnumerable<User>> SearchUsersAsync(string searchTerm)
+            {
+            var users = GetUsersWithDetails();
+                return await users
+                    .Where(u => u.Username.Contains(searchTerm) || u.Email.Contains(searchTerm))
+                    .ToListAsync();
+            }
+
 
             public async Task AddUserAsync(User user)
             {
@@ -139,19 +148,11 @@
                     .AnyAsync(uc => uc.UserId == userId && uc.ContactId == contactId);
             }
 
-            public async Task<IEnumerable<User>> SearchUsersAsync(string searchTerm)
-            {
-                var users = GetAllUsers();
-                return await users
-                    .Where(u => u.Username.Contains(searchTerm) || u.Email.Contains(searchTerm))
-                    .ToListAsync();
-            }
-
             public async Task<IEnumerable<UserContact>> GetPendingFriendRequestsAsync(int userId)
             {
                 return await _context.UserContacts
                     .Where(uc => uc.ContactId == userId && uc.Status == FriendRequestStatus.Pending)
-                    .Include(uc => uc.Sender) // Include sender details
+                    .Include(uc => uc.Sender)
                     .ToListAsync();
             }
 

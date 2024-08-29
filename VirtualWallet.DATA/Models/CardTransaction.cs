@@ -17,6 +17,8 @@ namespace VirtualWallet.DATA.Models
         public int CardId { get; set; }
         public Card Card { get; set; }        
         public TransactionType TransactionType { get; set; }
+
+        public decimal? Fee { get; set; }
         
     }
 

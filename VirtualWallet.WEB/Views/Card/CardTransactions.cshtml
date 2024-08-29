@@ -13,12 +13,13 @@
         CreatedAfter = ViewBag.FilterParameters?.CreatedAfter,
         CreatedBefore = ViewBag.FilterParameters?.CreatedBefore,
         SortBy = ViewBag.FilterParameters?.SortBy,
-        SortOrder = ViewBag.FilterParameters?.SortOrder
+        SortOrder = ViewBag.FilterParameters?.SortOrder,
+        TransactionType = ViewBag.FilterParameters?.TransactionType // New filter for transaction type
     };
 }
 
-<section class="bg-dark-1 container text-white rounded p-4">
-    <div class="container">
+<section class="bg-dark-1 text-white rounded p-4">
+    <div class="">
         <div class="row">
             <div class="col-lg-8">
                 <div class="card bg-dark-3 shadow-sm mb-4">
@@ -32,7 +33,8 @@
                                         <th scope="col">Date</th>
                                         <th scope="col">Amount</th>
                                         <th scope="col">Type</th>
-                                        <th scope="col">To Wallet</th>
+                                        <th scope="col">Wallet</th>
+                                        <th scope="col">Fee</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -40,19 +42,21 @@
                                     {
                                         @foreach (var transaction in Model)
                                         {
+                                            var fee = transaction.Fee ?? 0;
                                             <tr>
                                                 <td>@transaction.Card.CardNumber</td>
                                                 <td>@transaction.CreatedAt.ToString("MMM dd, yyyy")</td>
                                                 <td>@transaction.Card.Currency @transaction.Amount</td>
                                                 <td>@transaction.Type.ToString()</td>
-                                                <td>@transaction.Wallet.Name</td>
+                                                <td>@transaction.Wallet.Name (@transaction.Wallet.Currency)</td>
+                                                <td>@fee</td>
                                             </tr>
                                         }
                                     }
                                     else
                                     {
                                         <tr>
-                                            <td colspan="5" class="text-center">No transactions found.</td>
+                                            <td colspan="6" class="text-center">No transactions found.</td>
                                         </tr>
                                     }
                                 </tbody>
@@ -76,11 +80,19 @@
                                 <label for="CardId" class="form-label">Select Card</label>
                                 <select class="form-select" id="CardId" name="CardId">
                                     <option value="">All Cards</option>
-                                    @{var selected = "";}
+                                    @{bool selected = false;}
                                     @foreach (var card in cards)
                                     {
-                                        @(selected = card.Id == ViewBag.FilterParameters?.CardId ? "selected" : "")
-                                        <option value="@card.Id" selected>@card.CardNumber</option>
+                                        @(selected = card.Id == ViewBag.FilterParameters?.CardId ? true : false)
+                                        if (selected)
+                                        {
+                                            <option value="@card.Id" selected>@card.CardNumber</option>
+                                        }
+
+                                        {
+                                            <option value="@card.Id">@card.CardNumber</option>
+                                        }
+
                                     }
                                 </select>
                             </div>
@@ -102,9 +114,18 @@
                             </div>
 
                             <div class="mb-3">
+                                <label for="TransactionType" class="form-label">Transaction Type</label>
+                                <select class="form-select" id="TransactionType" name="TransactionType">
+                                    <option value="">All</option>
+                                    <option value="Withdrawal">Withdrawal</option>
+                                    <option value="Deposit">Deposit</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
                                 <label for="SortBy" class="form-label">Sort By</label>
                                 <select class="form-select" id="SortBy" name="SortBy">
-                                    <option value="CreatedAt">Created At</option>
+                                    <option value="CreatedAt">Date</option>
                                     <option value="Amount">Amount</option>
                                 </select>
                             </div>

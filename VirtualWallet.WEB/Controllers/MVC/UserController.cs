@@ -18,19 +18,25 @@ namespace ForumProject.Controllers.MVC
         private readonly IWalletService _walletService;
         private readonly ICloudinaryService _cloudinaryService;
         private readonly IAuthService _authService;
+        private readonly IWalletTransactionService _walletTransactionService;
+        private readonly ICardTransactionService _cardTransactionService;
 
         public UserController(
             IUserService userService,
             IViewModelMapper modelMapper,
             IWalletService walletService,
             ICloudinaryService cloudinaryService,
-            IAuthService authService)
+            IAuthService authService,
+            IWalletTransactionService walletTransactionService,
+            ICardTransactionService cardTransactionService)
         {
             _userService = userService;
             _modelMapper = modelMapper;
             _walletService = walletService;
             _cloudinaryService = cloudinaryService;
             _authService = authService;
+            _walletTransactionService = walletTransactionService;
+            _cardTransactionService = cardTransactionService;
         }
 
         [RequireAuthorization]
@@ -209,13 +215,70 @@ namespace ForumProject.Controllers.MVC
             user.FaceIdUrl = licenseIdUrl;
 
             user.VerificationStatus = UserVerificationStatus.PendingVerification;
-            await _userService.UpdateUserAsync(user);
+            var result = await _userService.UpdateUserAsync(user);
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+                return RedirectToAction("Profile", "User");
+            }
+            
 
+            TempData["SuccessMessage"] = "Documents succesfully uploaded";
             return RedirectToAction("Profile", "User");
+        }
+        [RequireAuthorization]
+        [HttpGet]
+        public async Task<IActionResult> BlockUser(int userId)
+        {
+            var userResult = await _userService.GetUserByIdAsync(userId);
+            if (!userResult.IsSuccess)
+            {
+                TempData["ErrorMessage"] = userResult.Error;
+                return RedirectToAction("ManageUsers");
+            }
+
+            var model = new BlockUserViewModel
+            {
+                UserId = userId,
+                Username = userResult.Value.Username
+            };
+
+            return View("BlockUser", model);
         }
 
         [RequireAuthorization]
-        public async Task<IActionResult> BlockUser(int userId, string reason)
+        [HttpPost]
+        public async Task<IActionResult> BlockUser(BlockUserViewModel model)
+        {
+            var user = await _userService.GetUserByIdAsync(model.UserId);
+            if (!user.IsSuccess)
+            {
+                TempData["ErrorMessage"] = user.Error;
+                RedirectToAction("Profile", new { id = model.UserId });
+            }
+
+            user.Value.Role = UserRole.Blocked;
+
+            var blockRecord = new BlockedRecord
+            {
+                UserId = model.UserId,
+                Reason = model.Reason,
+                BlockedDate = DateTime.UtcNow
+            };
+
+            user.Value.BlockedRecord = blockRecord;
+
+            await _userService.UpdateUserAsync(user.Value);
+
+            TempData["SuccessMessage"] = $"User {user.Value.Username} has been blocked successfully.";
+            return RedirectToAction("Profile", new { id = model.UserId });
+        }
+
+
+
+        [RequireAuthorization]
+        [HttpGet]
+        public async Task<IActionResult> UnblockUser(int userId)
         {
             var user = await _userService.GetUserByIdAsync(userId);
             if (!user.IsSuccess)
@@ -224,44 +287,47 @@ namespace ForumProject.Controllers.MVC
                 return RedirectToAction("ManageUsers");
             }
 
-            user.Value.Role = UserRole.Blocked;
-
-            var blockRecord = new BlockedRecord
+            var model = new BlockUserViewModel
             {
                 UserId = userId,
-                Reason = reason,
-                BlockedDate = DateTime.UtcNow
+                Username = user.Value.Username
             };
 
-            user.Value.BlockedRecord = blockRecord;
-
-            await _userService.UpdateUserAsync(user.Value);
-
-            return RedirectToAction("ManageUsers");
+            return View("UnblockUser", model);
         }
 
-
         [RequireAuthorization]
-        public async Task<IActionResult> UnblockUser(int userId)
+        [HttpPost]
+        public async Task<IActionResult> UnblockUser(BlockUserViewModel model)
         {
-            var user = await _userService.GetUserByIdAsync(userId);
-            if (user == null || !user.IsSuccess)
+            if (!ModelState.IsValid)
+            {
+                return View("UnblockUser", model);
+            }
+
+            var user = await _userService.GetUserByIdAsync(model.UserId);
+            if (!user.IsSuccess)
             {
                 TempData["ErrorMessage"] = user.Error;
-                return RedirectToAction("ManageUsers");
+                return RedirectToAction("Profile", new { id = model.UserId });
             }
 
             user.Value.Role = UserRole.RegisteredUser;
 
             if (user.Value.BlockedRecord != null)
             {
-                user.Value.BlockedRecord = null;
+                user.Value.BlockedRecord.Reason += $" --- Unban Reason: {model.Reason}";
             }
+
+            user.Value.BlockedRecord = null;
 
             await _userService.UpdateUserAsync(user.Value);
 
-            return RedirectToAction("ManageUsers");
+            TempData["SuccessMessage"] = "User has been unblocked successfully.";
+            return RedirectToAction("Profile",new {id = model.UserId});
         }
+
+
 
 
         [HttpGet]
@@ -393,6 +459,7 @@ namespace ForumProject.Controllers.MVC
             return View(userViewModels);
         }
 
+
         [RequireAuthorization]
         public async Task<IActionResult> Cards()
         {
@@ -459,6 +526,53 @@ namespace ForumProject.Controllers.MVC
             TempData["SuccessMessage"] = "Account deleted successfully.";
             return RedirectToAction("Index", "Home");
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> AdminPanel(UserQueryParameters userParameters, TransactionQueryParameters walletTransactionParameters, CardTransactionQueryParameters cardTransactionParameters)
+        {
+            var usersResult = await _userService.FilterUsersAsync(userParameters);
+            var userViewModels = usersResult.IsSuccess
+                ? usersResult.Value.Select(_modelMapper.ToUserViewModel).ToList()
+                : Enumerable.Empty<UserViewModel>();
+
+            var totalUserCountResult = await _userService.GetTotalUserCountAsync(userParameters);
+            var totalUserCount = totalUserCountResult.IsSuccess ? totalUserCountResult.Value : 0;
+
+            var walletTransactionsResult = await _walletTransactionService.FilterWalletTransactionsAsync(walletTransactionParameters);
+            var walletTransactionViewModels = walletTransactionsResult.IsSuccess
+                ? walletTransactionsResult.Value.Select(_modelMapper.ToWalletTransactionViewModel).ToList()
+                : Enumerable.Empty<WalletTransactionViewModel>();
+
+            var totalWalletTransactionCountResult = await _walletTransactionService.GetTotalCountAsync(walletTransactionParameters);
+            var totalWalletTransactionCount = totalWalletTransactionCountResult.IsSuccess ? totalWalletTransactionCountResult.Value : 0;
+
+            var cardTransactionsResult = await _cardTransactionService.FilterCardTransactionsAsync(cardTransactionParameters);
+            var cardTransactionViewModels = cardTransactionsResult.IsSuccess
+                ? cardTransactionsResult.Value.Select(_modelMapper.ToCardTransactionViewModel).ToList()
+                : Enumerable.Empty<CardTransactionViewModel>();
+
+            var totalCardTransactionCountResult = await _cardTransactionService.GetCardTransactionTotalCountAsync(cardTransactionParameters);
+            var totalCardTransactionCount = totalCardTransactionCountResult.IsSuccess ? totalCardTransactionCountResult.Value : 0;
+
+            var viewModel = new AdminPanelViewModel
+            {
+                Users = userViewModels,
+                UsersTotalPages = (int)Math.Ceiling(totalUserCount / (double)userParameters.PageSize),
+                UsersCurrentPage = userParameters.PageNumber,
+
+                WalletTransactions = walletTransactionViewModels,
+                WalletTransactionsTotalPages = (int)Math.Ceiling(totalWalletTransactionCount / (double)walletTransactionParameters.PageSize),
+                WalletTransactionsCurrentPage = walletTransactionParameters.PageNumber,
+
+                CardTransactions = cardTransactionViewModels,
+                CardTransactionsTotalPages = (int)Math.Ceiling(totalCardTransactionCount / (double)cardTransactionParameters.PageSize),
+                CardTransactionsCurrentPage = cardTransactionParameters.PageNumber,
+            };
+
+            return View(viewModel);
+        }
+
 
     }
 }

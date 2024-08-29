@@ -1,0 +1,20 @@
+﻿@model BlockUserViewModel
+
+<div class="container bg-dark-1 text-white p-4 rounded shadow">
+    <h3>Unblock User - @Model.Username</h3>
+    <hr />
+    <form asp-action="UnblockUser" method="post">
+        <input type="hidden" asp-for="UserId" />
+        <input type="hidden" asp-for="Username" />
+
+        <div class="mb-3">
+            <label asp-for="Reason" class="form-label">Reason for Unblocking</label>
+            <textarea asp-for="Reason" class="form-control" rows="4" placeholder="Enter the reason for unblocking the user" required></textarea>
+            <span asp-validation-for="Reason" class="text-danger"></span>
+        </div>
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-success">Unblock User</button>
+            <button type="button" class="btn btn-secondary ms-2" onclick="window.history.back()">Cancel</button>
+        </div>
+    </form>
+</div>

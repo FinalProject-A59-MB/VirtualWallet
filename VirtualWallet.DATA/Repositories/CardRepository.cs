@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using VirtualWallet.DATA.Models;
+using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Repositories.Contracts;
 
 namespace VirtualWallet.DATA.Repositories
@@ -81,6 +82,13 @@ namespace VirtualWallet.DATA.Repositories
             {
                 transactions = transactions.Where(t => t.CreatedAt <= filterParameters.CreatedBefore.Value);
             }
+            if (!string.IsNullOrEmpty(filterParameters.TransactionType))
+            {
+                if (Enum.TryParse<TransactionType>(filterParameters.TransactionType, out var transactionTypeEnum))
+                {
+                    transactions = transactions.Where(t => t.TransactionType == transactionTypeEnum);
+                }
+            }
 
             var sortPropertyMapping = new Dictionary<string, Expression<Func<CardTransaction, object>>>()
                 {
@@ -105,10 +113,18 @@ namespace VirtualWallet.DATA.Repositories
         {
             var transactions = _context.CardTransactions.AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(filterParameters.Last4Digits))
+            if (!string.IsNullOrEmpty(filterParameters.TransactionType))
             {
-                transactions = transactions.Where(t => t.CardId.ToString().EndsWith(filterParameters.Last4Digits));
+                if (Enum.TryParse<TransactionType>(filterParameters.TransactionType, out var transactionTypeEnum))
+                {
+                    transactions = transactions.Where(t => t.TransactionType == transactionTypeEnum);
+                }
+                else
+                {
+                    return 0;
+                }
             }
+
             if (filterParameters.CreatedAfter.HasValue)
             {
                 transactions = transactions.Where(t => t.CreatedAt >= filterParameters.CreatedAfter.Value);
@@ -120,6 +136,7 @@ namespace VirtualWallet.DATA.Repositories
 
             return await transactions.CountAsync();
         }
+
 
 
     }

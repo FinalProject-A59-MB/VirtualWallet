@@ -79,18 +79,18 @@ namespace VirtualWallet.BUSINESS.Services
             }
         }
 
-        public async Task<Result<CardTransaction>> ProcessWalletToCardTransactionAsync(Wallet wallet, Card card, decimal amount)
+        public async Task<Result<CardTransaction>> ProcessWalletToCardTransactionAsync(Wallet wallet, Card card, decimal amount, decimal feeAmmount)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
 
             try
             {
-                if (wallet.Balance < amount)
+                if (wallet.Balance < amount+ feeAmmount)
                 {
                     return Result<CardTransaction>.Failure("Insufficient funds in the wallet.");
                 }
 
-                wallet.Balance -= amount;
+                wallet.Balance -= amount + feeAmmount;
 
                 var paymentResult = await _paymentProcessorService.DepositToRealCardAsync(card.PaymentProcessorToken, amount);
                 if (!paymentResult.IsSuccess)
@@ -107,7 +107,9 @@ namespace VirtualWallet.BUSINESS.Services
                     Amount = amount,
                     CreatedAt = DateTime.UtcNow,
                     TransactionType = TransactionType.Withdrawal,
-                    Status = TransactionStatus.Completed
+                    Status = TransactionStatus.Completed,
+                    Fee = feeAmmount,
+                    
                 };
 
                 await _cardTransactionRepository.AddCardTransactionAsync(cardTransaction);
@@ -140,7 +142,12 @@ namespace VirtualWallet.BUSINESS.Services
 
                 if(recipientWallet.Currency != senderWallet.Currency)
                 {
-                    CurrencyExchangeRatesResponse rates = await _currencyService.GetRatesForCurrencyAsync(senderWallet.Currency);
+                    var result = await _currencyService.GetRatesForCurrencyAsync(senderWallet.Currency);
+                    if(!result.IsSuccess)
+                    {
+                        return Result<WalletTransaction>.Failure(result.Error);
+                    }
+                    CurrencyExchangeRatesResponse rates = result.Value;
 
                     var rate = GetRate(rates, recipientWallet.Currency);
 

@@ -8,5 +8,11 @@ namespace VirtualWallet.DATA.Repositories.Contracts
         Task<IEnumerable<WalletTransaction>> GetTransactionsByRecipientIdAsync(int recipientId);
         Task<WalletTransaction?> GetTransactionByIdAsync(int id);
         Task AddWalletTransactionAsync(WalletTransaction walletTransaction);
+
+        Task<IEnumerable<WalletTransaction>> GetAllWalletTransactionsAsync();
+
+        public IQueryable<WalletTransaction> FilterWalletTransactions(TransactionQueryParameters parameters);
+
+
     }
 }

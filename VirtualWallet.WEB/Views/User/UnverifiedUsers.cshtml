@@ -4,42 +4,54 @@
     ViewData["Title"] = "Unverified Users";
 }
 
-<h2>Unverified Users</h2>
+<div class="container bg-dark-1 text-white p-4 rounded shadow animate__animated animate__fadeIn">
+    <h2 class="text-center text-light mb-4">Unverified Users</h2>
 
-@if (Model != null && Model.Any())
-{
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Username</th>
-                <th>Photo ID</th>
-                <th>License ID</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in Model)
-            {
-                <tr>
-                    <td>@user.Username</td>
-                    <td><img src="@user.PhotoIdUrl" alt="Photo ID" style="max-height: 100px;" /></td>
-                    <td><img src="@user.LicenseIdUrl" alt="License ID" style="max-height: 100px;" /></td>
-                    <td>
-                        <form asp-action="VerifyUser" method="post" style="display:inline-block;">
-                            <input type="hidden" name="userId" value="@user.UserId" />
-                            <button type="submit" class="btn btn-success">Verify</button>
-                        </form>
-                        <form asp-action="DenyUserVerification" method="post" style="display:inline-block;">
-                            <input type="hidden" name="userId" value="@user.UserId" />
-                            <button type="submit" class="btn btn-danger">Deny</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>No users are pending verification at this time.</p>
-}
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-dark table-hover table-bordered">
+                <thead>
+                    <tr class="text-center">
+                        <th scope="col">Username</th>
+                        <th scope="col">Photo ID</th>
+                        <th scope="col">License ID</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr class="text-center text-xl-center">
+                            <td>
+                                <a href="@Url.Action("Profile","User",new {id = user.UserId})">User</a>
+                            </td>
+                            <td>
+                                <a href="@user.PhotoIdUrl">Photo Id</a>
+                            </td>
+                            <td>
+                                <a href="@user.LicenseIdUrl">License Id</a>
+                            </td>
+                            <td>
+                                <div class="d-flex justify-content-center gap-2">
+                                    <form asp-action="VerifyUser" method="post" class="d-inline">
+                                        <input type="hidden" name="userId" value="@user.UserId" />
+                                        <button type="submit" class="btn btn-success btn-sm">Verify</button>
+                                    </form>
+                                    <form asp-action="DenyUserVerification" method="post" class="d-inline">
+                                        <input type="hidden" name="userId" value="@user.UserId" />
+                                        <button type="submit" class="btn btn-danger btn-sm">Deny</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="text-center text-light">No users are pending verification at this time.</p>
+    }
+</div>

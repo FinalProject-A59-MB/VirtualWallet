@@ -8,7 +8,7 @@
     var onlyUser = Model.Id == ViewBag.UserId;
     var viewProfileAsUser = Model.Id != ViewBag.UserId;
     bool areFriends = Model.Contacts.Any(c => c.ContactId == ViewBag.UserId && c.Status == FriendRequestStatus.Accepted);
-
+    bool blocked = Model.Role == UserRole.Blocked.ToString();
 }
 
 <div class="container @(canViewFullProfile ? "" : "w-50") bg-dark-1 py-5">
@@ -36,7 +36,8 @@
 
             <!-- Account Details Tab -->
             <div class="tab-pane fade show active" id="account-details" role="tabpanel" aria-labelledby="account-details-tab">
-                <div class="row mt-4 animate__animated animate__fadeIn">
+                <div class="@(canViewFullProfile ? "row mt-4 " : "d-flex justify-content-center ")animate__animated animate__fadeIn">
+                    <!--here -->
                     @if (canViewFullProfile)
                     {
                         <!-- Left Column: Total Balance and Wallets -->
@@ -115,7 +116,7 @@
                             <div class="card-body">
                                 <div class="row">
                                     <!-- Account Information -->
-                                    <div class="col-md-6">
+                                    <div class="@(canViewFullProfile ? "col-md-6" : "")">
                                         <h5 class="mb-3 text-info">Account Information</h5>
                                         <p><strong class="text-info">Username:</strong> @Model.Username</p>
                                         <p><strong class="text-info">Email:</strong> @Model.Email</p>
@@ -123,7 +124,23 @@
                                         {
                                             <a href="@Url.Action("SendVerificationEmail","User")">Resend verification email.</a>
                                         }
-                                        <p><strong class="text-info">User Status:</strong> @Model.Role.ToString()</p>
+                                        @{
+                                            var statusClass = blocked ? "text-danger animate__animated animate__fadeInUp animate__infinite" : "text-white";
+                                        }
+
+                                        <p>
+                                            <strong class="text-info">User Status:</strong>
+                                            <strong class="@statusClass ">@Model.Role.ToString()</strong>
+                                        </p>
+
+                                        @if (blocked)
+                                        {
+                                            <p>
+                                                If you believe this is a mistake you can contact us here:
+                                                <a href="mailto:vaultora@@gmail.com" class="text-info">vaultora@gmail.com</a>
+                                            </p>
+                                        }
+
                                         @if (Model.VerificationStatus == UserVerificationStatus.NotVerified)
                                         {
                                             <a href="@Url.Action("UploadVerification","User")">Verify your account.</a>
@@ -157,15 +174,21 @@
                                 {
                                     <a href="@Url.Action("RequestMoney", "Transaction", new { senderId = Model.Id })" class="btn btn-primary btn mb-2 me-2">Request Money</a>
                                 }
-                                <form asp-controller="User" asp-action="SendFriendRequest" method="post" class="d-inline">
-                                    <input type="hidden" name="contactId" value="@Model.Id" />
-                                    <button type="submit" class="btn btn-success btn mb-2 me-2">Add as Friend</button>
-                                </form>
+                                @if (!areFriends)
+                                {
+                                    <form asp-controller="User" asp-action="SendFriendRequest" method="post" class="d-inline">
+                                        <input type="hidden" name="contactId" value="@Model.Id" />
+                                        <button type="submit" class="btn btn-success btn mb-2 me-2">Add as Friend</button>
+                                    </form>
+                                }
+                                
                             }
                             @if (isAdmin && viewProfileAsUser)
                             {
-                                <a href="@Url.Action("UnbanUser", "Admin", new { userId = Model.Id })" class="btn btn-warning btn mb-2 me-2">Unban User</a>
-                                <a href="@Url.Action("BanUser", "Admin", new { userId = Model.Id })" class="btn btn-danger btn mb-2 me-2">Ban User</a>
+                                <a href="@Url.Action("BlockUser", "User", new { userId = Model.Id })" class="btn btn-danger btn mb-2 me-2">Ban User</a>
+
+                                <a href="@Url.Action("UnblockUser", "User", new { userId = Model.Id })" class="btn btn-warning btn mb-2 me-2">Unban User</a>
+
                             }
                             @if (canViewFullProfile)
                             {
@@ -188,7 +211,7 @@
 
             <!-- Profile Details Tab -->
             <div class="tab-pane fade animate__animated animate__fadeIn" id="profile-details" role="tabpanel" aria-labelledby="profile-details-tab">
-                <div class="d-flex gap-4 @(canViewFullProfile ? "w-75" : "w-50") mx-auto">
+                <div class="d-flex gap-4 w-75 mx-auto">
                     <!-- User Image -->
                     <div class="col-md-@(canViewFullProfile ? "4" : "6") d-flex flex-column align-items-center mb-4 card bg-dark-3 text-white mb-4 shadow-sm p-3">
                         <img src="@Model.UserProfile.PhotoUrl" alt="Profile Picture" class="img-thumbnail mb-3 shadow-lg" style="max-width: 100%;">
@@ -233,7 +256,7 @@
                     <h4 class="mt-4">Friends List</h4>
 
                     <!-- Search Form -->
-                    <form asp-controller="User" asp-action="SearchFriends" method="get" class="mb-4">
+                    <form asp-controller="User" asp-action="SearchUsers" method="get" class="mb-4">
                         <input type="hidden" name="userId" value="@Model.Id" />
                         <div class="input-group">
                             <input type="text" name="searchTerm" class="form-control" placeholder="Search friends by name or email..." aria-label="Search friends">
@@ -261,23 +284,26 @@
                                             <td class="text-center"><a href="@Url.Action("Profile","User", new {id = contact.ContactId})">@contact.Contact.Username</a> </td>
                                             <td class="text-center">@contact.Status.ToString()</td>
                                             <td>
-                                                <div class="description-container">
+                                                <div class="description-container d-flex justify-content-center">
                                                     <!-- Display Mode -->
-                                                    @{
-                                                        var context = @contact.Description ?? "Click to add a description";
-                                                    }
-                                                    <span class="description-text" onclick="showEditForm(this)">
-                                                        @context
-                                                    </span>
-
-                                                    <!-- Edit Mode (Hidden by Default) -->
-                                                    <div class="description-form" style="display: none;">
+                                                    <div class="description-form text-center position-absolute" style="display: none;">
                                                         <form id="descriptionForm-@contact.ContactId" asp-controller="User" asp-action="UpdateFriendDescription" method="post" class="d-flex description-form" style="display: none;" onsubmit="saveDescription(event, @contact.ContactId)">
                                                             <input type="hidden" name="contactId" value="@contact.ContactId" />
                                                             <input type="text" name="description" value="@contact.Description" class="form-control form-control-sm" placeholder="Enter description" maxlength="30" />
                                                             <button type="submit" class="btn btn-outline-success btn-sm ms-2">Save</button>
                                                         </form>
                                                     </div>
+                                                    @{
+                                                        var context = @contact.Description ?? "Click to add a description";
+                                                    }
+                                                    <span class="description-text" onclick="showEditForm(this)">
+                                                        @context
+                                                        <i class="bi bi-pencil-square small"></i>
+                                                    </span>
+                                                    
+
+                                                    <!-- Edit Mode (Hidden by Default) -->
+                                                    
                                                 </div>
                                             </td>
                                             <td class="text-center">

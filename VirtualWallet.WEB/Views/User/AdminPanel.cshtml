@@ -1,0 +1,201 @@
+﻿@model AdminPanelViewModel
+
+@{
+    ViewData["Title"] = "Admin Panel";
+
+    int userTotalPages = Model.UsersTotalPages;
+    int walletTransactionTotalPages = Model.WalletTransactionsTotalPages;
+    int cardTransactionTotalPages = Model.CardTransactionsTotalPages;
+    int userCurrentPage = Model.UsersCurrentPage;
+    int walletTransactionCurrentPage = Model.WalletTransactionsCurrentPage;
+    int cardTransactionCurrentPage = Model.CardTransactionsCurrentPage;
+}
+
+<div class="container bg-dark-1 text-white p-4 rounded shadow">
+    <h2 class="text-center text-light mb-4">Admin Panel</h2>
+    <hr />
+
+    <!-- User Management Section -->
+    <div class="mb-5">
+        <h3 class="text-center text-light mb-4">User Management</h3>
+        <form method="get" asp-action="Index" class="d-flex justify-content-center mb-4">
+            <input type="text" name="Username" class="form-control me-2 w-50" placeholder="Search by Username" value="@ViewContext.HttpContext.Request.Query["Username"]" />
+            <input type="text" name="Email" class="form-control me-2 w-50" placeholder="Search by Email" value="@ViewContext.HttpContext.Request.Query["Email"]" />
+            <input type="text" name="PhoneNumber" class="form-control me-2 w-50" placeholder="Search by Phone Number" value="@ViewContext.HttpContext.Request.Query["PhoneNumber"]" />
+            <button type="submit" class="btn btn-outline-success">Search</button>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-dark table-hover table-bordered">
+                <thead>
+                    <tr class="text-center">
+                        <th scope="col">Username</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Phone Number</th>
+                        <th scope="col">Status</th>
+                        <th scope="col" style="width: 250px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Users.Any())
+                    {
+                        @foreach (var user in Model.Users)
+                        {
+                            <tr class="text-center text-xl-center">
+                                <td>@user.Username</td>
+                                <td>@user.Email</td>
+                                <td>@user.UserProfile.PhoneNumber</td>
+                                <td>@user.Role.ToString()</td>
+                                <td class="d-flex justify-content-center gap-2">
+                                    @if (user.Role == UserRole.Blocked.ToString())
+                                    {
+                                        <a href="@Url.Action("UnblockUser", "User", new { userId = user.Id })" class="btn btn-warning btn mb-2 me-2">Unban User</a>
+
+                                    }
+                                    else
+                                    {
+                                        <a href="@Url.Action("BlockUser", "User", new { userId = user.Id })" class="btn btn-danger btn mb-2 me-2">Ban User</a>
+
+
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center">No users found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination for User List -->
+        <nav aria-label="User pagination" class="mt-4">
+            @PaginationHelper.GeneratePaginationLinks(Url, userTotalPages, userCurrentPage, "AdminPanel", new { section = "users" })
+        </nav>
+    </div>
+
+    <!-- Wallet Transaction Management Section -->
+    <div class="mb-5">
+        <h3 class="text-center text-light mb-4">Wallet Transaction Management</h3>
+        <form method="get" asp-action="SearchWalletTransactions" class="d-flex justify-content-center mb-4">
+            <input type="text" name="SenderUsername" class="form-control me-2 w-50" placeholder="Search by Sender" value="@ViewContext.HttpContext.Request.Query["SenderUsername"]" />
+            <input type="text" name="RecipientUsername" class="form-control me-2 w-50" placeholder="Search by Recipient" value="@ViewContext.HttpContext.Request.Query["RecipientUsername"]" />
+            <input type="date" name="StartDate" class="form-control me-2 w-50" placeholder="From Date" value="@ViewContext.HttpContext.Request.Query["StartDate"]" />
+            <input type="date" name="EndDate" class="form-control me-2 w-50" placeholder="To Date" value="@ViewContext.HttpContext.Request.Query["EndDate"]" />
+            <button type="submit" class="btn btn-outline-success">Search</button>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-dark table-hover table-bordered">
+                <thead>
+                    <tr class="text-center">
+                        <th scope="col">Date</th>
+                        <th scope="col">Sender</th>
+                        <th scope="col">Recipient</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">Direction</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.WalletTransactions.Any())
+                    {
+                        @foreach (var transaction in Model.WalletTransactions)
+                        {
+                            <tr class="text-center text-xl-center">
+                                <td>@transaction.CreatedAt.ToString()</td>
+                                <td>@transaction.Sender</td>
+                                <td>@transaction.Recipient</td>
+                                <td>@transaction.Currency @transaction.Amount</td>
+                                <td>@transaction.Direction</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center">No transactions found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination for Wallet Transactions -->
+        <nav aria-label="Wallet transaction pagination" class="mt-4">
+            @PaginationHelper.GeneratePaginationLinks(Url, walletTransactionTotalPages, walletTransactionCurrentPage, "AdminPanel", new { section = "walletTransactions" })
+        </nav>
+    </div>
+
+    <!-- Card Transaction Management Section -->
+    <div>
+        <h3 class="text-center text-light mb-4">Card Transaction Management</h3>
+        <form method="get" asp-action="SearchCardTransactions" class="d-flex justify-content-center mb-4">
+            <input type="text" name="CardId" class="form-control me-2 w-50" placeholder="Search by Card ID" value="@ViewContext.HttpContext.Request.Query["CardId"]" />
+            <input type="text" name="RecipientUsername" class="form-control me-2 w-50" placeholder="Search by Recipient" value="@ViewContext.HttpContext.Request.Query["RecipientUsername"]" />
+            <input type="date" name="CreatedAfter" class="form-control me-2 w-50" placeholder="From Date" value="@ViewContext.HttpContext.Request.Query["CreatedAfter"]" />
+            <input type="date" name="CreatedBefore" class="form-control me-2 w-50" placeholder="To Date" value="@ViewContext.HttpContext.Request.Query["CreatedBefore"]" />
+            <button type="submit" class="btn btn-outline-success">Search</button>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-dark table-hover table-bordered">
+                <thead>
+                    <tr class="text-center">
+                        <th scope="col">Date</th>
+                        <th scope="col">Card Holder</th>
+                        <th scope="col">Recipient</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">Direction</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.CardTransactions.Any())
+                    {
+                        @foreach (var transaction in Model.CardTransactions)
+                        {
+                            string sender;
+                            string receiver;
+                            string currency;
+                            @if (transaction.Type == TransactionType.Withdrawal)
+                            {
+                                sender = "Wallet: " + transaction.Wallet.Name;
+                                receiver = "Card: " + transaction.Card.CardNumber;
+                                currency = transaction.Wallet.Currency.ToString();
+
+                            }
+                            else
+                            {
+                                sender = "Card: " + transaction.Card.CardNumber;
+                                receiver = "Wallet: " + transaction.Wallet.Name;
+                                currency = transaction.Card.Currency.ToString();
+
+                            }
+                            <tr class="text-center text-xl-center">
+                                <td>@transaction.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                <td>@sender</td>
+                                <td>@receiver</td>
+                                <td>@currency @transaction.Amount</td>
+                                <td>@transaction.Type</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center">No transactions found.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination for Card Transactions -->
+        <nav aria-label="Card transaction pagination" class="mt-4">
+            @PaginationHelper.GeneratePaginationLinks(Url, cardTransactionTotalPages, cardTransactionCurrentPage, "AdminPanel", new { section = "cardTransactions" })
+        </nav>
+    </div>
+</div>

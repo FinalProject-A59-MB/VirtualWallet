@@ -229,7 +229,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 return View("CardTransactionFormPartial", model);
             }
 
-            var result = await _cardTransactionService.WithdrawAsync(model.CardId, model.WalletId, model.Amount);
+            var result = await _cardTransactionService.WithdrawAsync(model.WalletId, model.CardId, model.Amount);
 
             if (result.IsSuccess)
             {

@@ -160,7 +160,9 @@ public class ViewModelMapper : IViewModelMapper
             CardId = model.CardId,
             Card = model.Card,
             Wallet = model.Wallet,
-            TransactionType = model.Type
+            TransactionType = model.Type,
+            Fee = model.Fee,
+            
         };
     }
 
@@ -175,7 +177,8 @@ public class ViewModelMapper : IViewModelMapper
             CardId = transaction.CardId,
             Card = transaction.Card,
             Wallet = transaction.Wallet,
-            Type = transaction.TransactionType
+            Type = transaction.TransactionType,
+            Fee = transaction.Fee,
 
         };
     }
@@ -192,7 +195,22 @@ public class ViewModelMapper : IViewModelMapper
         };
     }
 
-
+    public WalletTransactionViewModel ToWalletTransactionViewModel(WalletTransaction transaction, int userId)
+    {
+        return new WalletTransactionViewModel
+        {
+            Id = transaction.Id,
+            CreatedAt = transaction.CreatedAt,
+            Sender = transaction.Sender.Name,
+            Recipient = transaction.Recipient.Name,
+            Amount = transaction.Amount,
+            Currency = transaction.Currency.ToString(),
+            Direction = transaction.SenderId == userId ? "Outgoing" : "Incoming",
+            WalletName = transaction.Sender.Name,
+            SortBy = transaction.SortBy,
+            SortOrder = transaction.SortOrder 
+        };
+    }
 
 }
 

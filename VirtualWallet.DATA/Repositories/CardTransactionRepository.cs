@@ -44,5 +44,10 @@ namespace VirtualWallet.DATA.Repositories
             await _context.CardTransactions.AddAsync(cardTransaction);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<CardTransaction>> GetAllCardTransactionsAsync()
+        {
+            return await GetCardTransactionsWithDetails().ToListAsync();
+        }
     }
 }

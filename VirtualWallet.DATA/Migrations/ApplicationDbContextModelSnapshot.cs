@@ -119,6 +119,9 @@ namespace VirtualWallet.DATA.Migrations
                     b.Property<int>("Currency")
                         .HasColumnType("int");
 
+                    b.Property<decimal?>("Fee")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -468,7 +471,18 @@ namespace VirtualWallet.DATA.Migrations
                     b.Property<int>("SenderId")
                         .HasColumnType("int");
 
+                    b.Property<string>("SortBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SortOrder")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

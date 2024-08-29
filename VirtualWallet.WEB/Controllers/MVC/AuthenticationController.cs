@@ -232,7 +232,7 @@ namespace ForumProject.Controllers.MVC
             }
 
             var user = userResult.Value;
-            user.VerificationStatus = UserVerificationStatus.Verified;
+            user.Role = UserRole.EmailVerifiedUser;
             var updateResult = await _userService.UpdateUserAsync(user);
 
             if (!updateResult.IsSuccess)

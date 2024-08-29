@@ -1,4 +1,5 @@
-﻿using VirtualWallet.BUSINESS.Resources;
+﻿using Microsoft.EntityFrameworkCore;
+using VirtualWallet.BUSINESS.Resources;
 using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
@@ -68,5 +69,62 @@ namespace VirtualWallet.DATA.Services
                 ? Result<IEnumerable<WalletTransaction>>.Success(transactions)
                 : Result<IEnumerable<WalletTransaction>>.Failure(ErrorMessages.InvalidWalletInformation);
         }
+
+        public async Task<Result<IEnumerable<WalletTransaction>>> FilterWalletTransactionsAsync(TransactionQueryParameters parameters)
+        {
+            var query = _walletTransactionRepository.FilterWalletTransactions(parameters);
+
+            var skip = (parameters.PageNumber - 1) * parameters.PageSize;
+            query = query.Skip(skip).Take(parameters.PageSize);
+
+            var transactions = await query.ToListAsync();
+
+            return transactions.Any()
+                ? Result<IEnumerable<WalletTransaction>>.Success(transactions)
+                : Result<IEnumerable<WalletTransaction>>.Failure("No transactions found.");
+        }
+
+
+        public async Task<Result<int>> GetTotalCountAsync(TransactionQueryParameters filterParameters)
+        {
+            var transactions = await _walletTransactionRepository.GetAllWalletTransactionsAsync();
+
+            if (!string.IsNullOrEmpty(filterParameters.Sender?.Username))
+            {
+                transactions = transactions.Where(t => t.Sender.Name.Contains(filterParameters.Sender.Username));
+            }
+
+            if (!string.IsNullOrEmpty(filterParameters.Recipient?.Username))
+            {
+                transactions = transactions.Where(t => t.Recipient.Name.Contains(filterParameters.Recipient.Username));
+            }
+
+            if (filterParameters.StartDate.HasValue)
+            {
+                transactions = transactions.Where(t => t.CreatedAt >= filterParameters.StartDate.Value);
+            }
+
+            if (filterParameters.EndDate.HasValue)
+            {
+                transactions = transactions.Where(t => t.CreatedAt <= filterParameters.EndDate.Value);
+            }
+
+            if (filterParameters.Direction == "Incoming" && filterParameters.Recipient != null)
+            {
+                transactions = transactions.Where(t => t.RecipientId == filterParameters.Recipient.Id);
+            }
+            else if (filterParameters.Direction == "Outgoing" && filterParameters.Sender != null)
+            {
+                transactions = transactions.Where(t => t.SenderId == filterParameters.Sender.Id);
+            }
+
+            var count = transactions.Count();
+
+            return count != 0
+                ? Result<int>.Success(count)
+                : Result<int>.Failure("No transactions found.");
+        }
+
+
     }
 }

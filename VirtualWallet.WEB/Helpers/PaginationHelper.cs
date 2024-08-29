@@ -18,10 +18,8 @@ namespace VirtualWallet.WEB.Helpers
             var ul = new TagBuilder("ul");
             ul.AddCssClass("pagination justify-content-center");
 
-            // First page link
             ul.InnerHtml.AppendHtml(CreatePageLink(urlHelper, action, routeValues, 1, "<<", currentPage == 1, currentPage));
 
-            // Previous page link
             ul.InnerHtml.AppendHtml(CreatePageLink(urlHelper, action, routeValues, currentPage - 1, "<", currentPage == 1, currentPage));
 
             for (var i = 1; i <= totalPages; i++)
@@ -29,10 +27,8 @@ namespace VirtualWallet.WEB.Helpers
                 ul.InnerHtml.AppendHtml(CreatePageLink(urlHelper, action, routeValues, i, i.ToString(), i == currentPage, currentPage));
             }
 
-            // Next page link
             ul.InnerHtml.AppendHtml(CreatePageLink(urlHelper, action, routeValues, currentPage + 1, ">", currentPage == totalPages, currentPage));
 
-            // Last page link
             ul.InnerHtml.AppendHtml(CreatePageLink(urlHelper, action, routeValues, totalPages, ">>", currentPage == totalPages, currentPage));
 
             var writer = new System.IO.StringWriter();

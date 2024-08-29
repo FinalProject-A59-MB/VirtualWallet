@@ -28,22 +28,12 @@ namespace VirtualWallet.DATA.Repositories
         {
             var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(w => w.Id == id);
 
-            if (wallet == null)
-            {
-                throw new Exception();
-            }
-
             return wallet;
         }
 
         public async Task<Wallet> GetWalletByNameAsync(string walletName)
         {
             var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(w => w.Name == walletName);
-
-            if (wallet == null)
-            {
-                throw new Exception();
-            }
 
             return wallet;
         }

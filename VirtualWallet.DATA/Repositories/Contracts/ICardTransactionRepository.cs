@@ -11,5 +11,7 @@ namespace VirtualWallet.DATA.Repositories.Contracts
         public Task<CardTransaction?> GetTransactionByIdAsync(int id);
 
         public Task AddCardTransactionAsync(CardTransaction cardTransaction);
+
+        public Task<IEnumerable<CardTransaction>> GetAllCardTransactionsAsync();
     }
 }

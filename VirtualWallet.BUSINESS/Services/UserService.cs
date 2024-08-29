@@ -1,4 +1,5 @@
-﻿using VirtualWallet.BUSINESS.Results;
+﻿using Microsoft.EntityFrameworkCore;
+using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.DATA.Helpers;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Models.Enums;
@@ -59,10 +60,10 @@ namespace VirtualWallet.DATA.Services
             return Result<User>.Success(user);
         }
 
-        public async Task<Result<IQueryable<User>>> GetUsers()
+        public async Task<Result<IEnumerable<User>>> GetUsers()
         {
-            var users = _userRepository.GetAllUsers();
-            return Result<IQueryable<User>>.Success(users);
+            var users = await _userRepository.GetAllUsers();
+            return Result<IEnumerable<User>>.Success(users);
         }
 
         public async Task<Result<User>> GetUserByIdAsync(int userId)
@@ -166,7 +167,6 @@ namespace VirtualWallet.DATA.Services
 
         public async Task<Result> AcceptFriendRequestAsync(int userId, int contactId)
         {
-            // Fetch the original friend request
             var friendRequest = await _userRepository.GetUserContactAsync(contactId, userId);
 
             if (friendRequest == null || friendRequest.Status != FriendRequestStatus.Pending)
@@ -174,16 +174,13 @@ namespace VirtualWallet.DATA.Services
                 return Result.Failure("Friend request not found.");
             }
 
-            // Mark the original friend request as accepted
             friendRequest.Status = FriendRequestStatus.Accepted;
             await _userRepository.UpdateContactAsync(friendRequest);
 
-            // Check if the reciprocal friend request already exists
             var reciprocalFriendRequest = await _userRepository.GetUserContactAsync(userId, contactId);
 
             if (reciprocalFriendRequest == null)
             {
-                // If it doesn't exist, create a new reciprocal friend request
                 reciprocalFriendRequest = new UserContact
                 {
                     UserId = userId,
@@ -197,7 +194,6 @@ namespace VirtualWallet.DATA.Services
             }
             else
             {
-                // If it does exist, update its status to accepted
                 reciprocalFriendRequest.Status = FriendRequestStatus.Accepted;
                 await _userRepository.UpdateContactAsync(reciprocalFriendRequest);
             }
@@ -248,6 +244,7 @@ namespace VirtualWallet.DATA.Services
 
             return Result<IEnumerable<User>>.Success(users);
         }
+
 
         public async Task<Result> UpdateContact(int userId, int contactId, string description)
         {
@@ -315,7 +312,72 @@ namespace VirtualWallet.DATA.Services
             return Result.Success();
         }
 
+        public async Task<Result<IEnumerable<User>>> FilterUsersAsync(UserQueryParameters parameters)
+        {
+            var query = await _userRepository.GetAllUsers();
+
+            if (!string.IsNullOrEmpty(parameters.Username))
+            {
+                query = query.Where(u => u.Username.Contains(parameters.Username));
+            }
+
+            if (!string.IsNullOrEmpty(parameters.Email))
+            {
+                query = query.Where(u => u.Email.Contains(parameters.Email));
+            }
+
+            if (!string.IsNullOrEmpty(parameters.PhoneNumber))
+            {
+                query = query.Where(u => u.UserProfile.PhoneNumber.Contains(parameters.PhoneNumber));
+            }
+
+            if (parameters.VerificationStatus != 0)
+            {
+                query = query.Where(u => u.VerificationStatus == parameters.VerificationStatus);
+            }
+
+            if (parameters.Role != 0)
+            {
+                query = query.Where(u => u.Role == parameters.Role);
+            }
+
+            var skip = (parameters.PageNumber - 1) * parameters.PageSize;
+            query = query.Skip(skip).Take(parameters.PageSize);
+
+            var users = query;
+
+            return users.Any()
+                ? Result<IEnumerable<User>>.Success(users)
+                : Result<IEnumerable<User>>.Failure("No users found.");
+        }
 
 
+        public async Task<Result<int>> GetTotalUserCountAsync(UserQueryParameters parameters)
+        {
+            var query = await _userRepository.GetAllUsers();
+
+            if (!string.IsNullOrEmpty(parameters.Username))
+            {
+                query = query.Where(u => u.Username.Contains(parameters.Username));
+            }
+
+            if (!string.IsNullOrEmpty(parameters.Email))
+            {
+                query = query.Where(u => u.Email.Contains(parameters.Email));
+            }
+
+            if (!string.IsNullOrEmpty(parameters.PhoneNumber))
+            {
+                query = query.Where(u => u.UserProfile.PhoneNumber.Contains(parameters.PhoneNumber));
+            }
+
+            var count =  query.Count();
+
+            return count != 0
+                ? Result<int>.Success(count)
+                : Result<int>.Failure("No Users found.");
+        }
     }
+
+
 }

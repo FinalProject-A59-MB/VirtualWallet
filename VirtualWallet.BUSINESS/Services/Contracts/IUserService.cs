@@ -5,7 +5,7 @@ namespace VirtualWallet.DATA.Services.Contracts
 {
     public interface IUserService
     {
-        public Task<Result<IQueryable<User>>> GetUsers();
+        public Task<Result<IEnumerable<User>>> GetUsers();
         public Task<Result<User>> GetUserByIdAsync(int userId);
 
         public Task<Result<User>> GetUserByUsernameAsync(string userName);
@@ -34,5 +34,9 @@ namespace VirtualWallet.DATA.Services.Contracts
 
         Task<Result> ChangePasswordAsync(int userId, string currentPassword, string newPassword);
         Task<Result> ChangeEmailAsync(int userId, string newEmail, string currentPassword);
+
+        public Task<Result<IEnumerable<User>>> FilterUsersAsync(UserQueryParameters parameters);
+        public Task<Result<int>> GetTotalUserCountAsync(UserQueryParameters parameters);
+
     }
 }
