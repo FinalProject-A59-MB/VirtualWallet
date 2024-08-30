@@ -7,6 +7,7 @@ using VirtualWallet.WEB.Models.ViewModels.CardViewModels;
 
 namespace VirtualWallet.WEB.Controllers
 {
+    [RequireAuthorization(minRequiredRoleLevel: 1)]
     public class CardTransactionController : BaseController
     {
         private readonly ICardTransactionService _cardTransactionService;
@@ -24,7 +25,7 @@ namespace VirtualWallet.WEB.Controllers
                 WalletId = walletId,
             };
 
-            return View("~/Views/Card/CardTransactions.cshtml",viewModel);
+            return View("CardTransactions.cshtml", viewModel);
         }
 
 
@@ -33,7 +34,7 @@ namespace VirtualWallet.WEB.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View("~/Views/Card/CardTransactions.cshtml", model);
+                return View("CardTransactions.cshtml", model);
             }
 
             var result = await _cardTransactionService.DepositAsync(model.CardId, model.WalletId, model.Amount);
@@ -41,7 +42,7 @@ namespace VirtualWallet.WEB.Controllers
             if (!result.IsSuccess)
             {
                 TempData["ErrorMessage"] = result.Error;
-                return View("~/Views/Card/CardTransactions.cshtml", model);
+                return View("CardTransactions.cshtml", model);
             }
 
             return RedirectToAction("TransactionSuccess", new { transactionId = result.Value.Id });
@@ -52,7 +53,7 @@ namespace VirtualWallet.WEB.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return View("~/Views/Card/CardTransactions.cshtml", model);
+                return View("CardTransactions.cshtml", model);
             }
 
             var result = await _cardTransactionService.WithdrawAsync(model.WalletId, model.CardId, model.Amount);
@@ -60,7 +61,7 @@ namespace VirtualWallet.WEB.Controllers
             if (!result.IsSuccess)
             {
                 TempData["ErrorMessage"] = result.Error;
-                return View("~/Views/Card/CardTransactions.cshtml", model);
+                return View("CardTransactions.cshtml", model);
             }
 
             return RedirectToAction("TransactionSuccess", new { transactionId = result.Value.Id });
