@@ -3,3 +3,6 @@
 
 
 <h1>@Model.Name</h1>
+
+<a asp-action="Update" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+<button class="btn btn-danger delete-wallet" data-id="@Model.Id">Delete</button>

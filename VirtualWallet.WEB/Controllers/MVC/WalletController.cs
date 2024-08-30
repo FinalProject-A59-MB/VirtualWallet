@@ -35,21 +35,19 @@ namespace VirtualWallet.WEB.Controllers.MVC
         [RequireAuthorization]
         public IActionResult Add()
         {
-            return View();
+            var model = new WalletRequestDto();
+            return View(model);
         }
 
         [HttpPost]
         [RequireAuthorization]
         public async Task<IActionResult> Add(WalletRequestDto wallet)
         {
-            //Get loged in user id
-            int userId = 0;
+            wallet.UserId = CurrentUser.Id;
 
-            wallet.UserId = userId;
+            Result<int> newWalletId = await _walletService.AddWalletAsync(_dtoMapper.ToWalletRequestDto(wallet));
 
-            var newWalletId = await _walletService.AddWalletAsync(_dtoMapper.ToWalletRequestDto(wallet));
-
-            return RedirectToAction("Index", new { id = newWalletId});
+            return RedirectToAction("Index", new { id = newWalletId.Value });
         }
 
         [HttpGet]
