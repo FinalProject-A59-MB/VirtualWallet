@@ -1,4 +1,5 @@
 ﻿using VirtualWallet.DATA.Models;
+using VirtualWallet.WEB.Models.DTOs.AuthDTOs;
 using VirtualWallet.WEB.Models.DTOs.CardDTOs;
 using VirtualWallet.WEB.Models.DTOs.UserDTOs;
 using VirtualWallet.WEB.Models.DTOs.WalletDTOs;
@@ -41,5 +42,7 @@ public interface IDtoMapper
     public BlockedRecord ToBlockedRecord(BlockedRecordRequestDto blockedRecordDto);
     public BlockedRecord ToUnblockRecord(UnblockRecordRequestDto unblockRecordDto);
     public UnblockRecordResponseDto ToUnblockRecordResponseDto(BlockedRecord blockedRecord);
+
+    public User ToUser(RegisterRequestDto dto);
 
 }

@@ -1,5 +1,6 @@
 ﻿using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Models.Enums;
+using VirtualWallet.WEB.Models.DTOs.AuthDTOs;
 using VirtualWallet.WEB.Models.DTOs.CardDTOs;
 using VirtualWallet.WEB.Models.DTOs.UserDTOs;
 using VirtualWallet.WEB.Models.DTOs.WalletDTOs;
@@ -180,6 +181,16 @@ public class DtoMapper : IDtoMapper
             UserId = blockedRecord.UserId,
             Username = blockedRecord.User.Username,
             Reason = blockedRecord.Reason,
+        };
+    }
+
+    public User ToUser(RegisterRequestDto dto)
+    {
+        return new User
+        {
+            Username = dto.Username,
+            Email = dto.Email,
+            Password = dto.Password,
         };
     }
 

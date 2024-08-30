@@ -1,0 +1,254 @@
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using VirtualWallet.BUSINESS.Services.Contracts;
+using VirtualWallet.DATA.Helpers;
+using VirtualWallet.DATA.Models;
+using VirtualWallet.DATA.Models.Enums;
+using VirtualWallet.DATA.Services.Contracts;
+using VirtualWallet.WEB.Models.DTOs.AuthDTOs;
+
+namespace VirtualWallet.WEB.Controllers.API
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AuthenticationApiController : ControllerBase
+    {
+        private readonly IAuthService _authService;
+        private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
+        private readonly IDtoMapper _dtoMapper;
+
+        public AuthenticationApiController(
+            IAuthService authService,
+            IUserService userService,
+            IEmailService emailService,
+            IDtoMapper dtoMapper)
+        {
+            _authService = authService;
+            _userService = userService;
+            _emailService = emailService;
+            _dtoMapper = dtoMapper;
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto model)
+        {
+
+            var authResult = await _authService.AuthenticateAsync(model.UsernameOrEmail, model.Password);
+
+            if (!authResult.IsSuccess)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, authResult.Error);
+            }
+
+            var token = _authService.GenerateToken(authResult.Value);
+            return Ok(new { Token = token });
+        }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequestDto model)
+        {
+
+            var userRequest = _dtoMapper.ToUser(model);
+            var registerResult = await _userService.RegisterUserAsync(userRequest);
+
+            if (!registerResult.IsSuccess)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, registerResult.Error);
+            }
+
+            var token = _authService.GenerateToken(registerResult.Value);
+            var verificationLink = Url.Action("VerifyEmail", "AuthenticationApi", new { token }, Request.Scheme);
+            string emailContent = $"Please verify your email by clicking <a href='{verificationLink}'>here</a>.";
+            await _emailService.SendEmailAsync(registerResult.Value.Email, "Email Verification", emailContent);
+
+            return StatusCode(StatusCodes.Status201Created, new { Token = token });
+        }
+
+        [HttpGet("verifyEmail")]
+        public async Task<IActionResult> VerifyEmail(string token)
+        {
+            var validateToken = _authService.ValidateToken(token);
+            if (!validateToken.IsSuccess)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, validateToken.Error);
+            }
+
+            var userId = _authService.GetUserIdFromToken(token);
+            if (!userId.IsSuccess)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, userId.Error);
+            }
+
+            var userResult = await _userService.GetUserByIdAsync(userId.Value);
+
+            if (!userResult.IsSuccess)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, userResult.Error);
+            }
+
+            var user = userResult.Value;
+            user.Role = UserRole.EmailVerifiedUser;
+            var updateResult = await _userService.UpdateUserAsync(user);
+
+            if (!updateResult.IsSuccess)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, updateResult.Error);
+            }
+
+            var newToken = _authService.GenerateToken(user);
+            return Ok(new { Token = newToken });
+        }
+
+        [HttpPost("forgotPassword")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto model)
+        {
+
+            var userResult = await _userService.GetUserByEmailAsync(model.Email);
+
+            if (!userResult.IsSuccess)
+            {
+                return StatusCode(StatusCodes.Status404NotFound, userResult.Error);
+            }
+
+            var token = _authService.GenerateToken(userResult.Value);
+            var resetLink = Url.Action("ResetPassword", "AuthenticationApi", new { token, email = model.Email }, Request.Scheme);
+            string emailContent = $"You can reset your password by clicking <a href='{resetLink}'>here</a>.";
+
+            await _emailService.SendEmailAsync(model.Email, "Password Reset", emailContent);
+
+            return Ok(new { Message = "Password reset link has been sent to your email." });
+        }
+
+        [HttpPost("resetPassword")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, ModelState);
+            }
+
+            var resetResult = await _authService.ResetPasswordAsync(model.Email, model.Token, model.NewPassword);
+
+            if (!resetResult.IsSuccess)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, resetResult.Error);
+            }
+
+            return Ok(new { Message = "Password has been reset successfully." });
+        }
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            HttpContext.Response.Cookies.Delete("jwt");
+            return Ok(new { Message = "Logged out successfully." });
+        }
+
+        [HttpPost("googleLogin")]
+        public IActionResult GoogleLogin()
+        {
+            var properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleLoginResponse", "AuthenticationApi") };
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+        }
+
+        [HttpGet("googleLoginResponse")]
+        public async Task<IActionResult> GoogleLoginResponse()
+        {
+            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            if (result?.Principal != null)
+            {
+                var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
+                var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+
+                if (email == null)
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, "Unable to retrieve email from Google. Please try again.");
+                }
+
+                var existingUser = await _userService.GetUserByEmailAsync(email);
+
+                if (existingUser.IsSuccess && existingUser.Value != null)
+                {
+                    var token = _authService.GenerateToken(existingUser.Value);
+                    return Ok(new { Token = token });
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status404NotFound, existingUser.Error);
+                }
+            }
+
+            return StatusCode(StatusCodes.Status400BadRequest, "An error occurred while logging in with Google. Please try again.");
+        }
+
+        [HttpPost("googleRegister")]
+        public IActionResult GoogleRegister()
+        {
+            var properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleRegisterResponse", "AuthenticationApi") };
+            return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+        }
+
+        [HttpGet("googleRegisterResponse")]
+        public async Task<IActionResult> GoogleRegisterResponse()
+        {
+            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
+            if (result?.Principal != null)
+            {
+                var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
+                var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+                var firstName = claims?.FirstOrDefault(c => c.Type == ClaimTypes.GivenName)?.Value;
+                var lastName = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Surname)?.Value;
+
+                if (email == null)
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, "Unable to retrieve email from Google. Please try again.");
+                }
+
+                var existingUser = await _userService.GetUserByEmailAsync(email);
+
+                if (existingUser.Value == null)
+                {
+                    var user = new User
+                    {
+                        Email = email,
+                        Username = email,
+                        Password = PasswordGenerator.GenerateSecurePassword(),
+                        UserProfile = new UserProfile
+                        {
+                            FirstName = firstName,
+                            LastName = lastName,
+                        },
+                        Role = UserRole.RegisteredUser,
+                        VerificationStatus = UserVerificationStatus.NotVerified
+                    };
+
+                    var registerResult = await _userService.RegisterUserAsync(user);
+
+                    if (!registerResult.IsSuccess)
+                    {
+                        return StatusCode(StatusCodes.Status400BadRequest, registerResult.Error);
+                    }
+
+                    var token = _authService.GenerateToken(registerResult.Value);
+                    var verificationLink = Url.Action("VerifyEmail", "AuthenticationApi", new { token }, Request.Scheme);
+                    string emailContent = $"Please verify your email by clicking <a href='{verificationLink}'>here</a>.";
+                    await _emailService.SendEmailAsync(user.Email, "Email Verification", emailContent);
+
+                    return Ok(new { Token = token });
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, "User already exists. Please log in.");
+                }
+            }
+
+            return StatusCode(StatusCodes.Status400BadRequest, "An error occurred while registering with Google. Please try again.");
+        }
+    }
+}
