@@ -67,7 +67,7 @@
                 </div>
 
                 <nav aria-label="Page navigation" class="mt-4">
-                    @PaginationHelper.GeneratePaginationLinks(Url, totalPages, pageNumber, "CardTransactions", routeValues)
+                    @PaginationHelper.GeneratePaginationLinks(Url, totalPages, pageNumber, "Index", routeValues)
                 </nav>
             </div>
 
@@ -75,12 +75,14 @@
                 <div class="card bg-dark-3 shadow-sm mb-4">
                     <div class="card-body">
                         <h5 class="mb-3">Filter Transactions</h5>
-                        <form method="get" action="@Url.Action("CardTransactions", "Card")">
+                        <form method="get" action="@Url.Action("Index", "CardTransactions")">
                             <div class="mb-3">
                                 <label for="CardId" class="form-label">Select Card</label>
                                 <select class="form-select" id="CardId" name="CardId">
                                     <option value="">All Cards</option>
-                                    @{bool selected = false;}
+                                    @{
+                                        bool selected = false;
+                                    }
                                     @foreach (var card in cards)
                                     {
                                         @(selected = card.Id == ViewBag.FilterParameters?.CardId ? true : false)
@@ -88,7 +90,7 @@
                                         {
                                             <option value="@card.Id" selected>@card.CardNumber</option>
                                         }
-
+                                        else
                                         {
                                             <option value="@card.Id">@card.CardNumber</option>
                                         }

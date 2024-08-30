@@ -192,7 +192,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
             if (result.IsSuccess)
             {
                 TempData["SuccessMessage"] = "Deposit completed successfully.";
-                return RedirectToAction("Wallets", "Wallet");
+                return RedirectToAction("Wallets", "User");
             }
             else
             {
@@ -272,7 +272,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
             if (result.IsSuccess)
             {
                 TempData["SuccessMessage"] = "Withdraw completed successfully.";
-                return RedirectToAction("Wallets", "Wallet");
+                return RedirectToAction("Wallets", "User");
             }
             else
             {

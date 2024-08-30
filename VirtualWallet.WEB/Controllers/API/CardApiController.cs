@@ -167,7 +167,7 @@ namespace VirtualWallet.WEB.Controllers.API
                 return StatusCode(StatusCodes.Status404NotFound, "No cards found.");
             }
 
-            var transactionsResult = await _cardService.FilterByAsync(filterParameters);
+            var transactionsResult = await _cardService.FilterByAsync(filterParameters,CurrentUser.Id);
 
             if (!transactionsResult.IsSuccess)
             {

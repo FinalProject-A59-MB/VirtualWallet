@@ -62,17 +62,22 @@ namespace VirtualWallet.DATA.Repositories
             }
         }
 
-        public async Task<ICollection<CardTransaction>> FilterByAsync(CardTransactionQueryParameters filterParameters)
+        public async Task<ICollection<CardTransaction>> FilterByAsync(CardTransactionQueryParameters filterParameters, int? userId = null)
         {
             var transactions = _context.CardTransactions.AsQueryable();
 
-            if (filterParameters.CardId!=0)
+            if (userId.HasValue)
             {
-                transactions = transactions.Where(t => t.CardId==filterParameters.CardId);
+                transactions = transactions.Where(t => t.UserId == userId.Value);
             }
-            if (0!=filterParameters.Amount)
+
+            if (filterParameters.CardId != 0)
             {
-                transactions = transactions.Where(t => t.Amount== filterParameters.Amount);
+                transactions = transactions.Where(t => t.CardId == filterParameters.CardId);
+            }
+            if (filterParameters.Amount != 0)
+            {
+                transactions = transactions.Where(t => t.Amount == filterParameters.Amount);
             }
             if (filterParameters.CreatedAfter.HasValue)
             {
@@ -91,10 +96,10 @@ namespace VirtualWallet.DATA.Repositories
             }
 
             var sortPropertyMapping = new Dictionary<string, Expression<Func<CardTransaction, object>>>()
-                {
-                    { "CreatedAt", t => t.CreatedAt },
-                    { "Amount", t => t.Amount }
-                };
+    {
+        { "CreatedAt", t => t.CreatedAt },
+        { "Amount", t => t.Amount }
+    };
 
             if (!string.IsNullOrEmpty(filterParameters.SortBy) && sortPropertyMapping.ContainsKey(filterParameters.SortBy))
             {
@@ -109,9 +114,15 @@ namespace VirtualWallet.DATA.Repositories
         }
 
 
-        public async Task<int> GetTotalCountAsync(CardTransactionQueryParameters filterParameters)
+
+        public async Task<int> GetTotalCountAsync(CardTransactionQueryParameters filterParameters, int? userId = null)
         {
             var transactions = _context.CardTransactions.AsQueryable();
+
+            if (userId.HasValue)
+            {
+                transactions = transactions.Where(t => t.UserId == userId.Value);
+            }
 
             if (!string.IsNullOrEmpty(filterParameters.TransactionType))
             {
@@ -133,9 +144,18 @@ namespace VirtualWallet.DATA.Repositories
             {
                 transactions = transactions.Where(t => t.CreatedAt <= filterParameters.CreatedBefore.Value);
             }
+            if (filterParameters.CardId != 0)
+            {
+                transactions = transactions.Where(t => t.CardId == filterParameters.CardId);
+            }
+            //if (filterParameters.Amount >= 0)
+            //{
+            //    transactions = transactions.Where(t => t.Amount == filterParameters.Amount);
+            //}
 
             return await transactions.CountAsync();
         }
+
 
 
 

@@ -171,9 +171,6 @@ namespace ForumProject.Controllers.MVC
             return RedirectToAction("Register", "Authentication");
         }
 
-
-
-
         [HttpGet]
         public IActionResult Register()
         {
@@ -197,12 +194,18 @@ namespace ForumProject.Controllers.MVC
                 return View(model);
             }
 
-            var token = _authService.GenerateToken(registerResult.Value);
-            HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
 
+            var token = _authService.GenerateToken(registerResult.Value);
             var verificationLink = Url.Action("VerifyEmail", "Authentication", new { token = token }, Request.Scheme);
-            string emailContent = $"Please verify your email by clicking <a href='{verificationLink}'>here</a>.";
-            await _emailService.SendEmailAsync(registerResult.Value.Email, "Email Verification", emailContent);
+
+            var result = await _emailService.SendVerificationEmailAsync(registerResult.Value, verificationLink);
+            if (result.IsSuccess)
+            {
+                TempData["SuccessMessage"] = registerResult.Error;
+
+            }
+
+            HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
 
             return RedirectToAction("Index", "Home");
         }

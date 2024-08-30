@@ -1,7 +1,11 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using VirtualWallet.BUSINESS.Results;
+using VirtualWallet.BUSINESS.Services;
 using VirtualWallet.BUSINESS.Services.Contracts;
+using VirtualWallet.DATA.Models;
 
 public class SmtpEmailService : IEmailService
 {
@@ -12,7 +16,7 @@ public class SmtpEmailService : IEmailService
         _configuration = configuration;
     }
 
-    public async Task SendEmailAsync(string toEmail, string subject, string message)
+    public async Task<Result> SendEmailAsync(string toEmail, string subject, string message)
     {
         var smtpSettings = _configuration.GetSection("EmailSettings");
 
@@ -37,5 +41,29 @@ public class SmtpEmailService : IEmailService
 
             await smtpClient.SendMailAsync(mailMessage);
         }
+
+        return Result.Success();
     }
+
+    public async Task<Result> SendVerificationEmailAsync(User user, string verificationLink)
+    {
+        var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "VirtualWallet.BUSINESS", "Resources", "EmailTemplates", "VerificationEmailTemplate.html");
+
+        if (!File.Exists(templatePath))
+        {
+            return Result.Failure("Email template not found.");
+        }
+
+        var emailTemplate = await File.ReadAllTextAsync(templatePath);
+
+        string emailContent = emailTemplate.Replace("{{Username}}", user.Username)
+                                           .Replace("{{VerificationLink}}", verificationLink);
+
+        await SendEmailAsync(user.Email, "Email Verification", emailContent);
+
+        return Result.Success();
+
+    }
+
+
 }

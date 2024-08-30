@@ -40,14 +40,14 @@ namespace VirtualWallet.WEB.Controllers
                 return RedirectToAction("AddCard", "Card");
             }
             ViewBag.Cards = cards.Value.Select(_viewModelMapper.ToCardViewModel).ToList();
-            var totalCount = await _cardService.GetTotalCountAsync(filterParameters);
+            var totalCount = await _cardService.GetTotalCountAsync(filterParameters, CurrentUser.Id);
 
             ViewBag.TotalCount = totalCount.Value;
             ViewBag.PageSize = filterParameters.PageSize;
             ViewBag.PageNumber = filterParameters.PageNumber;
             ViewBag.FilterParameters = filterParameters;
 
-            var transactions = await _cardService.FilterByAsync(filterParameters);
+            var transactions = await _cardService.FilterByAsync(filterParameters,CurrentUser.Id);
             if (!transactions.IsSuccess)
             {
                 var transactionViewModels2 = new List<CardTransactionViewModel>();
