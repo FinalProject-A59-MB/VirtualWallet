@@ -103,6 +103,11 @@ namespace VirtualWallet.WEB.Controllers.API
         [HttpPost("changePassword")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto model)
         {
+            if (!ModelState.IsValid)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, ModelState);
+            }
+
             var userId = CurrentUser.Id;
             var result = await _userService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword);
 
@@ -116,7 +121,10 @@ namespace VirtualWallet.WEB.Controllers.API
 
         [HttpPost("changeEmail")]
         public async Task<IActionResult> ChangeEmail([FromBody] ChangeEmailRequestDto model)
-        {
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, ModelState);
+            }
+
             var userId = CurrentUser.Id;
             var result = await _userService.ChangeEmailAsync(userId, model.NewEmail, model.CurrentPassword);
 
