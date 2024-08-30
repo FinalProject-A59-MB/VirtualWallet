@@ -10,25 +10,28 @@ public class DtoMapper : IDtoMapper
     {
     }
 
-    public UserResponseDto ToUserResponseDto(User user)
+    public UserProfile ToUserProfile(UserProfileRequestDto dto)
     {
-        return new UserResponseDto
+        return new UserProfile
         {
-            Id = user.Id,
-            Username = user.Username,
-            Email = user.Email,
-            Role = user.Role.ToString(),
-            VerificationStatus = user.VerificationStatus.ToString(),
-            UserProfile = ToUserProfileDto(user.UserProfile),
-            Cards = user.Cards?.Select(ToCardDto).ToList(),
-            //Wallets = user.UserWallets?.Select(uw => ToWalletDto(uw.Wallet)).ToList(),
-            Contacts = user.Contacts?.Select(uc => ToUserContactDto(uc)).ToList(),
+            Id = dto.Id,
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            PhotoUrl = dto.PhotoUrl,
+            PhoneNumber = dto.PhoneNumber,
+            DateOfBirth = dto.DateOfBirth,
+            Street = dto.Street,
+            City = dto.City,
+            State = dto.State,
+            Country = dto.Country,
+            PostalCode = dto.PostalCode,
+            UserId = dto.Id
         };
     }
 
-    public UserProfileDto ToUserProfileDto(UserProfile profile)
+    public UserProfileResponseDto ToUserProfileResponseDto(UserProfile profile)
     {
-        return new UserProfileDto
+        return new UserProfileResponseDto
         {
             Id = profile.Id,
             FirstName = profile.FirstName,
@@ -39,21 +42,135 @@ public class DtoMapper : IDtoMapper
             Street = profile.Street,
             City = profile.City,
             State = profile.State,
-            PostalCode = profile.PostalCode,
             Country = profile.Country,
+            PostalCode = profile.PostalCode
         };
     }
 
-    public UserContactDto ToUserContactDto(UserContact contact)
+
+    public User ToUser(UserAccountRequestDto dto, UserProfile profile)
     {
-        return new UserContactDto
+        return new User
         {
-            UserId = contact.UserId,
-            ContactId = contact.ContactId,
-            ContactName = contact.Contact.Username,
-            AddedDate = contact.AddedDate,
+            Id = dto.Id,
+            Username = dto.Username,
+            Email = dto.Email,
+            GoogleId = dto.GoogleId,
+            Password = dto.Password,
+            VerificationStatus = dto.VerificationStatus,
+            Role = dto.Role,
+            UserProfile = profile
         };
     }
+
+
+    public User ToUser(UserAccountRequestDto dto)
+    {
+        var user = new User
+        {
+            Id = dto.Id,
+            Username = dto.Username,
+            Email = dto.Email,
+            GoogleId = dto.GoogleId,
+            VerificationStatus = dto.VerificationStatus,
+            Role = dto.Role,
+            MainWalletId = dto.MainWalletId,
+            BlockedRecordId = dto.BlockedRecordId,
+        };
+
+        if (dto.Password != null)
+        {
+            user.Password = dto.Password;
+        }
+
+        if (dto.PhotoIdUrl != null)
+        {
+            user.PhotoIdUrl = dto.PhotoIdUrl;
+        }
+
+        if (dto.FaceIdUrl != null)
+        {
+            user.FaceIdUrl = dto.FaceIdUrl;
+        }
+
+        return user;
+    }
+
+    public UserAccountResponseDto ToUserAccountResponseDto(User user)
+    {
+        return new UserAccountResponseDto
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Email = user.Email,
+            VerificationStatus = user.VerificationStatus,
+            Role = user.Role,
+            GoogleId = user.GoogleId,
+            UserProfile = ToUserProfileResponseDto(user.UserProfile),
+            TotalBalance = user.Wallets.Sum(w => w.Balance),
+            MainWallet = user.MainWallet != null ? ToWalletResponseDto(user.MainWallet) : null,
+            BlockedRecord = user.BlockedRecord != null ? ToBlockedRecordResponseDto(user.BlockedRecord) : null,
+            PhotoIdUrl = user.PhotoIdUrl,
+            FaceIdUrl = user.FaceIdUrl
+        };
+    }
+    public UserContact ToUserContact(UserContactRequestDto dto)
+    {
+        return new UserContact
+        {
+            UserId = dto.UserId,
+            ContactId = dto.ContactId,
+            AddedDate = dto.AddedDate,
+            Status = dto.Status,
+            SenderId = dto.SenderId,
+            Description = dto.Description
+        };
+    }
+
+
+    public UserContactResponseDto ToUserContactResponseDto(UserContact contact)
+    {
+        return new UserContactResponseDto
+        {
+            UserId = contact.UserId,
+            Username = contact.User.Username,
+            ContactId = contact.ContactId,
+            ContactUsername = contact.Contact.Username,
+            AddedDate = contact.AddedDate,
+            Status = contact.Status,
+            SenderId = contact.SenderId,
+            SenderUsername = contact.Sender.Username,
+            Description = contact.Description
+        };
+    }
+
+
+
+    public BlockedRecordResponseDto ToBlockedRecordResponseDto(BlockedRecord blockedRecord)
+    {
+        return new BlockedRecordResponseDto
+        {
+            UserId = blockedRecord.UserId,
+            Reason = blockedRecord.Reason,
+            Username = blockedRecord.User.Username
+        };
+    }
+
+    public WalletResponseDto ToWalletResponseDto(Wallet wallet)
+    {
+        return new WalletResponseDto
+        {
+            Id = wallet.Id,
+            UserId = wallet.UserId,
+            Name = wallet.Name,
+            WalletType = wallet.WalletType,
+            Balance = wallet.Balance,
+            Currency = wallet.Currency,
+        };
+    }
+
+
+
 
     public CardResponseDto ToCardDto(Card card)
     {
@@ -100,31 +217,6 @@ public class DtoMapper : IDtoMapper
         };
     }
 
-
-
-
-    public User ToUser(UserRequestDto dto)
-    {
-        return new User
-        {
-            Username = dto.Username,
-            Email = dto.Email,
-            Password = dto.Password,
-            Role = UserRole.RegisteredUser,
-        };
-    }
-
-    public UserRequestDto ToUserDto(User dto)
-    {
-        return new UserRequestDto
-        {
-            Username = dto.Username,
-            Email = dto.Email,
-            Password = dto.Password,
-            Role = UserRole.RegisteredUser,
-        };
-    }
-
     public Card ToCard(CardRequestDto dto)
     {
         return new Card
@@ -139,7 +231,7 @@ public class DtoMapper : IDtoMapper
         };
     }
 
-    public Wallet ToWallet(WalletRequestDto dto)
+    public Wallet ToWalletRequestDto(WalletRequestDto dto)
     {
         return new Wallet
         {
@@ -167,13 +259,12 @@ public class DtoMapper : IDtoMapper
         };
     }
 
-    public WalletResponseDto ToWalletDto(Wallet wallet)
+    public WalletResponseDto ToWallet(Wallet wallet)
     {
         return new WalletResponseDto
         {
             Id = wallet.Id,
             UserId = wallet.UserId,
-            User = wallet.User,
             Name = wallet.Name,
             Currency = wallet.Currency,
             WalletType = wallet.WalletType,

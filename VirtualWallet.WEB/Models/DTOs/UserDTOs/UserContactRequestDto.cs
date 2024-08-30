@@ -1,21 +1,14 @@
 ﻿using VirtualWallet.DATA.Models.Enums;
 
-namespace VirtualWallet.DATA.Models
+namespace VirtualWallet.WEB.Models.DTOs.UserDTOs
 {
-    public class UserContact
+    public class UserContactRequestDto
     {
         public int UserId { get; set; }
-        public User User { get; set; }
-
         public int ContactId { get; set; }
-        public User Contact { get; set; }
-
         public DateTime AddedDate { get; set; }
-
         public FriendRequestStatus Status { get; set; }
         public int SenderId { get; set; }
-        public User Sender { get; set; }
         public string? Description { get; set; }
     }
-
 }
