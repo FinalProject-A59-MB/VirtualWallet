@@ -1,30 +1,37 @@
 ﻿@model CardViewModel
 
 @{
-    ViewData["Title"] = "Delete Card";
+    ViewData["Title"] = "Remove Card";
 }
 
-<div class="card mb-4 w-50 mx-auto">
-    <div class="card-body">
-        <h2 class="text-center text-danger">Delete Card</h2>
+<div class="d-flex justify-content-center align-items-center">
+    <div class="card mb-4 w-50 mx-auto">
+        <div class="card-body bg-dark-1 text-center">
+            <h4 class="text-danger">
+                Confirm Remove
+            </h4>
+            <h4 class="mt-4">Are you sure you want to remove this card?</h4>
 
-        <p class="text-center">Are you sure you want to delete this card?</p>
+            <div class="d-flex mx-auto mt-4 bg-dark text-light w-50">
+                <div class="card-body">
+                    <p><strong>Card Holder Name:</strong> @Model.CardHolderName</p>
+                    <p><strong>Card Number:</strong> @Model.CardNumber</p>
+                    <p><strong>Issuer:</strong> @Model.Issuer</p>
+                    <p><strong>Expiration Date:</strong> @Model.ExpirationDate</p>
+                </div>
+            </div>
 
-        <div class="card mb-4">
-            <div class="card-body">
-                <p><strong>Card Holder Name:</strong> @Model.CardHolderName</p>
-                <p><strong>Card Number:</strong> @Model.CardNumber</p>
-                <p><strong>Issuer:</strong> @Model.Issuer</p>
-                <p><strong>Expiration Date:</strong> @Model.ExpirationDate</p>
+            <div class="mt-4">
+                <form asp-action="Delete" method="post" class="d-inline-block">
+                    <input type="hidden" asp-for="Id" />
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt"></i> Remove Card
+                    </button>
+                </form>
+                <a asp-action="Profile" asp-controller="User" class="btn btn-secondary ms-2">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
             </div>
         </div>
-
-        <form asp-action="Delete" method="post">
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group text-center">
-                <button type="submit" class="btn btn-danger">Delete</button>
-                <a asp-action="Profile" asp-controller="User" class="btn btn-secondary">Cancel</a>
-            </div>
-        </form>
     </div>
 </div>

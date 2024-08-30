@@ -57,10 +57,20 @@ namespace VirtualWallet.DATA.Repositories
             var card = await GetCardByIdAsync(cardId);
             if (card != null)
             {
+                var cardTransactions = await _context.CardTransactions
+                    .Where(ct => ct.CardId == cardId)
+                    .ToListAsync();
+
+                _context.CardTransactions.RemoveRange(cardTransactions);
+
+                await _context.SaveChangesAsync();
+
                 _context.Cards.Remove(card);
                 await _context.SaveChangesAsync();
             }
         }
+
+
 
         public async Task<ICollection<CardTransaction>> FilterByAsync(CardTransactionQueryParameters filterParameters, int? userId = null)
         {

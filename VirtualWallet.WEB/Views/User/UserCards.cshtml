@@ -30,12 +30,16 @@
                             <a href="@Url.Action("Index", "CardTransactions", new { cardId = card.Id })" class="btn btn-outline-primary w-45">
                                 <i class="bi bi-clock-history"></i> View Transactions
                             </a>
-                            <form asp-controller="Card" asp-action="DeleteCard" method="post" class="d-inline w-45">
+
+                            <a href="@Url.Action("DeleteCard", "Card", new { cardId = card.Id })" class="btn btn-danger w-45">
+                                <i class="bi bi-trash"></i> Remove
+                            </a>
+                       @*      <form asp-controller="Card" asp-action="DeleteCard" method="post" class="d-inline w-45">
                                 <input type="hidden" name="cardId" value="@card.Id" />
                                 <button type="submit" class="btn btn-danger w-100">
                                     <i class="bi bi-trash"></i> Delete
                                 </button>
-                            </form>
+                            </form> *@
                         </div>
                     </div>
                 </div>
