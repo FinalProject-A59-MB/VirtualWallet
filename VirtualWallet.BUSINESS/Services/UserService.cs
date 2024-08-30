@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using VirtualWallet.BUSINESS.Helpers;
 using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Helpers;
@@ -29,6 +31,19 @@ namespace VirtualWallet.DATA.Services
             var email = userToRegister.Email;
             var password = userToRegister.Password;
 
+
+            var emailValidationResult = EmailValidator.Validate(email);
+            if (!emailValidationResult.IsSuccess)
+            {
+                return Result<User>.Failure(emailValidationResult.Error);
+            }
+
+            var passwordValidationResult = PasswordValidator.Validate(password);
+            if (!passwordValidationResult.IsSuccess)
+            {
+                return Result<User>.Failure(passwordValidationResult.Error);
+            }
+
             var existingUser = await _userRepository.GetUserByUsernameAsync(username);
             if (existingUser != null)
             {
@@ -41,29 +56,20 @@ namespace VirtualWallet.DATA.Services
                 return Result<User>.Failure("Email already exists.");
             }
 
-            var hashedPassword = PasswordHasher.HashPassword(password);
-
-            var user = new User
-            {
-                Username = username,
-                Password = hashedPassword,
-                Email = email,
-                Role = UserRole.RegisteredUser,
-                VerificationStatus = UserVerificationStatus.NotVerified
-            };
-
-            await _userRepository.AddUserAsync(user);
-
+            userToRegister.Password = PasswordHasher.HashPassword(password);
+            userToRegister.Role = UserRole.RegisteredUser;
+            userToRegister.VerificationStatus = UserVerificationStatus.NotVerified;
             var userProfile = new UserProfile
             {
-                UserId = user.Id,
+                UserId = userToRegister.Id,
                 FirstName = "",
                 LastName = "",
             };
-
+            userToRegister.UserProfile = userProfile;
+            await _userRepository.AddUserAsync(userToRegister);
             await _userRepository.AddUserProfileAsync(userProfile);
 
-            return Result<User>.Success(user);
+            return Result<User>.Success(userToRegister);
         }
 
         public async Task<Result<IEnumerable<User>>> GetUsers()
@@ -145,7 +151,6 @@ namespace VirtualWallet.DATA.Services
                 return Result.Failure("Friend request already sent.");
             }
 
-            
             var senderContact = new UserContact
             {
                 UserId = userId,
@@ -155,7 +160,6 @@ namespace VirtualWallet.DATA.Services
                 Status = FriendRequestStatus.Pending
             };
 
-            
             var receiverContact = new UserContact
             {
                 UserId = contactId,
