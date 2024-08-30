@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Services.Contracts;
+using VirtualWallet.WEB.Controllers.MVC;
 
 namespace VirtualWallet.WEB.Controllers.API
 {
     [ApiController]
     [Route("api/userWallet")]
-    public class UserWalletController : BaseController
+    public class UserWalletController : BaseApiController
     {
         private readonly IUserWalletService _userWalletService;
 
@@ -19,6 +20,7 @@ namespace VirtualWallet.WEB.Controllers.API
         [HttpGet]
         public async Task<IActionResult> GetUserWalletsByUserId(int userId)
         {
+            
             var result = await _userWalletService.GetUserWalletsByUserIdAsync(userId);
 
             if (!result.IsSuccess)

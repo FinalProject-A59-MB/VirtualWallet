@@ -3,7 +3,7 @@ using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Services;
 using VirtualWallet.DATA.Services.Contracts;
-using VirtualWallet.WEB.Models.DTOs;
+using VirtualWallet.WEB.Models.DTOs.WalletDTOs;
 using VirtualWallet.WEB.Models.ViewModels;
 
 namespace VirtualWallet.WEB.Controllers.MVC
@@ -21,15 +21,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
             _viewModelMapper = viewModelMapper;
         }
 
-        [RequireAuthorization]
-        public async Task<IActionResult> Wallets()
-        {
-            var user = CurrentUser;
 
-            var userViewModel = _viewModelMapper.ToUserViewModel(user);
-
-            return View("UserWalletsPartial", userViewModel);
-        }
 
 
         [HttpGet]

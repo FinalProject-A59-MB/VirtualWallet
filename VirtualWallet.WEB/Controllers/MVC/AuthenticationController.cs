@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Services.Contracts;
-using VirtualWallet.WEB.Models.ViewModels;
 using System.Security.Claims;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Helpers;
-using VirtualWallet.WEB.Controllers;
+using VirtualWallet.WEB.Controllers.MVC;
+using VirtualWallet.WEB.Models.ViewModels.AuthenticationViewModels;
 
 namespace ForumProject.Controllers.MVC
 {
@@ -41,6 +41,7 @@ namespace ForumProject.Controllers.MVC
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
+            
             if (!ModelState.IsValid)
             {
                 return View(model);

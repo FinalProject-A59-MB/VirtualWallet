@@ -2,12 +2,15 @@
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Services.Contracts;
-using VirtualWallet.WEB.Controllers;
-using VirtualWallet.WEB.Models.ViewModels;
 using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.BUSINESS.Services;
 using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.WEB.Helpers;
+using VirtualWallet.WEB.Controllers.MVC;
+using VirtualWallet.WEB.Models.ViewModels.UserViewModels;
+using VirtualWallet.WEB.Models.ViewModels.CardViewModels;
+using VirtualWallet.WEB.Models.ViewModels.WalletViewModels;
+using VirtualWallet.WEB.Models.ViewModels.AdminViewModels;
 
 namespace ForumProject.Controllers.MVC
 {
@@ -43,7 +46,6 @@ namespace ForumProject.Controllers.MVC
         public async Task<IActionResult> Profile(int? id)
         {
             UserViewModel profileViewModel;
-            
             if (id.HasValue & id != 0)
             {
 
@@ -63,7 +65,10 @@ namespace ForumProject.Controllers.MVC
 
                 profileViewModel = _modelMapper.ToUserViewModel(CurrentUser);
             }
-            profileViewModel.TotalBalance = profileViewModel.Wallets.Select(x => x.Balance).Sum();
+            
+            var totalBalanceResult = await _userService.GetTotalBalanceInMainWalletCurrencyAsync(profileViewModel.Id);
+
+            profileViewModel.TotalBalance = totalBalanceResult.Value.TotalAmount;
 
 
             return View(profileViewModel);
@@ -466,7 +471,17 @@ namespace ForumProject.Controllers.MVC
             }
             var viewModel = _modelMapper.ToUserViewModel(CurrentUser);
 
-            return View("UserCardsPartial", viewModel);
+            return View("UserCards", viewModel);
+        }
+
+        [RequireAuthorization(minRequiredRoleLevel: 2)]
+        public async Task<IActionResult> Wallets()
+        {
+            var user = CurrentUser;
+
+            var userViewModel = _modelMapper.ToUserViewModel(user);
+
+            return View("UserWallets", userViewModel);
         }
 
         [RequireAuthorization(minRequiredRoleLevel: 2)]

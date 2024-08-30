@@ -7,7 +7,7 @@ using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Services.Contracts;
-using VirtualWallet.WEB.Models.ViewModels;
+using VirtualWallet.WEB.Models.ViewModels.CardViewModels;
 
 namespace VirtualWallet.WEB.Controllers.MVC
 {
@@ -51,16 +51,9 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 return View(model);
             }
 
-            var cardToVerify = new Card
-            {
-                CardHolderName = model.CardHolderName,
-                CardNumber = model.CardNumber,
-                Cvv = model.Cvv,
-                ExpirationDate = DateTime.ParseExact(model.ExpirationDate, "MM/yy", null),
-                Issuer = model.Issuer
-            };
+            var card = _viewModelMapper.ToCard(model);
 
-            var tokenResult = await _paymentProcessorService.VerifyAndRetrieveTokenAsync(cardToVerify);
+            var tokenResult = await _paymentProcessorService.VerifyAndRetrieveTokenAsync(card);
 
             if (!tokenResult.IsSuccess)
             {
@@ -68,18 +61,8 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 return View("AddCard", model);
             }
             var currency = await _paymentProcessorService.GetCardCurrency(tokenResult.Value);
-            var card = new Card
-            {
-                CardHolderName = model.CardHolderName,
-                CardNumber = model.CardNumber,
-                Issuer = model.Issuer,
-                ExpirationDate = DateTime.ParseExact(model.ExpirationDate, "MM/yy", null),
-                Cvv = model.Cvv,
-                PaymentProcessorToken = tokenResult.Value,
-                CardType = model.CardType,
-                Currency = currency.Value
-
-            };
+            card.Currency = currency.Value;
+            card.PaymentProcessorToken = tokenResult.Value;
 
             var addCardResult = await _cardService.AddCardAsync(CurrentUser, card);
 
@@ -87,23 +70,6 @@ namespace VirtualWallet.WEB.Controllers.MVC
             {
                 TempData["ErrorMessage"] = addCardResult.Error;
                 return View("AddCard", model);
-            }
-
-            if (!CurrentUser.MainWalletId.HasValue)
-            {
-                var wallet = new Wallet
-                {
-                    Name = "Main Wallet",
-                    WalletType = WalletType.Main,
-                    UserId = CurrentUser.Id,
-                    Currency = card.Currency
-                };
-                CurrentUser.MainWalletId = wallet.Id;
-                CurrentUser.MainWallet = wallet;
-
-                var walletResult = await _walletService.AddWalletAsync(wallet);
-
-                CurrentUser.Wallets.Add(wallet);
             }
 
             return RedirectToAction("Profile", "User");
@@ -281,8 +247,6 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 amountToWithdraw = decimal.Parse(exchangeResult.Keys.FirstOrDefault());
                 fee = exchangeResult.Values.FirstOrDefault();
             }
-            
-            
 
             model.Fee = fee;
             model.Amount = amountToWithdraw;

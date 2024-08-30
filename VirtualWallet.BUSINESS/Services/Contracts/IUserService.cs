@@ -1,5 +1,6 @@
 ﻿using VirtualWallet.DATA.Models;
 using VirtualWallet.BUSINESS.Results;
+using VirtualWallet.DATA.Models.Enums;
 
 namespace VirtualWallet.DATA.Services.Contracts
 {
@@ -37,6 +38,8 @@ namespace VirtualWallet.DATA.Services.Contracts
 
         public Task<Result<IEnumerable<User>>> FilterUsersAsync(UserQueryParameters parameters);
         public Task<Result<int>> GetTotalUserCountAsync(UserQueryParameters parameters);
+
+        public Task<Result<(decimal TotalAmount, CurrencyType Currency)>> GetTotalBalanceInMainWalletCurrencyAsync(int userId);
 
     }
 }

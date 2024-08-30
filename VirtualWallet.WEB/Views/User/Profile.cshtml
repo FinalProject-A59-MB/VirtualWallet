@@ -9,6 +9,7 @@
     var viewProfileAsUser = Model.Id != ViewBag.UserId;
     bool areFriends = Model.Contacts.Any(c => c.ContactId == ViewBag.UserId && c.Status == FriendRequestStatus.Accepted);
     bool blocked = Model.Role == UserRole.Blocked.ToString();
+    var mainCurrency = Model.MainWallet == null ? "$" : Model.MainWallet.Currency.ToString();
 }
 
 <div class="container @(canViewFullProfile ? "" : "w-50") bg-dark-1 py-5">
@@ -46,10 +47,13 @@
                             <div class="card bg-dark-3 text-white mb-4 shadow-sm">
                                 <div class="d-flex justify-content-center align-items-center">
                                     <div class="card-body d-flex align-items-center">
-                                        <i class="bi bi-wallet2 display-3 me-3"></i>
+                                        <a href="@Url.Action("Wallets", "User")" style="color: white;">
+                                            <i class="bi bi-wallet2 display-3 me-3"></i>
+                                        </a>
+                                        
                                         <div>
                                             <h5>Total Balance</h5>
-                                            <h3>$@Model.TotalBalance.ToString()</h3>
+                                            <h3>@mainCurrency @Model.TotalBalance.ToString()</h3>
                                         </div>
                                     </div>
                                     <div class="card-body d-flex align-items-center">

@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using VirtualWallet.BUSINESS.Resources;
 using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.DATA.Repositories;
+using Microsoft.AspNetCore.Http;
+using VirtualWallet.DATA.Models.Enums;
+using VirtualWallet.DATA.Services.Contracts;
 
 namespace VirtualWallet.BUSINESS.Services
 {
@@ -13,12 +16,18 @@ namespace VirtualWallet.BUSINESS.Services
         private readonly ICardRepository _cardRepository;
         private readonly IPaymentProcessorService _paymentProcessorService;
         private readonly ICardTransactionRepository _cardTransactionRepository;
+        private readonly IWalletService _walletService;
 
-        public CardService(ICardRepository cardRepository, IPaymentProcessorService paymentProcessorService, ICardTransactionRepository cardTransactionRepository)
+        public CardService(
+            ICardRepository cardRepository, 
+            IPaymentProcessorService paymentProcessorService, 
+            ICardTransactionRepository cardTransactionRepository,
+            IWalletService walletService)
         {
             _cardRepository = cardRepository;
             _paymentProcessorService = paymentProcessorService;
             _cardTransactionRepository = cardTransactionRepository;
+            _walletService = walletService;
         }
 
         public async Task<Result<Card>> GetCardByIdAsync(int cardId)
@@ -42,6 +51,25 @@ namespace VirtualWallet.BUSINESS.Services
             if (user == null || card == null)
             {
                 return Result.Failure("Invalid user or card information.");
+            }
+
+            if (!user.MainWalletId.HasValue)
+            {
+                var wallet = new Wallet
+                {
+                    Name = "Main Wallet",
+                    WalletType = WalletType.Main,
+                    UserId = user.Id,
+                    Currency = card.Currency
+                };
+
+                var walletResult = await _walletService.AddWalletAsync(wallet);
+                if (!walletResult.IsSuccess)
+                {
+                    return Result.Failure("Unable to add main Wallet.");
+                }
+
+                user.MainWalletId = wallet.Id;
             }
 
             user.Cards.Add(card);

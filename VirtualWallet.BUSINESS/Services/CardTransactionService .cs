@@ -65,6 +65,7 @@ namespace VirtualWallet.BUSINESS.Services
                 return Result<CardTransaction>.Failure(ErrorMessages.InvalidWithdrawalAmount);
             decimal feeAmount = 0;
             decimal amountToWithdraw = amount;
+
             // Calculate the fee and the actual amount to withdraw
             if (cardResult.Currency != walletResult.Currency)
             {
@@ -75,10 +76,6 @@ namespace VirtualWallet.BUSINESS.Services
                 amountToWithdraw = feeAndAmount["amountToWithdraw"];
                 feeAmount = feeAndAmount["feeAmount"];
             }
-            
-            
-
-            
 
             var totalAmountToWithdraw = amountToWithdraw + feeAmount;
 

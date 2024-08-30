@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VirtualWallet.BUSINESS.Results;
+using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Helpers;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Models.Enums;
@@ -11,10 +12,15 @@ namespace VirtualWallet.DATA.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly ICurrencyService _currencyService;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(
+            IUserRepository userRepository,
+            ICurrencyService currencyService
+            )
         {
             _userRepository = userRepository;
+            _currencyService = currencyService;
         }
 
         public async Task<Result<User>> RegisterUserAsync(User userToRegister)
@@ -377,6 +383,53 @@ namespace VirtualWallet.DATA.Services
                 ? Result<int>.Success(count)
                 : Result<int>.Failure("No Users found.");
         }
+
+        public async Task<Result<(decimal TotalAmount, CurrencyType Currency)>> GetTotalBalanceInMainWalletCurrencyAsync(int userId)
+        {
+            var userResult = await GetUserByIdAsync(userId);
+            if (!userResult.IsSuccess)
+            {
+                return Result<(decimal TotalAmount, CurrencyType Currency)>.Failure("User not found.");
+            }
+
+            var user = userResult.Value;
+
+            if (user.MainWallet == null)
+            {
+                return Result<(decimal TotalAmount, CurrencyType Currency)>.Failure("User does not have a main wallet set.");
+            }
+
+            var mainWalletCurrency = user.MainWallet.Currency;
+            decimal totalAmount = 0m;
+
+            foreach (var wallet in user.Wallets)
+            {
+                if (wallet.Currency == mainWalletCurrency)
+                {
+                    totalAmount += wallet.Balance;
+                }
+                else
+                {
+                    var conversionResult = await _currencyService.GetRatesForCurrencyAsync(wallet.Currency);
+                    if (!conversionResult.IsSuccess)
+                    {
+                        return Result<(decimal TotalAmount, CurrencyType Currency)>.Failure(conversionResult.Error);
+                    }
+
+                    var conversionRates = conversionResult.Value.Data;
+                    if (!conversionRates.TryGetValue(mainWalletCurrency.ToString(), out var rate))
+                    {
+                        return Result<(decimal TotalAmount, CurrencyType Currency)>.Failure($"Conversion rate for {mainWalletCurrency} not found.");
+                    }
+
+                    totalAmount += wallet.Balance * rate;
+                }
+            }
+
+            return Result<(decimal TotalAmount, CurrencyType Currency)>.Success((totalAmount, mainWalletCurrency));
+        }
+
+
     }
 
 
