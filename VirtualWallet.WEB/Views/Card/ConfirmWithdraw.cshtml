@@ -16,9 +16,9 @@
             <h3>Are you sure you want to withdraw:</h3>
             <h2><strong>@amount @Model.Card.Currency</strong></h2>
             <h3>from your wallet</h3>
-            <h2><strong>@Model.Wallet.Name</strong></h2>
+            <h2><strong>@Model.Wallet.Name (@Model.Wallet.Currency)</strong></h2>
             <h3>to the card</h3>
-            <h2><strong>@Model.Card.CardNumber</strong> ?</h2>
+            <h2><strong>@Model.Card.CardNumber (@Model.Card.Currency)</strong> ?</h2>
             <h4 class="text-warning mt-3">
                 The transaction fee will be
                 <strong>@fee @Model.Card.Currency</strong>.

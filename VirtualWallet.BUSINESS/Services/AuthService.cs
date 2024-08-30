@@ -17,13 +17,11 @@ namespace VirtualWallet.BUSINESS.Services
     {
         private readonly IConfiguration _configuration;
         private readonly IUserRepository _userRepository;
-        private readonly IUserService _userService;
 
-        public AuthService(IConfiguration configuration, IUserRepository userRepository, IUserService userService)
+        public AuthService(IConfiguration configuration, IUserRepository userRepository)
         {
             _configuration = configuration;
             _userRepository = userRepository;
-            _userService = userService;
         }
 
         public async Task<Result<User>> AuthenticateAsync(string identifier, string password)
@@ -45,20 +43,15 @@ namespace VirtualWallet.BUSINESS.Services
                 return Result.Failure(validateTokenResult.Error);
             }
 
-            var userResult = await _userService.GetUserByEmailAsync(email);
-            if (!userResult.IsSuccess)
+            var user = await _userRepository.GetUserByEmailAsync(email);
+            if (user==null)
             {
                 return Result.Failure("Invalid email.");
             }
 
-            var user = userResult.Value;
             user.Password = PasswordHasher.HashPassword(newPassword);
 
-            var updateResult = await _userService.UpdateUserAsync(user);
-            if (!updateResult.IsSuccess)
-            {
-                return Result.Failure("Password reset failed.");
-            }
+            await _userRepository.UpdateUserAsync(user);
 
             return Result.Success();
         }

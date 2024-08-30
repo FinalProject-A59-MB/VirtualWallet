@@ -71,7 +71,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 TempData["ErrorMessage"] = addCardResult.Error;
                 return View("AddCard", model);
             }
-
+            TempData["SuccessMessage"] = "Card added succesfully";
             return RedirectToAction("Profile", "User");
         }
 
@@ -151,23 +151,8 @@ namespace VirtualWallet.WEB.Controllers.MVC
 
             var card = await _cardService.GetCardByIdAsync(model.CardId);
             var wallet = await _walletService.GetWalletByIdAsync(model.WalletId);
-            //var walletCurrency = wallet.Value.Currency;
-            //var cardCurrency = card.Value.Currency;
-
             var amountToDeposit = model.Amount;
             decimal fee = 0;
-            //if (cardCurrency != walletCurrency)
-            //{
-            //    var feeResult = await _cardTransactionService.CalculateFeeAsync(model.Amount, card.Value.Currency, wallet.Value.Currency);
-            //    if (!feeResult.IsSuccess)
-            //    {
-            //        TempData["ErrorMessage"] = feeResult.Error;
-            //        return View("CardTransactionFormPartial", model);
-            //    }
-            //    var exchangeResult = feeResult.Value;
-            //    amountToDeposit = decimal.Parse(exchangeResult.Keys.FirstOrDefault());
-            //    fee = exchangeResult.Values.FirstOrDefault();
-            //}
 
             var feeResult = await _cardTransactionService.CalculateFeeAsync(model.Amount, card.Value.Currency, wallet.Value.Currency);
             if (feeResult.IsSuccess)
@@ -240,18 +225,12 @@ namespace VirtualWallet.WEB.Controllers.MVC
             }
             var card = await _cardService.GetCardByIdAsync(model.CardId);
             var wallet = await _walletService.GetWalletByIdAsync(model.WalletId);
-            var walletCurrency = wallet.Value.Currency;
-            var cardCurrency = card.Value.Currency;
 
             var amountToWithdraw = model.Amount;
             decimal fee = 0;
-            if (cardCurrency != walletCurrency) {
-                var feeResult = await _cardTransactionService.CalculateFeeAsync(model.Amount, wallet.Value.Currency, card.Value.Currency);
-                if (!feeResult.IsSuccess)
-                {
-                    TempData["ErrorMessage"] = feeResult.Error;
-                    return View("CardTransactionFormPartial", model);
-                }
+            var feeResult = await _cardTransactionService.CalculateFeeAsync(model.Amount, wallet.Value.Currency, card.Value.Currency);
+            if (feeResult.IsSuccess)
+            {
                 var exchangeResult = feeResult.Value;
                 amountToWithdraw = exchangeResult["amountToWithdraw"];
                 fee = exchangeResult["feeAmount"];

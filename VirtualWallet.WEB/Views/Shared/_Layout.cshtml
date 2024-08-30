@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/VirtualWallet.WEB.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-
+    <link rel="icon" href="~/favicon.ico" type="image/x-icon"asp-append-version="true" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body class="bg-dark-3">
@@ -55,8 +55,8 @@
                                     Card Transfers
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="cardTransfersDropdown">
-                                    <li><a class="dropdown-item" href="@Url.Action("Withdraw", "CardTransfers")"><i class="bi bi-arrow-up-circle me-2"></i>Withdraw</a></li>
-                                    <li><a class="dropdown-item" href="@Url.Action("Deposit", "CardTransfers")"><i class="bi bi-arrow-down-circle me-2"></i> Deposit</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Withdraw", "Card")"><i class="bi bi-arrow-up-circle me-2"></i>Withdraw</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Deposit", "Card")"><i class="bi bi-arrow-down-circle me-2"></i> Deposit</a></li>
                                 </ul>
                             </li>
 
@@ -67,7 +67,7 @@
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="transactionHistoryDropdown">
                                     <li><a class="dropdown-item" href="@Url.Action("WalletTransactions", "History")"><i class="bi bi-currency-exchange me-2"></i>Wallet Transactions</a></li>
-                                    <li><a class="dropdown-item" href="@Url.Action("CardTransactions", "History")"><i class="bi bi-bank2 me-2"></i>Card Transactions</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Index", "CardTransactions")"><i class="bi bi-bank2 me-2"></i>Card Transactions</a></li>
                                 </ul>
                             </li>
 
