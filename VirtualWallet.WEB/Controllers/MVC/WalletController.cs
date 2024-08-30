@@ -47,7 +47,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
 
             wallet.UserId = userId;
 
-            var newWalletId = await _walletService.AddWalletAsync(_dtoMapper.ToWallet(wallet));
+            var newWalletId = await _walletService.AddWalletAsync(_dtoMapper.ToWalletRequestDto(wallet));
 
             return RedirectToAction("Index", new { id = newWalletId});
         }
@@ -67,7 +67,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
 
             wallet.UserId = userId;
 
-            await _walletService.UpdateWalletAsync(_dtoMapper.ToWallet(wallet));
+            await _walletService.UpdateWalletAsync(_dtoMapper.ToWalletRequestDto(wallet));
 
             return RedirectToAction("Index", new { id = wallet.Id });
         }

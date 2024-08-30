@@ -5,30 +5,41 @@ using VirtualWallet.WEB.Models.DTOs.WalletDTOs;
 
 public interface IDtoMapper
 {
-    public UserResponseDto ToUserResponseDto(User user);
+    public UserProfile ToUserProfile(UserProfileRequestDto dto);
 
-    public UserProfileDto ToUserProfileDto(UserProfile profile);
+    public UserProfileResponseDto ToUserProfileResponseDto(UserProfile profile);
 
-    public UserContactDto ToUserContactDto(UserContact contact);
+    public User ToUser(UserAccountRequestDto dto, UserProfile profile);
+
+    public UserAccountResponseDto ToUserAccountResponseDto(User user);
+
+    public Wallet ToWalletRequestDto(WalletRequestDto dto);
+
+    public WalletTransactionDto ToWalletTransactionDto(WalletTransaction transaction); 
+
+    public WalletResponseDto ToWallet(Wallet wallet);
 
     public CardResponseDto ToCardDto(Card card);
 
     public CardTransactionResponseDto ToCardTransactionDto(CardTransaction transaction);
 
-    public User ToUser(UserRequestDto dto);
-
     public Card ToCard(CardRequestDto dto);
-
-    public Wallet ToWallet(WalletRequestDto dto);
-
-    public WalletTransactionDto ToWalletTransactionDto(WalletTransaction transaction); 
-
-    public WalletResponseDto ToWalletDto(Wallet wallet);
-
-    public UserRequestDto ToUserDto(User dto);
 
     public CardResponseDto ToCardResponseDto(Card card);
 
     public CardTransactionResponseDto ToCardTransactionResponseDto(CardTransaction transaction);
+
+    public User ToUser(UserAccountRequestDto dto);
+
+    public BlockedRecordResponseDto ToBlockedRecordResponseDto(BlockedRecord blockedRecord);
+
+    public WalletResponseDto ToWalletResponseDto(Wallet wallet);
+
+    public UserContact ToUserContact(UserContactRequestDto dto);
+    public UserContactResponseDto ToUserContactResponseDto(UserContact contact);
+
+    public BlockedRecord ToBlockedRecord(BlockedRecordRequestDto blockedRecordDto);
+    public BlockedRecord ToUnblockRecord(UnblockRecordRequestDto unblockRecordDto);
+    public UnblockRecordResponseDto ToUnblockRecordResponseDto(BlockedRecord blockedRecord);
 
 }
