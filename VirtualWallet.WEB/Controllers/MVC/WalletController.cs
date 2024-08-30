@@ -53,9 +53,9 @@ namespace VirtualWallet.WEB.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> Update(int id)
         {
-            var wallet = await _walletService.GetWalletByIdAsync(id);
+            Result<Wallet> wallet = await _walletService.GetWalletByIdAsync(id);
 
-            return View(wallet);
+            return View(wallet.Value);
         }
 
         [HttpPost]

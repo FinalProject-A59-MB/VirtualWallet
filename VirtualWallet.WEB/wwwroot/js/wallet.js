@@ -8,6 +8,7 @@
                 type: 'DELETE',
                 success: function (result) {
                     alert("Wallet deleted successfully.");
+                    window.location.href = '/User/Wallets';
                 },
                 error: function (xhr, status, error) {
                     alert("Failed to delete the wallet. Please try again.");

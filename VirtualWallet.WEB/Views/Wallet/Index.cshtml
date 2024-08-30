@@ -1,7 +1,8 @@
 ﻿@using VirtualWallet.DATA.Models
 @model Wallet
-
-
+@section Scripts {
+    <script src="~/js/wallet.js"></script>
+}
 <h1>@Model.Name</h1>
 
 <a asp-action="Update" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>

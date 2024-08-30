@@ -1,5 +1,6 @@
-﻿@using VirtualWallet.WEB.Models.DTOs.WalletDTOs
-@model WalletRequestDto
+﻿@using VirtualWallet.DATA.Models
+@using VirtualWallet.WEB.Models.DTOs.WalletDTOs
+@model Wallet
 
 @{
     ViewData["Title"] = "Update Wallet";
@@ -16,49 +17,6 @@
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
 
-    <div class="form-group">
-        <label asp-for="WalletType" class="control-label"></label>
-        <select asp-for="WalletType" class="form-control">
-            @foreach (var walletType in Enum.GetValues(typeof(WalletType)))
-            {
-                if((WalletType)walletType == Model.WalletType)
-                {
-                    <option value="@walletType" selected>
-                    @walletType
-                    </option>
-                }
-                else
-                {
-                  <option value="@walletType">
-                    @walletType
-                </option>  
-                }
-            }
-        </select>
-        <span asp-validation-for="WalletType" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Currency" class="control-label"></label>
-        <select asp-for="Currency" class="form-control">
-            @foreach (var currency in Enum.GetValues(typeof(CurrencyType)))
-            {
-                if((CurrencyType)currency == Model.Currency)
-                {
-                    <option value="@currency" selected>
-                        @currency
-                    </option>
-                }
-                else
-                {
-                    <option value="@currency">
-                        @currency
-                    </option>
-                } 
-            }
-        </select>
-        <span asp-validation-for="Currency" class="text-danger"></span>
-    </div>
 
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Update</button>
