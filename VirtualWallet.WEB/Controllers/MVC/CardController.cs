@@ -151,23 +151,32 @@ namespace VirtualWallet.WEB.Controllers.MVC
 
             var card = await _cardService.GetCardByIdAsync(model.CardId);
             var wallet = await _walletService.GetWalletByIdAsync(model.WalletId);
-            var walletCurrency = wallet.Value.Currency;
-            var cardCurrency = card.Value.Currency;
+            //var walletCurrency = wallet.Value.Currency;
+            //var cardCurrency = card.Value.Currency;
 
             var amountToDeposit = model.Amount;
             decimal fee = 0;
-            if (cardCurrency != walletCurrency)
+            //if (cardCurrency != walletCurrency)
+            //{
+            //    var feeResult = await _cardTransactionService.CalculateFeeAsync(model.Amount, card.Value.Currency, wallet.Value.Currency);
+            //    if (!feeResult.IsSuccess)
+            //    {
+            //        TempData["ErrorMessage"] = feeResult.Error;
+            //        return View("CardTransactionFormPartial", model);
+            //    }
+            //    var exchangeResult = feeResult.Value;
+            //    amountToDeposit = decimal.Parse(exchangeResult.Keys.FirstOrDefault());
+            //    fee = exchangeResult.Values.FirstOrDefault();
+            //}
+
+            var feeResult = await _cardTransactionService.CalculateFeeAsync(model.Amount, card.Value.Currency, wallet.Value.Currency);
+            if (feeResult.IsSuccess)
             {
-                var feeResult = await _cardTransactionService.CalculateFeeAsync(model.Amount, card.Value.Currency, wallet.Value.Currency);
-                if (!feeResult.IsSuccess)
-                {
-                    TempData["ErrorMessage"] = feeResult.Error;
-                    return View("CardTransactionFormPartial", model);
-                }
                 var exchangeResult = feeResult.Value;
-                amountToDeposit = decimal.Parse(exchangeResult.Keys.FirstOrDefault());
-                fee = exchangeResult.Values.FirstOrDefault();
+                amountToDeposit = exchangeResult["amountToWithdraw"];
+                fee = exchangeResult["feeAmount"];
             }
+
 
             model.Fee = fee;
             model.Amount = amountToDeposit;
@@ -244,8 +253,8 @@ namespace VirtualWallet.WEB.Controllers.MVC
                     return View("CardTransactionFormPartial", model);
                 }
                 var exchangeResult = feeResult.Value;
-                amountToWithdraw = decimal.Parse(exchangeResult.Keys.FirstOrDefault());
-                fee = exchangeResult.Values.FirstOrDefault();
+                amountToWithdraw = exchangeResult["amountToWithdraw"];
+                fee = exchangeResult["feeAmount"];
             }
 
             model.Fee = fee;

@@ -65,5 +65,24 @@ public class SmtpEmailService : IEmailService
 
     }
 
+    public async Task<Result> SendPasswordResetEmailAsync(User user, string resetLink)
+    {
+        var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "VirtualWallet.BUSINESS", "Resources", "EmailTemplates", "PasswordResetTemplate.html");
+
+        if (!File.Exists(templatePath))
+        {
+            return Result.Failure("Email template not found.");
+        }
+
+        var emailTemplate = await File.ReadAllTextAsync(templatePath);
+
+        string emailContent = emailTemplate.Replace("{{Username}}", user.Username)
+                                           .Replace("{{ResetLink}}", resetLink);
+
+        await SendEmailAsync(user.Email, "Password Reset", emailContent);
+
+        return Result.Success();
+    }
+
 
 }

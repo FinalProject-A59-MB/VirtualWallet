@@ -16,27 +16,83 @@
     <header>
         <!-- Main Navigation -->
         <nav class="navbar navbar-expand-sm navbar-light border-bottom box-shadow bg-dark-2">
-            <div class="container-fluid">
-                <!-- Left-aligned Brand -->
-                <a class="navbar-brand text-white fw-bold" asp-area="" asp-controller="Home" asp-action="Index">VaulTora</a>
+            <div class="container-fluid my-1">
+                <!-- Logo on the left -->
+                <a class="navbar-brand text-white fw-bold ms-4" asp-area="" asp-controller="Home" asp-action="Index">VaulTora</a>
 
-                <!-- Right-aligned Navbar Links -->
-                <div class="d-flex align-items-center ms-auto">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="@Url.Action("Index", "Home")">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="@Url.Action("About", "Home")">About us</a>
-                        </li>
+                <!-- Centered Navigation Links -->
+                <!-- Centered Navigation Links -->
+                <div class="collapse navbar-collapse justify-content-center gap-5">
+                    <ul class="navbar-nav justify-content-center gap-3">
+                        @if (ViewBag.IsAuthenticated)
+                        {
+                            <li class="nav-item mx-3">
+                                <a class="nav-link text-white" href="@Url.Action("Index", "Home")">Home</a>
+                            </li>
+                            <li class="nav-item mx-3">
+                                <a class="nav-link text-white" href="@Url.Action("About", "Home")">About us</a>
+                            </li>
+                            <li class="nav-item mx-3">
+                                <a class="nav-link text-white" href="@Url.Action("FAQ", "Home")">FAQ</a>
+                            </li>
+                            <li class="nav-item mx-3">
+                                <a class="nav-link text-white" href="@Url.Action("Contacts", "Home")">Contacts</a>
+                            </li>
+                            <!-- Money Transfers Dropdown -->
+                            <li class="nav-item dropdown mx-3">
+                                <a class="nav-link dropdown-toggle text-white" href="#" id="moneyTransfersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Money Transfers
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="moneyTransfersDropdown">
+                                    <li><a class="dropdown-item" href="@Url.Action("SendMoney", "Transfers")"><i class="bi bi-box-arrow-up-right me-2"></i>Send Money</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("RequestMoney", "Transfers")"><i class="bi bi-box-arrow-down-left me-2"></i>Request Money</a></li>
+                                </ul>
+                            </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="@Url.Action("FAQ", "Home")">FAQ</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="@Url.Action("Contacts", "Home")">Contacts</a>
-                        </li>
+                            <!-- Card Transfers Dropdown -->
+                            <li class="nav-item dropdown mx-3">
+                                <a class="nav-link dropdown-toggle text-white" href="#" id="cardTransfersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Card Transfers
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="cardTransfersDropdown">
+                                    <li><a class="dropdown-item" href="@Url.Action("Withdraw", "CardTransfers")"><i class="bi bi-arrow-up-circle me-2"></i>Withdraw</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Deposit", "CardTransfers")"><i class="bi bi-arrow-down-circle me-2"></i> Deposit</a></li>
+                                </ul>
+                            </li>
+
+                            <!-- Transaction History Dropdown -->
+                            <li class="nav-item dropdown mx-3">
+                                <a class="nav-link dropdown-toggle text-white" href="#" id="transactionHistoryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Transaction History
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="transactionHistoryDropdown">
+                                    <li><a class="dropdown-item" href="@Url.Action("WalletTransactions", "History")"><i class="bi bi-currency-exchange me-2"></i>Wallet Transactions</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("CardTransactions", "History")"><i class="bi bi-bank2 me-2"></i>Card Transactions</a></li>
+                                </ul>
+                            </li>
+
+                        }
+                        else
+                        {
+                            <!-- Regular Navigation Links -->
+                            <li class="nav-item mx-3">
+                                <a class="nav-link text-white" href="@Url.Action("Index", "Home")">Home</a>
+                            </li>
+                            <li class="nav-item mx-3">
+                                <a class="nav-link text-white" href="@Url.Action("About", "Home")">About us</a>
+                            </li>
+                            <li class="nav-item mx-3">
+                                <a class="nav-link text-white" href="@Url.Action("FAQ", "Home")">FAQ</a>
+                            </li>
+                            <li class="nav-item mx-3">
+                                <a class="nav-link text-white" href="@Url.Action("Contacts", "Home")">Contacts</a>
+                            </li>
+                        }
                     </ul>
+                </div>
+
+                <div class="d-flex align-items-center ms-auto me-4">
+       
                     @if (ViewBag.IsAuthenticated)
                     {
                         <button class="btn btn-outline-light ms-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#dashboardOffcanvas" aria-controls="dashboardOffcanvas">
@@ -213,7 +269,7 @@
 
     <footer class="border-top footer text-muted bg-dark-2">
         <div class="container">
-            &copy; 2024 - VirtualWallet.WEB - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2024 - VaulTora - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
 

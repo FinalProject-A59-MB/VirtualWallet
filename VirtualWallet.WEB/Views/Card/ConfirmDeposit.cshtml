@@ -2,21 +2,27 @@
 
 @{
     ViewData["Title"] = "Confirm Deposit";
+    dynamic fee = Model.Fee.HasValue
+    ? decimal.Round(Model.Fee.Value, 2, MidpointRounding.AwayFromZero)
+    : "0.00";
+
+    dynamic amount = decimal.Round(Model.Amount, 2, MidpointRounding.AwayFromZero);
+
 }
 
 <div class="d-flex justify-content-center align-items-center">
     <div class="card mb-4 w-50 mx-auto">
         <div class="card-body bg-dark-1 text-center">
-            <h3 class="text-info">@Model.ActionTitle</h3>
-            <h4 class="mt-4">
-                <p>Are you sure you want to deposit:</p>
-                <p><strong>@Model.Amount @Model.Card.Currency</strong></p>
-                <p>to your wallet</p>
-                <strong>@Model.Wallet.Name</strong>?
-            </h4>
+            <h3 class="text-warning">@Model.ActionTitle</h3>
+            <h3>Are you sure you want to deposit:</h3>
+            <h2><strong>@amount @Model.Wallet.Currency</strong></h2>
+            <h3>to your wallet</h3>
+            <h2><strong>@Model.Wallet.Name</strong></h2>
+            <h3>from your card</h3>
+            <h2><strong>@Model.Card.CardNumber</strong> ?</h2>
             <h4 class="text-warning mt-3">
                 The transaction fee will be
-                <strong>@Model.Fee @Model.Card.Currency</strong>.
+                <strong>@fee @Model.Card.Currency</strong>.
             </h4>
 
             <div class="mt-4">

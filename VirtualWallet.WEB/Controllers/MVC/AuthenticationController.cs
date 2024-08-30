@@ -251,6 +251,11 @@ namespace ForumProject.Controllers.MVC
             return View("EmailVerification", true);
         }
 
+        public IActionResult EmailVerification()
+        {
+            return View();
+        }
+
         public IActionResult Logout()
         {
             HttpContext.Response.Cookies.Delete("jwt");
@@ -279,18 +284,26 @@ namespace ForumProject.Controllers.MVC
                 var token = _authService.GenerateToken(user);
 
                 var resetLink = Url.Action("ResetPassword", "Authentication", new { token, email = model.Email }, Request.Scheme);
-                string emailContent = $"You can reset your password by clicking <a href='{resetLink}'>here</a>.";
+                var emailResult = await _emailService.SendPasswordResetEmailAsync(user, resetLink);
 
-                await _emailService.SendEmailAsync(model.Email, "Password Reset", emailContent);
-                TempData["SuccessMessage"] = "Password reset link has been sent to your email.";
+                if (emailResult.IsSuccess)
+                {
+                    TempData["SuccessMessage"] = "Password reset link has been sent to your email.";
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = emailResult.Error;
+                }
             }
             else
             {
                 TempData["ErrorMessage"] = userResult.Error;
+                return View();
             }
 
-            return View();
+            return RedirectToAction("Index", "Home");
         }
+
 
         [HttpGet]
         public IActionResult ResetPassword(string token, string email)
@@ -317,7 +330,7 @@ namespace ForumProject.Controllers.MVC
             else
             {
                 ModelState.AddModelError("", resetResult.Error);
-                return View();
+                return RedirectToAction("Index", "Home");
             }
         }
 

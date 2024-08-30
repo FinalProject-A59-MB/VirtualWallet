@@ -372,7 +372,7 @@ namespace ForumProject.Controllers.MVC
         public async Task<IActionResult> SendFriendRequest(int contactId)
         {
             var userId = CurrentUser.Id;
-            var result = await _userService.SendFriendRequestAsync(userId, contactId);
+            var result = await _userService.SendFriendRequestAsync( userId, contactId);
 
             if (!result.IsSuccess)
             {

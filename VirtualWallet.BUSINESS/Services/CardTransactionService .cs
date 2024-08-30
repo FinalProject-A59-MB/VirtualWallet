@@ -105,9 +105,16 @@ namespace VirtualWallet.BUSINESS.Services
             {
                 return Result<Dictionary<string, decimal>>.Failure(exchangeRateResult.Error);
             }
-
+            decimal exchangeRate;
             // Get the exchange rate for the target currency
-            var exchangeRate = exchangeRateResult.Value.Data[toCurrency.ToString()];
+            try
+            {
+                exchangeRate = exchangeRateResult.Value.Data[toCurrency.ToString()];
+            }catch (Exception ex)
+            {
+                return Result<Dictionary<string, decimal>>.Failure(ex.Message);
+            }
+            
 
             // Calculate the amount in the target currency
             var amountInTargetCurrency = amount * exchangeRate;

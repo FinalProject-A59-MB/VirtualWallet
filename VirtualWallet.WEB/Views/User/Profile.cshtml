@@ -311,7 +311,7 @@
                                                 </div>
                                             </td>
                                             <td class="text-center">
-                                                @if (contact.Status == FriendRequestStatus.Pending && onlyUser)
+                                                @if (contact.Status == FriendRequestStatus.Pending && onlyUser && contact.Sender.Id != Model.Id)
                                                 {
                                                     <form asp-controller="User" asp-action="AcceptFriendRequest" method="post" class="d-inline">
                                                         <input type="hidden" name="contactId" value="@contact.SenderId" />

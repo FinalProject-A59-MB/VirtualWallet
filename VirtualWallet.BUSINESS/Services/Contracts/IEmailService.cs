@@ -9,6 +9,9 @@ namespace VirtualWallet.BUSINESS.Services.Contracts
 
 
         Task<Result> SendVerificationEmailAsync(User user, string verificationLink);
+
+        Task<Result> SendPasswordResetEmailAsync(User user, string resetLink);
+
     }
 
 }
