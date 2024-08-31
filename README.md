@@ -119,7 +119,9 @@ cd VirtualWallet
 ## Setup the Database
 
 Database Schema: Below is the database schema diagram representing the structure of the database used in the VirtualWallet project:
+
 ![database schema diagram](./db_diagram.jpg)
+
 1.  **Configure Connection String**:
     
     -   Open the `appsettings.json` file located in the `VirtualWallet.WEB` project.
