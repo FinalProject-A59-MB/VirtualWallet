@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace VirtualWallet.WEB.Controllers
 {
-    [RequireAuthorization(minRequiredRoleLevel: 2)]
+    [RequireAuthorization(minRequiredRoleLevel: 3)]
     public class CardTransactionsController : BaseController
     {
         private readonly ICardTransactionService _cardTransactionService;

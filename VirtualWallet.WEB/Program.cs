@@ -66,13 +66,13 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICardTransactionRepository, CardTransactionRepository>();
 builder.Services.AddScoped<IRealCardRepository, RealCardRepository>();
 //builder.Services.AddScoped<IRecurringPaymentRepository, RecurringPaymentRepository>(); TODO
-//builder.Services.AddScoped<IUserContactRepository, UserContactRepository>(); TODO
 builder.Services.AddScoped<IUserWalletRepository, UserWalletRepository>();
 builder.Services.AddScoped<IWalletRepository, WalletRepository>();
 builder.Services.AddScoped<IWalletTransactionRepository, WalletTransactionRepository>();
 
 // Services
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<ICardService, CardService>();
 builder.Services.AddScoped<ICardTransactionService, CardTransactionService>();
 builder.Services.AddScoped<IEmailService, SmtpEmailService>();
@@ -127,13 +127,7 @@ builder.Services.AddSwaggerGen(options =>
                 });
 });
 
-
-
-
 var app = builder.Build();
-// Custom middlewares
-
-
 
 // Data Seeding
 using (var scope = app.Services.CreateScope())
@@ -151,6 +145,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Custom middlewares
 app.UseMiddleware<CurrentUserMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 

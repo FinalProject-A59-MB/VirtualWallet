@@ -87,12 +87,12 @@ public class RequireAuthorizationAttribute : Attribute, IAsyncAuthorizationFilte
     {
         return role switch
         {
-            UserRole.Admin => 4,
-            UserRole.Staff => 3,
-            UserRole.VerifiedUser => 2,
+            UserRole.Admin => 5,
+            UserRole.Staff => 4,
+            UserRole.VerifiedUser => 3,
+            UserRole.PendingVerification => 2,
+            UserRole.EmailVerifiedUser => 2,
             UserRole.RegisteredUser => 1,
-            UserRole.EmailVerifiedUser => 1,
-            UserRole.PendingVerification => 1,
             UserRole.Blocked => 1,
             _ => 0,
         };

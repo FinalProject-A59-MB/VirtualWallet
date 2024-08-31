@@ -223,7 +223,7 @@ namespace ForumProject.Controllers.MVC
             TempData["SuccessMessage"] = "Documents succesfully uploaded";
             return RedirectToAction("Profile", "User");
         }
-        [RequireAuthorization(minRequiredRoleLevel: 4)]
+        [RequireAuthorization(minRequiredRoleLevel: 5)]
 
         [HttpGet]
         public async Task<IActionResult> BlockUser(int userId)
@@ -244,7 +244,7 @@ namespace ForumProject.Controllers.MVC
             return View("BlockUser", model);
         }
 
-        [RequireAuthorization(minRequiredRoleLevel: 4)]
+        [RequireAuthorization(minRequiredRoleLevel: 5)]
 
         [HttpPost]
         public async Task<IActionResult> BlockUser(BlockUserViewModel model)
@@ -275,7 +275,7 @@ namespace ForumProject.Controllers.MVC
 
 
 
-        [RequireAuthorization(minRequiredRoleLevel: 4)]
+        [RequireAuthorization(minRequiredRoleLevel: 5)]
         [HttpGet]
         public async Task<IActionResult> UnblockUser(int userId)
         {
@@ -295,7 +295,7 @@ namespace ForumProject.Controllers.MVC
             return View("UnblockUser", model);
         }
 
-        [RequireAuthorization(minRequiredRoleLevel: 4)]
+        [RequireAuthorization(minRequiredRoleLevel: 5)]
         [HttpPost]
         public async Task<IActionResult> UnblockUser(BlockUserViewModel model)
         {
@@ -328,7 +328,7 @@ namespace ForumProject.Controllers.MVC
 
 
 
-        [RequireAuthorization(minRequiredRoleLevel: 3)]
+        [RequireAuthorization(minRequiredRoleLevel: 5)]
         [HttpGet]
         public async Task<IActionResult> UnverifiedUsers()
         {
@@ -342,7 +342,7 @@ namespace ForumProject.Controllers.MVC
         }
 
 
-        [RequireAuthorization(minRequiredRoleLevel: 3)]
+        [RequireAuthorization(minRequiredRoleLevel: 5)]
         [HttpPost]
         public async Task<IActionResult> VerifyUser(int userId)
         {
@@ -356,7 +356,7 @@ namespace ForumProject.Controllers.MVC
             return RedirectToAction("UnverifiedUsers");
         }
 
-        [RequireAuthorization(minRequiredRoleLevel: 3)]
+        [RequireAuthorization(minRequiredRoleLevel: 5)]
         [HttpPost]
         public async Task<IActionResult> DenyUserVerification(int userId)
         {
@@ -370,7 +370,7 @@ namespace ForumProject.Controllers.MVC
             return RedirectToAction("UnverifiedUsers");
         }
 
-        [RequireAuthorization(minRequiredRoleLevel: 2)]
+        [RequireAuthorization(minRequiredRoleLevel: 3)]
         [HttpPost]
         public async Task<IActionResult> SendFriendRequest(int contactId)
         {
@@ -387,7 +387,7 @@ namespace ForumProject.Controllers.MVC
             return RedirectToAction("Profile", new { id = contactId });
         }
 
-        [RequireAuthorization(minRequiredRoleLevel: 2)]
+        [RequireAuthorization(minRequiredRoleLevel: 3)]
         [HttpPost]
         public async Task<IActionResult> AcceptFriendRequest(int contactId)
         {
@@ -403,7 +403,7 @@ namespace ForumProject.Controllers.MVC
             return RedirectToAction("Profile");
         }
 
-        [RequireAuthorization(minRequiredRoleLevel: 2)]
+        [RequireAuthorization(minRequiredRoleLevel: 3)]
         [HttpPost]
         public async Task<IActionResult> DenyFriendRequest(int contactId)
         {
@@ -419,7 +419,7 @@ namespace ForumProject.Controllers.MVC
             return RedirectToAction("Profile");
         }
 
-        [RequireAuthorization(minRequiredRoleLevel: 2)]
+        [RequireAuthorization(minRequiredRoleLevel: 3)]
         public async Task<IActionResult> PendingFriendRequests()
         {
             var userId = CurrentUser.Id;
@@ -435,14 +435,14 @@ namespace ForumProject.Controllers.MVC
         }
 
 
-        [RequireAuthorization(minRequiredRoleLevel: 2)]
+        [RequireAuthorization(minRequiredRoleLevel: 3)]
         [HttpGet]
         public IActionResult TransactionLog(TransactionLogViewModel model)
         {
             return View("TransactionLog", model);
         }
 
-        [RequireAuthorization(minRequiredRoleLevel: 2)]
+        [RequireAuthorization(minRequiredRoleLevel: 3)]
         [HttpGet]
         public async Task<IActionResult> SearchUsers(string searchTerm)
         {
@@ -545,7 +545,7 @@ namespace ForumProject.Controllers.MVC
         }
 
 
-        [RequireAuthorization(minRequiredRoleLevel: 4)]
+        [RequireAuthorization(minRequiredRoleLevel: 5)]
         [HttpGet]
         public async Task<IActionResult> AdminPanel(UserQueryParameters userParameters, TransactionQueryParameters walletTransactionParameters, CardTransactionQueryParameters cardTransactionParameters)
         {
