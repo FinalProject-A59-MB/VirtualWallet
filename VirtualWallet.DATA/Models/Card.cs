@@ -15,7 +15,6 @@ namespace VirtualWallet.DATA.Models
         public int UserId { get; set; }
         public User User { get; set; }
         public CardType CardType { get; set; }
-
         public ICollection<CardTransaction> CardTransactions { get; set; }
         public string PaymentProcessorToken { get; set; }
 

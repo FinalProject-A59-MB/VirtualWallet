@@ -69,9 +69,6 @@ namespace VirtualWallet.DATA.Repositories
                 await _context.SaveChangesAsync();
             }
         }
-
-
-
         public async Task<ICollection<CardTransaction>> FilterByAsync(CardTransactionQueryParameters filterParameters, int? userId = null)
         {
             var transactions = _context.CardTransactions.AsQueryable();
@@ -122,9 +119,6 @@ namespace VirtualWallet.DATA.Repositories
 
             return await transactions.Skip(skip).Take(filterParameters.PageSize).ToListAsync();
         }
-
-
-
         public async Task<int> GetTotalCountAsync(CardTransactionQueryParameters filterParameters, int? userId = null)
         {
             var transactions = _context.CardTransactions.AsQueryable();
@@ -158,16 +152,9 @@ namespace VirtualWallet.DATA.Repositories
             {
                 transactions = transactions.Where(t => t.CardId == filterParameters.CardId);
             }
-            //if (filterParameters.Amount >= 0)
-            //{
-            //    transactions = transactions.Where(t => t.Amount == filterParameters.Amount);
-            //}
 
             return await transactions.CountAsync();
         }
-
-
-
 
     }
 }
