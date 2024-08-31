@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Cors.Infrastructure;
-using VirtualWallet.BUSINESS.Resources;
+﻿using VirtualWallet.BUSINESS.Resources;
 using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.DATA.Models;
-using VirtualWallet.DATA.Models.Enums;
-using VirtualWallet.DATA.Repositories;
 using VirtualWallet.DATA.Repositories.Contracts;
 using VirtualWallet.DATA.Services.Contracts;
 
@@ -36,7 +33,7 @@ namespace VirtualWallet.DATA.Services
 
         public async Task<Result<Wallet>> GetWalletByIdAsync(int id)
         {
-            var wallet =  await _walletRepository.GetWalletByIdAsync(id);
+            var wallet = await _walletRepository.GetWalletByIdAsync(id);
 
             return wallet != null
                 ? Result<Wallet>.Success(wallet)
@@ -68,6 +65,11 @@ namespace VirtualWallet.DATA.Services
             if (!walletResult.IsSuccess)
             {
                 return Result.Failure(ErrorMessages.WalletNotFound);
+            }
+
+            if (walletResult.Value.Balance > 0)
+            {
+                return Result.Failure(ErrorMessages.WalletNotEmpty);
             }
 
             await _walletRepository.RemoveWalletAsync(walletId);

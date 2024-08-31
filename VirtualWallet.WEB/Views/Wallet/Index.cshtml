@@ -3,7 +3,62 @@
 @section Scripts {
     <script src="~/js/wallet.js"></script>
 }
-<h1>@Model.Name</h1>
 
-<a asp-action="Update" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
-<button class="btn btn-danger delete-wallet" data-id="@Model.Id">Delete</button>
+
+
+
+
+<div class="container my-5">
+
+
+
+    <div class="card bg-dark-3 text-white h-100 shadow-sm animate__animated animate__fadeInUp">
+        <div class="card-body d-flex flex-column justify-content-between">
+            
+            <div class="mb-4">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-wallet2 display-4 text-info me-3"></i>
+                    <h1>@Model.Name</h1>
+                </div>
+                <p class="card-text">Wallet Type: <span class="fw-bold">@Model.WalletType</span></p>
+                <p class="card-text">Currency: <span class="fw-bold">@Model.Currency</span></p>
+                <p class="card-text">Balance: <span class="fw-bold">@Model.Balance</span></p>
+            </div>
+
+            <div>
+                <a asp-action="Update" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+                <button class="btn btn-danger delete-wallet ml-3" data-id="@Model.Id">Delete</button>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var transaction in Model.WalletTransactions)
+                {
+                    <tr>
+                        <td>@transaction.CreatedAt.ToString("MMM dd, yyyy")</td>
+                        <td>@transaction.DepositedAmount.ToString("C")</td>
+                        <td>@transaction.Currency</td>
+                        <td>@transaction.Status</td>
+                        <td>@transaction.Sender.Name</td>
+                        <td>@transaction.Recipient.Name</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

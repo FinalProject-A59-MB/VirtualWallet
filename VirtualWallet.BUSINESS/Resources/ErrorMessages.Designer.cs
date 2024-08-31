@@ -374,5 +374,13 @@ namespace VirtualWallet.BUSINESS.Resources {
                 return ResourceManager.GetString("WalletNotFound", resourceCulture);
             }
         }
+
+        public static string WalletNotEmpty
+        {
+            get
+            {
+                return ResourceManager.GetString("WalletNotEmpty", resourceCulture);
+            }
+        }
     }
 }

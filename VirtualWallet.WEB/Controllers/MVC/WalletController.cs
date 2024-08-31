@@ -22,13 +22,18 @@ namespace VirtualWallet.WEB.Controllers.MVC
         }
 
 
-
-
         [HttpGet]
         public async Task<IActionResult> Index(int id)
         {
-            var wallet = await _walletService.GetWalletByIdAsync(id);
-            return View(wallet.Value);
+            var result = await _walletService.GetWalletByIdAsync(id);
+
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+                return RedirectToAction("Wallets", "User");
+            }
+
+            return View(result.Value);
         }
 
         [HttpGet]
@@ -45,9 +50,15 @@ namespace VirtualWallet.WEB.Controllers.MVC
         {
             wallet.UserId = CurrentUser.Id;
 
-            Result<int> newWalletId = await _walletService.AddWalletAsync(_dtoMapper.ToWalletRequestDto(wallet));
+            Result<int> result = await _walletService.AddWalletAsync(_dtoMapper.ToWalletRequestDto(wallet));
 
-            return RedirectToAction("Index", new { id = newWalletId.Value });
+            if(!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+                return RedirectToAction("Wallets", "User");
+            }
+
+            return RedirectToAction("Index", new { id = result.Value });
         }
 
         [HttpGet]
@@ -65,7 +76,12 @@ namespace VirtualWallet.WEB.Controllers.MVC
 
             wallet.UserId = userId;
 
-            await _walletService.UpdateWalletAsync(_dtoMapper.ToWalletRequestDto(wallet));
+            var result = await _walletService.UpdateWalletAsync(_dtoMapper.ToWalletRequestDto(wallet));
+
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+            }
 
             return RedirectToAction("Index", new { id = wallet.Id });
         }
@@ -73,9 +89,15 @@ namespace VirtualWallet.WEB.Controllers.MVC
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
-            await _walletService.RemoveWalletAsync(id);
+            var result = await _walletService.RemoveWalletAsync(id);
 
-            return Ok();
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+                return RedirectToAction("Index", new { id = id });
+            }
+
+            return RedirectToAction("Wallets", "User");
         }
     }
 }

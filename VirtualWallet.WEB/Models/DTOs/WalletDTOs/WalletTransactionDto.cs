@@ -10,6 +10,5 @@
         public string SenderName { get; set; }
         public int RecipientId { get; set; }
         public string RecipientName { get; set; }
-        public string Category { get; set; }
     }
 }

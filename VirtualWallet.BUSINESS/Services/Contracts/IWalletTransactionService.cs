@@ -8,7 +8,8 @@ namespace VirtualWallet.DATA.Services.Contracts
         Task<Result<IEnumerable<WalletTransaction>>> GetTransactionsBySenderIdAsync(int senderId);
         Task<Result<IEnumerable<WalletTransaction>>> GetTransactionsByRecipientIdAsync(int recipientId);
         Task<Result<WalletTransaction>> GetTransactionByIdAsync(int id);
-        Task<Result<WalletTransaction>> DepositAsync(int senderWalletId, int recipientWalletId, decimal amount);
+        Task<Result<int>> DepositStep1Async(int senderWalletId, int recipientWalletId, decimal amount);
+        Task<Result<int>> DepositStep2Async(int senderWalletId, int recipientWalletId, int transactionId);
         Task<Result<IEnumerable<WalletTransaction>>> FilterWalletTransactionsAsync(TransactionQueryParameters parameters);
         Task<Result<int>> GetTotalCountAsync(TransactionQueryParameters filterParameters);
     }

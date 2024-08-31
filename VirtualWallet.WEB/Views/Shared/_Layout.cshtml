@@ -44,7 +44,7 @@
                                     Money Transfers
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="moneyTransfersDropdown">
-                                    <li><a class="dropdown-item" href="@Url.Action("SendMoney", "Transfers")"><i class="bi bi-box-arrow-up-right me-2"></i>Send Money</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Index", "WalletTransaction")"><i class="bi bi-box-arrow-up-right me-2"></i>Send Money</a></li>
                                     <li><a class="dropdown-item" href="@Url.Action("RequestMoney", "Transfers")"><i class="bi bi-box-arrow-down-left me-2"></i>Request Money</a></li>
                                 </ul>
                             </li>
@@ -149,7 +149,7 @@
                     </li>
                 }
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="@Url.Action("SendMoney", "Transaction")">
+                    <a class="nav-link text-white" href="@Url.Action("Index", "WalletTransaction")">
                         <i class="bi bi-box-arrow-up-right me-2"></i> Send Money
                     </a>
                 </li>

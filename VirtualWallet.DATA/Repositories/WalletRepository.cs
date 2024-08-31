@@ -26,7 +26,7 @@ namespace VirtualWallet.DATA.Repositories
 
         public async Task<Wallet> GetWalletByIdAsync(int id)
         {
-            var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(w => w.Id == id);
+            var wallet = await _dbContext.Wallets.Include(x => x.WalletTransactions).FirstOrDefaultAsync(w => w.Id == id);
 
             return wallet;
         }

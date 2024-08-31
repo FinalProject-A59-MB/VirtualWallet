@@ -30,5 +30,5 @@ public interface IViewModelMapper
 
     public UserVerificationViewModel ToUserVerificationViewModel(User u);
 
-    public WalletTransactionViewModel ToWalletTransactionViewModel(WalletTransaction transaction, int userId);
+    public WalletTransactionViewModel ToWalletTransactionViewModel(WalletTransaction transaction);
 }

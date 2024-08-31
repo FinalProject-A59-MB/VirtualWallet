@@ -1,4 +1,5 @@
 ﻿using Twilio.Rest.Video.V1.Room.Participant;
+using VirtualWallet.DATA.Models.Enums;
 
 namespace VirtualWallet.WEB.Models.ViewModels.WalletViewModels
 {
@@ -10,11 +11,6 @@ namespace VirtualWallet.WEB.Models.ViewModels.WalletViewModels
         public string Recipient { get; set; }
         public decimal Amount { get; set; }
         public string Currency { get; set; }
-        public string Direction { get; set; }
-        public string WalletName { get; set; }
-
-        public string SortBy { get; set; }
-
-        public string SortOrder { get; set; }
+        public TransactionStatus Status { get; set; }
     }
 }

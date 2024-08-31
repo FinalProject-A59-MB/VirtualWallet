@@ -3,7 +3,6 @@ using VirtualWallet.BUSINESS.Resources;
 using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
-using VirtualWallet.DATA.Repositories;
 using VirtualWallet.DATA.Repositories.Contracts;
 using VirtualWallet.DATA.Services.Contracts;
 
@@ -24,23 +23,43 @@ namespace VirtualWallet.DATA.Services
             _transactionHandlingService = transactionHandlingService;
         }
 
-        public async Task<Result<WalletTransaction>> DepositAsync(int senderWalletId, int recipientWalletId, decimal amount)
+        //Step1
+        public async Task<Result<int>> DepositStep1Async(int senderWalletId, int recipientWalletId, decimal amount)
         {
             var senderWallet = await _walletRepository.GetWalletByIdAsync(senderWalletId);
 
             if (senderWallet == null)
-                return Result<WalletTransaction>.Failure(ErrorMessages.WalletNotFound);
+                return Result<int>.Failure(ErrorMessages.WalletNotFound);
 
             var recipientWallet = await _walletRepository.GetWalletByIdAsync(recipientWalletId);
 
             if (senderWallet == null)
-                return Result<WalletTransaction>.Failure(ErrorMessages.WalletNotFound);
+                return Result<int>.Failure(ErrorMessages.WalletNotFound);
 
             if (amount <= 0)
-                return Result<WalletTransaction>.Failure(ErrorMessages.InvalidDepositAmount);
+                return Result<int>.Failure(ErrorMessages.InvalidDepositAmount);
 
-            var transaction = await _transactionHandlingService.ProcessWalletToWalletTransactionAsync(senderWallet, recipientWallet, amount);
-            return Result<WalletTransaction>.Success(transaction.Value);
+            return await _transactionHandlingService.ProcessWalletToWalletTransactionStep1Async(senderWallet, recipientWallet, amount);
+        }
+
+        //Step2
+        public async Task<Result<int>> DepositStep2Async(int senderWalletId, int recipientWalletId, int transactionId)
+        {
+            var senderWallet = await _walletRepository.GetWalletByIdAsync(senderWalletId);
+
+            if (senderWallet == null)
+                return Result<int>.Failure(ErrorMessages.WalletNotFound);
+
+            var recipientWallet = await _walletRepository.GetWalletByIdAsync(recipientWalletId);
+
+            if (senderWallet == null)
+                return Result<int>.Failure(ErrorMessages.WalletNotFound);
+
+            WalletTransaction? transactionResult = await _walletTransactionRepository.GetTransactionByIdAsync(transactionId);
+
+            //TODO CHECK WALLETTRASCATION RESULT
+
+            return await _transactionHandlingService.ProcessWalletToWalletTransactionStep2Async(senderWallet, recipientWallet, transactionResult);
         }
 
         public async Task<Result<WalletTransaction>> GetTransactionByIdAsync(int id)

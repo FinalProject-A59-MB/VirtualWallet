@@ -9,6 +9,8 @@ namespace VirtualWallet.BUSINESS.Services.Contracts
         
         public Task<Result<CardTransaction>> ProcessWalletToCardTransactionAsync(Wallet wallet, Card card, decimal amount, decimal feeAmout);
 
-        public Task<Result<WalletTransaction>> ProcessWalletToWalletTransactionAsync(Wallet senderWallet, Wallet recipientWallet, decimal amount);
+        public Task<Result<int>> ProcessWalletToWalletTransactionStep1Async(Wallet senderWallet, Wallet recipientWallet, decimal amount);
+
+        public Task<Result<int>> ProcessWalletToWalletTransactionStep2Async(Wallet senderWallet, Wallet recipientWallet, WalletTransaction walletTransaction);
     }
 }

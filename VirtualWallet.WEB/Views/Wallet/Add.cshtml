@@ -3,39 +3,41 @@
 @{
     ViewData["Title"] = "Add Wallet";
 }
+<div class="container">
 
-<h2>Add Wallet</h2>
+    <h2>Add Wallet</h2>
 
-<form asp-action="Add" method="post">
-    <div class="form-group">
-        <label asp-for="Name" class="control-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
+    <form asp-action="Add" method="post">
+        <div class="form-group">
+            <label asp-for="Name" class="control-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
 
-    <div class="form-group">
-        <label asp-for="WalletType" class="control-label"></label>
-        <select asp-for="WalletType" class="form-control">
-            @foreach (var walletType in Enum.GetValues(typeof(WalletType)))
-            {
-                <option value="@walletType">@walletType</option>
-            }
-        </select>
-        <span asp-validation-for="WalletType" class="text-danger"></span>
-    </div>
+        <div class="form-group">
+            <label asp-for="WalletType" class="control-label"></label>
+            <select asp-for="WalletType" class="form-control">
+                @foreach (var walletType in Enum.GetValues(typeof(WalletType)))
+                {
+                    <option value="@walletType">@walletType</option>
+                }
+            </select>
+            <span asp-validation-for="WalletType" class="text-danger"></span>
+        </div>
 
-    <div class="form-group">
-        <label asp-for="Currency" class="control-label"></label>
-        <select asp-for="Currency" class="form-control">
-            @foreach (var currency in Enum.GetValues(typeof(CurrencyType)))
-            {
-                <option value="@currency">@currency</option>
-            }
-        </select>
-        <span asp-validation-for="Currency" class="text-danger"></span>
-    </div>
+        <div class="form-group">
+            <label asp-for="Currency" class="control-label"></label>
+            <select asp-for="Currency" class="form-control">
+                @foreach (var currency in Enum.GetValues(typeof(CurrencyType)))
+                {
+                    <option value="@currency">@currency</option>
+                }
+            </select>
+            <span asp-validation-for="Currency" class="text-danger"></span>
+        </div>
 
-    <div class="form-group">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
-</form>
+        <div class="form-group mt-3">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+</div>

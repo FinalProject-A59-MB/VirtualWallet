@@ -219,6 +219,9 @@
   <data name="UserNotFound" xml:space="preserve">
     <value>User with id={0} doesn't exist.</value>
   </data>
+  <data name="WalletNotEmpty" xml:space="preserve">
+    <value>Wallet is not empty!</value>
+  </data>
   <data name="WalletNotFound" xml:space="preserve">
     <value>Wallet not found.</value>
   </data>

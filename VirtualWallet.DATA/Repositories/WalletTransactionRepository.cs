@@ -40,10 +40,11 @@ namespace VirtualWallet.DATA.Repositories
             return await GetWalletTransactionsWithDetails().FirstOrDefaultAsync(t => t.Id == id);
         }
 
-        public async Task AddWalletTransactionAsync(WalletTransaction walletTransaction)
+        public async Task<int> AddWalletTransactionAsync(WalletTransaction walletTransaction)
         {
-            _dbContext.WalletTransactions.Add(walletTransaction);
+            var entity = _dbContext.WalletTransactions.Add(walletTransaction);
             await _dbContext.SaveChangesAsync();
+            return entity.Entity.Id;
         }
 
         public async Task<IEnumerable<WalletTransaction>> GetAllWalletTransactionsAsync()
@@ -91,7 +92,7 @@ namespace VirtualWallet.DATA.Repositories
                 switch (parameters.SortBy)
                 {
                     case "Amount":
-                        query = sortOrder ? query.OrderBy(t => t.Amount) : query.OrderByDescending(t => t.Amount);
+                        query = sortOrder ? query.OrderBy(t => t.DepositedAmount) : query.OrderByDescending(t => t.DepositedAmount);
                         break;
                     case "CreatedAt":
                     default:

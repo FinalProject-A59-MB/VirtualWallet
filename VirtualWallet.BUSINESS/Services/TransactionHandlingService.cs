@@ -4,6 +4,7 @@ using VirtualWallet.BUSINESS.Services.Responses;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Repositories.Contracts;
+using VirtualWallet.DATA.Services.Contracts;
 
 namespace VirtualWallet.BUSINESS.Services
 {
@@ -16,6 +17,8 @@ namespace VirtualWallet.BUSINESS.Services
         private readonly IWalletTransactionRepository _walletTransactionRepository;
         private readonly IPaymentProcessorService _paymentProcessorService;
         private readonly ICurrencyService _currencyService;
+        private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
 
         public TransactionHandlingService(
             ApplicationDbContext context,
@@ -24,7 +27,9 @@ namespace VirtualWallet.BUSINESS.Services
             ICardTransactionRepository cardTransactionRepository,
             IWalletTransactionRepository walletTransactionRepository,
             IPaymentProcessorService paymentProcessorService, 
-            ICurrencyService currencyService)
+            ICurrencyService currencyService,
+            IUserService userService,
+            IEmailService emailService)
         {
             _context = context;
             _cardRepository = cardRepository;
@@ -33,6 +38,8 @@ namespace VirtualWallet.BUSINESS.Services
             _walletTransactionRepository = walletTransactionRepository;
             _paymentProcessorService = paymentProcessorService;
             _currencyService = currencyService;
+            _userService = userService;
+            _emailService = emailService;
         }
 
         public async Task<Result<CardTransaction>> ProcessCardToWalletTransactionAsync(Card card, Wallet wallet, decimal amount)
@@ -85,7 +92,7 @@ namespace VirtualWallet.BUSINESS.Services
 
             try
             {
-                if (wallet.Balance < amount+ feeAmmount)
+                if (wallet.Balance < amount + feeAmmount)
                 {
                     return Result<CardTransaction>.Failure("Insufficient funds in the wallet.");
                 }
@@ -130,14 +137,12 @@ namespace VirtualWallet.BUSINESS.Services
             }
         }
 
-        public async Task<Result<WalletTransaction>> ProcessWalletToWalletTransactionAsync(Wallet senderWallet, Wallet recipientWallet, decimal amount)
+        public async Task<Result<int>> ProcessWalletToWalletTransactionStep1Async(Wallet senderWallet, Wallet recipientWallet, decimal amount)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
 
             try
             {
-                senderWallet.Balance -= amount;
-
                 decimal recipientAmount = amount;
 
                 if(recipientWallet.Currency != senderWallet.Currency)
@@ -145,7 +150,7 @@ namespace VirtualWallet.BUSINESS.Services
                     var result = await _currencyService.GetRatesForCurrencyAsync(senderWallet.Currency);
                     if(!result.IsSuccess)
                     {
-                        return Result<WalletTransaction>.Failure(result.Error);
+                        return Result<int>.Failure(result.Error);
                     }
                     CurrencyExchangeRatesResponse rates = result.Value;
 
@@ -154,31 +159,85 @@ namespace VirtualWallet.BUSINESS.Services
                     recipientAmount = amount * rate;
                 }
 
-                recipientWallet.Balance += recipientAmount;
-
                 var walletTransaction = new WalletTransaction
                 {
-                    SenderId = senderWallet.UserId,
-                    RecipientId = recipientWallet.UserId,
+                    SenderId = senderWallet.Id,
+                    RecipientId = recipientWallet.Id,
                     CreatedAt = DateTime.UtcNow,
-                    Status = TransactionStatus.Completed,
+                    Status = TransactionStatus.Pending,
                     Currency = recipientWallet.Currency,
-                    Amount = recipientAmount,
+                    WithdrownAmount = amount,
+                    DepositedAmount = recipientAmount,
+                    VerificationCode = GenerateVerificationCode()
                 };
 
-                await _walletTransactionRepository.AddWalletTransactionAsync(walletTransaction);
-                await _walletRepository.UpdateWalletAsync(senderWallet);
-                await _walletRepository.UpdateWalletAsync(recipientWallet);
+                var transactionId = await _walletTransactionRepository.AddWalletTransactionAsync(walletTransaction);
+
+                _context.SaveChanges();
 
                 await transaction.CommitAsync();
 
-                return Result<WalletTransaction>.Success(walletTransaction);
+                var userResult = await _userService.GetUserByIdAsync(recipientWallet.UserId);
+
+                if(!userResult.IsSuccess)
+                {
+                    throw new Exception(userResult.Error);
+                }
+
+                var emailResult = await _emailService.SendPaymentVerificationEmailAsync(userResult.Value, walletTransaction.VerificationCode);
+
+                if (!emailResult.IsSuccess)
+                {
+                    throw new Exception(emailResult.Error);
+                }
+
+                return Result<int>.Success(transactionId);
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
 
-                return Result<WalletTransaction>.Failure($"Transaction failed: {ex.Message}");
+                return Result<int>.Failure($"Transaction failed: {ex.Message}");
+            }
+        }
+
+        public async Task<Result<int>> ProcessWalletToWalletTransactionStep2Async(Wallet senderWallet, Wallet recipientWallet, WalletTransaction walletTransaction)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                senderWallet.Balance -= walletTransaction.WithdrownAmount;
+
+                recipientWallet.Balance += walletTransaction.DepositedAmount;
+
+                walletTransaction.Status = TransactionStatus.Completed;
+
+                _context.SaveChanges();
+
+                await transaction.CommitAsync();
+
+                var userResult = await _userService.GetUserByIdAsync(recipientWallet.UserId);
+
+                if (!userResult.IsSuccess)
+                {
+                    throw new Exception(userResult.Error);
+                }
+
+                var emailResult = await _emailService.SendEmailAsync(userResult.Value.Email, "Money Deposit", "TODO");
+
+                if (!emailResult.IsSuccess)
+                {
+                    throw new Exception(emailResult.Error);
+                }
+
+                return Result<int>.Success(walletTransaction.Id);
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+
+                return Result<int>.Failure($"Transaction failed: {ex.Message}");
             }
         }
 
@@ -192,6 +251,13 @@ namespace VirtualWallet.BUSINESS.Services
             }
 
             throw new Exception("Currency not found!");
+        }
+
+        private string GenerateVerificationCode()
+        {
+            Random random = new Random();
+            int verificationCode = random.Next(1000, 10000); // Generates a random number between 1000 and 9999
+            return verificationCode.ToString();
         }
     }
 }

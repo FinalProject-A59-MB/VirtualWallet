@@ -198,7 +198,7 @@ public class ViewModelMapper : IViewModelMapper
         };
     }
 
-    public WalletTransactionViewModel ToWalletTransactionViewModel(WalletTransaction transaction, int userId)
+    public WalletTransactionViewModel ToWalletTransactionViewModel(WalletTransaction transaction)
     {
         return new WalletTransactionViewModel
         {
@@ -206,12 +206,9 @@ public class ViewModelMapper : IViewModelMapper
             CreatedAt = transaction.CreatedAt,
             Sender = transaction.Sender.Name,
             Recipient = transaction.Recipient.Name,
-            Amount = transaction.Amount,
+            Amount = transaction.DepositedAmount,
             Currency = transaction.Currency.ToString(),
-            Direction = transaction.SenderId == userId ? "Outgoing" : "Incoming",
-            WalletName = transaction.Sender.Name,
-            SortBy = transaction.SortBy,
-            SortOrder = transaction.SortOrder 
+            Status = transaction.Status,
         };
     }
 

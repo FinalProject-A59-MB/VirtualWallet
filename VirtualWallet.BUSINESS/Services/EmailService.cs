@@ -84,5 +84,25 @@ public class SmtpEmailService : IEmailService
         return Result.Success();
     }
 
+    public async Task<Result> SendPaymentVerificationEmailAsync(User user, string verificationCode)
+    {
+        var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "VirtualWallet.BUSINESS", "Resources", "EmailTemplates", "PaymentVerificationEmailTemplate.html");
+
+        if (!File.Exists(templatePath))
+        {
+            return Result.Failure("Email template not found.");
+        }
+
+        var emailTemplate = await File.ReadAllTextAsync(templatePath);
+
+        string emailContent = emailTemplate.Replace("{{Username}}", user.Username)
+                                           .Replace("{{VerificationCode}}", verificationCode);
+
+        await SendEmailAsync(user.Email, "Payment Code", emailContent);
+
+        return Result.Success();
+
+    }
+
 
 }
