@@ -10,6 +10,7 @@ using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Helpers;
 using VirtualWallet.WEB.Controllers.MVC;
 using VirtualWallet.WEB.Models.ViewModels.AuthenticationViewModels;
+using VirtualWallet.BUSINESS.Services;
 
 namespace ForumProject.Controllers.MVC
 {
@@ -19,17 +20,20 @@ namespace ForumProject.Controllers.MVC
         private readonly IViewModelMapper _viewModelMapper;
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
+        private readonly IGoogleAuthService _googleAuthService;
 
         public AuthenticationController(
             IAuthService authService,
             IViewModelMapper modelMapper,
             IUserService userService,
-            IEmailService emailService)
+            IEmailService emailService,
+            IGoogleAuthService googleAuthService)
         {
             _authService = authService;
             _viewModelMapper = modelMapper;
             _userService = userService;
             _emailService = emailService;
+            _googleAuthService = googleAuthService;
         }
 
         [HttpGet]
@@ -69,38 +73,21 @@ namespace ForumProject.Controllers.MVC
 
         public async Task<IActionResult> GoogleLoginResponse()
         {
-            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            var authenticateResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            if (result?.Principal != null)
+            var result = await _googleAuthService.ProcessGoogleLoginResponse(authenticateResult);
+
+            if (!result.IsSuccess)
             {
-                var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
-                var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-
-                if (email == null)
-                {
-                    TempData["ErrorMessage"] = "Unable to retrieve email from Google. Please try again.";
-                    return RedirectToAction("Login", "Authentication");
-                }
-
-                var existingUser = await _userService.GetUserByEmailAsync(email);
-
-                if (existingUser.Value != null)
-                {
-                    var token = _authService.GenerateToken(existingUser.Value);
-                    HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
-
-                    return RedirectToAction("Index", "Home");
-                }
-                else
-                {
-                    TempData["ErrorMessage"] = existingUser.Error;
-                    return RedirectToAction("Register", "Authentication");
-                }
+                TempData["ErrorMessage"] = result.Error;
+                return RedirectToAction("Login", "Authentication");
             }
 
-            TempData["ErrorMessage"] = "An error occurred while logging in with Google. Please try again.";
-            return RedirectToAction("Login", "Authentication");
+            HttpContext.Response.Cookies.Append("jwt", result.Value, new CookieOptions { HttpOnly = true });
+
+            return RedirectToAction("Index", "Home");
         }
+
 
         public IActionResult GoogleRegister()
         {
@@ -112,64 +99,23 @@ namespace ForumProject.Controllers.MVC
         {
             var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            if (result?.Principal != null)
+            var registerResult = await _googleAuthService.ProcessGoogleRegisterResponseWithoutUrl(result);
+
+            if (!registerResult.IsSuccess)
             {
-                var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
-                var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-                var firstName = claims?.FirstOrDefault(c => c.Type == ClaimTypes.GivenName)?.Value;
-                var lastName = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Surname)?.Value;
-
-                if (email == null)
-                {
-                    TempData["ErrorMessage"] = "Unable to retrieve email from Google. Please try again.";
-                    return RedirectToAction("Register", "Authentication");
-                }
-
-                var existingUser = await _userService.GetUserByEmailAsync(email);
-
-                if (existingUser.Value == null)
-                {
-                    var user = new User
-                    {
-                        Email = email,
-                        Username = email,
-                        Password = PasswordGenerator.GenerateSecurePassword(),
-                        UserProfile = new UserProfile
-                        {
-                            FirstName = firstName,
-                            LastName = lastName,
-                        },
-                        Role = UserRole.RegisteredUser,
-                        VerificationStatus = UserVerificationStatus.NotVerified
-                    };
-
-                    var registerResult = await _userService.RegisterUserAsync(user);
-
-                    if (!registerResult.IsSuccess)
-                    {
-                        TempData["ErrorMessage"] = registerResult.Error;
-                        return RedirectToAction("Register", "Authentication");
-                    }
-
-                    var token = _authService.GenerateToken(registerResult.Value);
-                    HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
-
-                    var verificationLink = Url.Action("VerifyEmail", "Authentication", new { token = token }, Request.Scheme);
-                    string emailContent = $"Please verify your email by clicking <a href='{verificationLink}'>here</a>.";
-                    await _emailService.SendEmailAsync(user.Email, "Email Verification", emailContent);
-
-                    return RedirectToAction("Index", "Home");
-                }
-                else
-                {
-                    TempData["ErrorMessage"] = existingUser.Error;
-                    return RedirectToAction("Login", "Authentication");
-                }
+                TempData["ErrorMessage"] = registerResult.Error;
+                return RedirectToAction("Register", "Authentication");
             }
 
-            TempData["ErrorMessage"] = "An error occurred while registering with Google. Please try again.";
-            return RedirectToAction("Register", "Authentication");
+            var token = _authService.GenerateToken(registerResult.Value);
+            HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
+
+            var verificationLink = Url.Action("VerifyEmail", "Authentication", new { token = token }, Request.Scheme);
+            await _emailService.SendVerificationEmailAsync(registerResult.Value, verificationLink);
+
+            return RedirectToAction("Index", "Home");
         }
+
 
         [HttpGet]
         public IActionResult Register()
