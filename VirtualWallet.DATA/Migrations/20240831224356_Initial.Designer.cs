@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace VirtualWallet.DATA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240831132401_WalletTransactionFix4")]
-    partial class WalletTransactionFix4
+    [Migration("20240831224356_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
