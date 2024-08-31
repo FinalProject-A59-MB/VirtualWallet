@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using VirtualWallet.DATA.Models;
+using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Repositories.Contracts;
 
 namespace VirtualWallet.DATA.Repositories
@@ -26,7 +27,20 @@ namespace VirtualWallet.DATA.Repositories
 
         public async Task<Wallet> GetWalletByIdAsync(int id)
         {
-            var wallet = await _dbContext.Wallets.Include(x => x.WalletTransactions).FirstOrDefaultAsync(w => w.Id == id);
+            var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(w => w.Id == id);
+
+            var listOfSentTransactions = await _dbContext.WalletTransactions.Where(x => x.SenderId == id).ToListAsync();
+            var listOfRecievedTransactions = await _dbContext.WalletTransactions.Where(x => x.RecipientId == id && x.Status == TransactionStatus.Completed).ToListAsync();
+
+            if (wallet != null)
+            {
+                var allTransactions = listOfSentTransactions;
+                allTransactions.AddRange(listOfRecievedTransactions);
+
+                allTransactions.OrderByDescending(x => x.CreatedAt);
+
+                wallet.WalletTransactions = allTransactions;
+            }
 
             return wallet;
         }

@@ -224,7 +224,10 @@ namespace VirtualWallet.BUSINESS.Services
                     throw new Exception(userResult.Error);
                 }
 
-                var emailResult = await _emailService.SendEmailAsync(userResult.Value.Email, "Money Deposit", "TODO");
+                var emailResult = await _emailService.SendEmailAsync(
+                    userResult.Value.Email, 
+                    "Money Deposit", 
+                    $"You have successfully received {walletTransaction.DepositedAmount} {walletTransaction.Currency} from {senderWallet.Name}");
 
                 if (!emailResult.IsSuccess)
                 {
