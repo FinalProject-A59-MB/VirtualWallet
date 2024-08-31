@@ -85,6 +85,86 @@ namespace VirtualWallet.TESTS.BUSINESS.Services
             };
         }
 
+        public static Card GetTestCard()
+        {
+            return new Card
+            {
+                Id = 1,
+                Name = "Test Card",
+                CardNumber = "1234567812345678",
+                ExpirationDate = new DateTime(2025, 12, 31),
+                CardHolderName = "Test User",
+                Currency = CurrencyType.USD,
+                Issuer = "Test Bank",
+                Cvv = "123",
+                UserId = 1,
+                User = GetTestUser(), 
+                CardType = CardType.Credit,
+                PaymentProcessorToken = "token_12345",
+                CardTransactions = new List<CardTransaction>()
+            };
+        }
+
+        public static Card GetTestCard2()
+        {
+            return new Card
+            {
+                Id = 2,
+                Name = "Test Card2",
+                CardNumber = "12345678123456782",
+                ExpirationDate = new DateTime(2025, 12, 31),
+                CardHolderName = "Test User2",
+                Currency = CurrencyType.USD,
+                Issuer = "Test Bank2",
+                Cvv = "1232",
+                UserId = 2,
+                User = GetTestUser2(),
+                CardType = CardType.Credit,
+                PaymentProcessorToken = "token_123452",
+                CardTransactions = new List<CardTransaction>()
+            };
+        }
+
+        public static CardTransaction GetTestCardTransaction()
+        {
+            return new CardTransaction
+            {
+                Id = 1,
+                Amount = 100.00m,
+                CreatedAt = DateTime.Now,
+                Currency = CurrencyType.USD,
+                Status = TransactionStatus.Completed,
+                UserId = 1,
+                User = GetTestUser(),
+                WalletId = 1,
+                Wallet = GetTestWallet(),
+                CardId = 1,
+                Card = GetTestCard(),
+                TransactionType = TransactionType.Withdrawal,
+                Fee = 2.00m
+            };
+        }
+
+        public static CardTransaction GetTestCardTransaction2()
+        {
+            return new CardTransaction
+            {
+                Id = 2,
+                Amount = 200.00m,
+                CreatedAt = DateTime.Now,
+                Currency = CurrencyType.USD,
+                Status = TransactionStatus.Completed,
+                UserId = 2,
+                User = GetTestUser2(),
+                WalletId = 2,
+                Wallet = GetTestWallet2(),
+                CardId = 2,
+                Card = GetTestCard2(),
+                TransactionType = TransactionType.Withdrawal,
+                Fee = 2.02m
+            };
+        }
+
         public static Wallet GetTestWallet()
         {
             return new Wallet
@@ -95,6 +175,55 @@ namespace VirtualWallet.TESTS.BUSINESS.Services
                 Currency = CurrencyType.USD,
                 WalletType = WalletType.Main,
                 UserId = 1
+            };
+        }
+
+        public static Wallet GetTestWallet2()
+        {
+            return new Wallet
+            {
+                Id = 2,
+                Name = "Main Wallet2",
+                Balance = 200.0m,
+                Currency = CurrencyType.USD,
+                WalletType = WalletType.Main,
+                UserId = 2
+            };
+        }
+
+        public static WalletTransaction GetTestWalletTransaction()
+        {
+            return new WalletTransaction
+            {
+                Id = 1,
+                WithdrownAmount = 100m,
+                DepositedAmount = 100m,
+                CreatedAt = DateTime.UtcNow,
+                Currency = CurrencyType.USD,
+                Status = TransactionStatus.Pending,
+                SenderId = 1,
+                Sender = GetTestWallet(),
+                RecipientId = 2,
+                Recipient = GetTestWallet(),
+                VerificationCode = "1234"
+            };
+        }
+
+        public static WalletTransaction GetTestWalletTransaction2()
+        {
+            return new WalletTransaction
+            {
+                Id = 2,
+                WithdrownAmount = 200m,
+                DepositedAmount = 200m,
+                CreatedAt = DateTime.UtcNow,
+                Currency = CurrencyType.USD,
+                Status = TransactionStatus.Pending,
+                SenderId = 2,
+                Sender = GetTestWallet2(),
+                RecipientId = 1,
+                Recipient = GetTestWallet2(),
+                VerificationCode = "12342"
             };
         }
 
