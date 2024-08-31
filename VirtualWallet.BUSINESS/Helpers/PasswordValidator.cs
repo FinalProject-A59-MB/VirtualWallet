@@ -32,9 +32,9 @@ namespace VirtualWallet.BUSINESS.Helpers
                 return Result.Failure("Password must contain at least one digit.");
             }
 
-            if (!Regex.IsMatch(password, @"[\+\-\*\&\^]"))
+            if (!Regex.IsMatch(password, @"[^a-zA-Z0-9\s]"))
             {
-                return Result.Failure("Password must contain at least one special character (+, -, *, &, ^, …).");
+                return Result.Failure("Password must contain at least one special character.");
             }
 
             return Result.Success();

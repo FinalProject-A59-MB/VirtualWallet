@@ -74,6 +74,7 @@ namespace ForumProject.Controllers.MVC
             return View(profileViewModel);
         }
 
+        [RequireAuthorization(minRequiredRoleLevel: 2)]
 
         public IActionResult EditProfile()
         {
@@ -82,7 +83,7 @@ namespace ForumProject.Controllers.MVC
 
             return View(profile);
         }
-
+        [RequireAuthorization(minRequiredRoleLevel: 2)]
         [HttpPost]
         public async Task<IActionResult> UpdateProfile(UserProfileViewModel userProfilemodel)
         {
@@ -222,7 +223,8 @@ namespace ForumProject.Controllers.MVC
             TempData["SuccessMessage"] = "Documents succesfully uploaded";
             return RedirectToAction("Profile", "User");
         }
-        [RequireAuthorization]
+        [RequireAuthorization(minRequiredRoleLevel: 4)]
+
         [HttpGet]
         public async Task<IActionResult> BlockUser(int userId)
         {
@@ -242,7 +244,8 @@ namespace ForumProject.Controllers.MVC
             return View("BlockUser", model);
         }
 
-        [RequireAuthorization]
+        [RequireAuthorization(minRequiredRoleLevel: 4)]
+
         [HttpPost]
         public async Task<IActionResult> BlockUser(BlockUserViewModel model)
         {
@@ -416,7 +419,7 @@ namespace ForumProject.Controllers.MVC
             return RedirectToAction("Profile");
         }
 
-        [RequireAuthorization(minRequiredRoleLevel: 3)]
+        [RequireAuthorization(minRequiredRoleLevel: 2)]
         public async Task<IActionResult> PendingFriendRequests()
         {
             var userId = CurrentUser.Id;

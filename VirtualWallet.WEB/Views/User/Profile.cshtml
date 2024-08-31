@@ -126,7 +126,7 @@
                                         <p><strong class="text-info">Email:</strong> @Model.Email</p>
                                         @if (Model.Role == UserRole.RegisteredUser.ToString())
                                         {
-                                            <a href="@Url.Action("SendVerificationEmail","User")">Resend verification email.</a>
+                                            <a href="@Url.Action("ResendVerificationEmail","Authentication",new{id = Model.Id})">Resend verification email.</a>
                                         }
                                         @{
                                             var statusClass = blocked ? "text-danger animate__animated animate__fadeInUp animate__infinite" : "text-white";

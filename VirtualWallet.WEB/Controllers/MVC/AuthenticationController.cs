@@ -201,11 +201,32 @@ namespace ForumProject.Controllers.MVC
             var result = await _emailService.SendVerificationEmailAsync(registerResult.Value, verificationLink);
             if (result.IsSuccess)
             {
-                TempData["SuccessMessage"] = registerResult.Error;
+                TempData["SuccessMessage"] = "A verification link has been sent to your email. Please use it to verify your account to gain full access.";
 
             }
 
             HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ResendVerificationEmail(int id)
+        {
+            var userResult = await _userService.GetUserByIdAsync(id);
+            if (!userResult.IsSuccess)
+            {
+                TempData["ErrorMessage"] = userResult.Error;
+                return RedirectToAction("Index", "Home");
+            }
+            var token = _authService.GenerateToken(userResult.Value);
+            var verificationLink = Url.Action("VerifyEmail", "Authentication", new { token = token }, Request.Scheme);
+
+            var result = await _emailService.SendVerificationEmailAsync(userResult.Value, verificationLink);
+            if (result.IsSuccess)
+            {
+                TempData["SuccessMessage"] = "A verification link has been re-sent to your email. Please use it to verify your account to gain full access.";
+            }
 
             return RedirectToAction("Index", "Home");
         }

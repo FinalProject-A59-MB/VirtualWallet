@@ -17,7 +17,7 @@ namespace VirtualWallet.BUSINESS.Helpers
                 return Result.Failure("Email cannot be empty.");
             }
 
-            string emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+            string emailPattern = @"^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$";
 
             if (!Regex.IsMatch(email, emailPattern))
             {

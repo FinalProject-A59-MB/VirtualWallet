@@ -31,7 +31,6 @@ namespace VirtualWallet.DATA.Services
             var email = userToRegister.Email;
             var password = userToRegister.Password;
 
-
             var emailValidationResult = EmailValidator.Validate(email);
             if (!emailValidationResult.IsSuccess)
             {
@@ -59,18 +58,22 @@ namespace VirtualWallet.DATA.Services
             userToRegister.Password = PasswordHasher.HashPassword(password);
             userToRegister.Role = UserRole.RegisteredUser;
             userToRegister.VerificationStatus = UserVerificationStatus.NotVerified;
+
+            await _userRepository.AddUserAsync(userToRegister);
+
             var userProfile = new UserProfile
             {
                 UserId = userToRegister.Id,
                 FirstName = "",
                 LastName = "",
             };
-            userToRegister.UserProfile = userProfile;
-            await _userRepository.AddUserAsync(userToRegister);
             await _userRepository.AddUserProfileAsync(userProfile);
+
+            userToRegister.UserProfile = userProfile;
 
             return Result<User>.Success(userToRegister);
         }
+
 
         public async Task<Result<IEnumerable<User>>> GetUsers()
         {
