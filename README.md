@@ -7,6 +7,7 @@ VirtualWallet is a comprehensive and secure digital wallet application designed 
 
 -   **Sensitive Information in appsettings**: The `appsettings.json` file contains sensitive information, such as API keys and connection strings. This data is exposed intentionally as this is a presentation project. It allows users to easily launch the project on their own. In a production environment, sensitive information should be secured using environment variables or secret management tools.
 
+
 ## Technology Stack
 
 -   **Backend**: ASP.NET Core
@@ -117,6 +118,8 @@ cd VirtualWallet
 
 ## Setup the Database
 
+Database Schema: Below is the database schema diagram representing the structure of the database used in the VirtualWallet project:
+![database schema diagram](./db_diagram.jpg)
 1.  **Configure Connection String**:
     
     -   Open the `appsettings.json` file located in the `VirtualWallet.WEB` project.
