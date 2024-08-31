@@ -11,6 +11,8 @@ using VirtualWallet.WEB.Models.ViewModels.CardViewModels;
 
 namespace VirtualWallet.WEB.Controllers.MVC
 {
+    [RequireAuthorization(minRequiredRoleLevel: 2)]
+
     public class CardController : BaseController
     {
         private readonly ICardService _cardService;
@@ -19,6 +21,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
         private readonly IViewModelMapper _viewModelMapper;
         private readonly IWalletService _walletService;
         private readonly ICardTransactionService _cardTransactionService;
+        [RequireAuthorization(minRequiredRoleLevel: 2)]
 
         public CardController(
             ICardService cardService,
@@ -35,6 +38,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
             _walletService = walletService;
             _cardTransactionService = cardTransactionService;
         }
+        [RequireAuthorization(minRequiredRoleLevel: 2)]
 
         [HttpGet]
         public IActionResult AddCard(int userId)
@@ -119,6 +123,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
             return View("_CardPartial", cardModel);
         }
 
+        [RequireAuthorization(minRequiredRoleLevel: 3)]
 
         [HttpGet]
         public IActionResult Deposit()
@@ -137,6 +142,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
 
             return View("CardTransactionFormPartial", model);
         }
+        [RequireAuthorization(minRequiredRoleLevel: 3)]
 
         [HttpPost]
         public async Task<IActionResult> ConfirmDeposit(CardTransactionViewModel model)
@@ -169,6 +175,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
             model.Card = card.Value;
             return View("ConfirmDeposit", model);
         }
+        [RequireAuthorization(minRequiredRoleLevel: 3)]
 
         [HttpPost]
         public async Task<IActionResult> DepositToWallet(CardTransactionViewModel model)
@@ -194,6 +201,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 return View("CardTransactionFormPartial", model);
             }
         }
+        [RequireAuthorization(minRequiredRoleLevel: 3)]
 
         [HttpGet]
         public IActionResult Withdraw()
@@ -212,6 +220,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
 
             return View("CardTransactionFormPartial", model);
         }
+        [RequireAuthorization(minRequiredRoleLevel: 3)]
 
         [HttpPost]
         public async Task<IActionResult> ConfirmWithdraw(CardTransactionViewModel model)
@@ -243,6 +252,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
             return View("ConfirmWithdraw", model);
         }
 
+        [RequireAuthorization(minRequiredRoleLevel: 3)]
 
         [HttpPost]
         public async Task<IActionResult> WithdrawFromWallet(CardTransactionViewModel model)
