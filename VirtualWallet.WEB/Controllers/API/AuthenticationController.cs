@@ -13,6 +13,9 @@ using VirtualWallet.BUSINESS.Results;
 
 namespace VirtualWallet.WEB.Controllers.API
 {
+    /// <summary>
+    /// Controller responsible for handling authentication-related actions such as login, registration, and password management.
+    /// </summary>
     [Route("api/authentication")]
     [ApiController]
     public class AuthenticationController : ControllerBase
@@ -22,6 +25,13 @@ namespace VirtualWallet.WEB.Controllers.API
         private readonly IEmailService _emailService;
         private readonly IDtoMapper _dtoMapper;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuthenticationController"/> class.
+        /// </summary>
+        /// <param name="authService">Service for handling authentication.</param>
+        /// <param name="userService">Service for handling user-related actions.</param>
+        /// <param name="emailService">Service for sending emails.</param>
+        /// <param name="dtoMapper">Service for mapping DTOs to models.</param>
         public AuthenticationController(
             IAuthService authService,
             IUserService userService,
@@ -34,10 +44,14 @@ namespace VirtualWallet.WEB.Controllers.API
             _dtoMapper = dtoMapper;
         }
 
+        /// <summary>
+        /// Logs in the user and generates a JWT token upon successful authentication.
+        /// </summary>
+        /// <param name="model">The login request containing username/email and password.</param>
+        /// <returns>A JWT token if login is successful; otherwise, an error message.</returns>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequestDto model)
         {
-
             Result<User> authResult = await _authService.AuthenticateAsync(model.UsernameOrEmail, model.Password);
 
             if (!authResult.IsSuccess)
@@ -49,10 +63,14 @@ namespace VirtualWallet.WEB.Controllers.API
             return Ok(new { Token = token });
         }
 
+        /// <summary>
+        /// Registers a new user and sends a verification email upon successful registration.
+        /// </summary>
+        /// <param name="model">The registration request containing user details.</param>
+        /// <returns>A JWT token if registration is successful; otherwise, an error message.</returns>
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto model)
         {
-
             User userRequest = _dtoMapper.ToUser(model);
             Result<User> registerResult = await _userService.RegisterUserAsync(userRequest);
 
@@ -69,6 +87,11 @@ namespace VirtualWallet.WEB.Controllers.API
             return StatusCode(StatusCodes.Status201Created, new { Token = token });
         }
 
+        /// <summary>
+        /// Verifies the user's email based on the provided token.
+        /// </summary>
+        /// <param name="token">The email verification token.</param>
+        /// <returns>A new JWT token if verification is successful; otherwise, an error message.</returns>
         [HttpGet("verifyEmail")]
         public async Task<IActionResult> VerifyEmail(string token)
         {
@@ -104,10 +127,14 @@ namespace VirtualWallet.WEB.Controllers.API
             return Ok(new { Token = newToken });
         }
 
+        /// <summary>
+        /// Initiates the password reset process by sending a reset link to the user's email.
+        /// </summary>
+        /// <param name="model">The request containing the user's email address.</param>
+        /// <returns>A message indicating that the reset link has been sent.</returns>
         [HttpPost("forgotPassword")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto model)
         {
-
             Result<User> userResult = await _userService.GetUserByEmailAsync(model.Email);
 
             if (!userResult.IsSuccess)
@@ -124,6 +151,11 @@ namespace VirtualWallet.WEB.Controllers.API
             return Ok(new { Message = "Password reset link has been sent to your email." });
         }
 
+        /// <summary>
+        /// Resets the user's password based on the provided token and new password.
+        /// </summary>
+        /// <param name="model">The reset password request containing the email, token, and new password.</param>
+        /// <returns>A message indicating that the password has been reset successfully.</returns>
         [HttpPost("resetPassword")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto model)
         {
@@ -142,6 +174,10 @@ namespace VirtualWallet.WEB.Controllers.API
             return Ok(new { Message = "Password has been reset successfully." });
         }
 
+        /// <summary>
+        /// Logs out the user by deleting the JWT cookie.
+        /// </summary>
+        /// <returns>A message indicating that the user has been logged out successfully.</returns>
         [HttpPost("logout")]
         public IActionResult Logout()
         {
@@ -149,6 +185,10 @@ namespace VirtualWallet.WEB.Controllers.API
             return Ok(new { Message = "Logged out successfully." });
         }
 
+        /// <summary>
+        /// Initiates the Google login process.
+        /// </summary>
+        /// <returns>A challenge result for Google authentication.</returns>
         [HttpPost("googleLogin")]
         public IActionResult GoogleLogin()
         {
@@ -156,6 +196,10 @@ namespace VirtualWallet.WEB.Controllers.API
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
 
+        /// <summary>
+        /// Handles the response from Google after the user has authenticated.
+        /// </summary>
+        /// <returns>A JWT token if login is successful; otherwise, an error message.</returns>
         [HttpGet("googleLoginResponse")]
         public async Task<IActionResult> GoogleLoginResponse()
         {
@@ -187,6 +231,10 @@ namespace VirtualWallet.WEB.Controllers.API
             return StatusCode(StatusCodes.Status400BadRequest, "An error occurred while logging in with Google. Please try again.");
         }
 
+        /// <summary>
+        /// Initiates the Google registration process.
+        /// </summary>
+        /// <returns>A challenge result for Google authentication.</returns>
         [HttpPost("googleRegister")]
         public IActionResult GoogleRegister()
         {
@@ -194,6 +242,10 @@ namespace VirtualWallet.WEB.Controllers.API
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
 
+        /// <summary>
+        /// Handles the response from Google after the user has registered.
+        /// </summary>
+        /// <returns>A JWT token if registration is successful; otherwise, an error message.</returns>
         [HttpGet("googleRegisterResponse")]
         public async Task<IActionResult> GoogleRegisterResponse()
         {

@@ -9,6 +9,9 @@ using VirtualWallet.WEB.Models.DTOs.WalletDTOs;
 
 namespace VirtualWallet.WEB.Controllers.API
 {
+    /// <summary>
+    /// Controller responsible for managing user-related actions such as profile management, account settings, and admin-level operations.
+    /// </summary>
     [Route("api/User")]
     [ApiController]
     [RequireAuthorization(minRequiredRoleLevel: 1)]
@@ -22,6 +25,16 @@ namespace VirtualWallet.WEB.Controllers.API
         private readonly IWalletTransactionService _walletTransactionService;
         private readonly ICardTransactionService _cardTransactionService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UserController"/> class.
+        /// </summary>
+        /// <param name="userService">Service for managing users.</param>
+        /// <param name="dtoMapper">Service for mapping DTOs to models.</param>
+        /// <param name="walletService">Service for managing wallets.</param>
+        /// <param name="cloudinaryService">Service for handling cloud storage operations.</param>
+        /// <param name="authService">Service for managing authentication.</param>
+        /// <param name="walletTransactionService">Service for managing wallet transactions.</param>
+        /// <param name="cardTransactionService">Service for managing card transactions.</param>
         public UserController(
             IUserService userService,
             IDtoMapper dtoMapper,
@@ -40,6 +53,11 @@ namespace VirtualWallet.WEB.Controllers.API
             _cardTransactionService = cardTransactionService;
         }
 
+        /// <summary>
+        /// Retrieves the profile information of a user by their ID.
+        /// </summary>
+        /// <param name="id">The ID of the user.</param>
+        /// <returns>The user's profile information if found; otherwise, an error message.</returns>
         [HttpGet("profile")]
         public async Task<IActionResult> GetProfile(int id)
         {
@@ -64,11 +82,16 @@ namespace VirtualWallet.WEB.Controllers.API
             return StatusCode(StatusCodes.Status200OK, profileDto);
         }
 
+        /// <summary>
+        /// Updates the user's profile information and optionally updates their profile picture.
+        /// </summary>
+        /// <param name="userProfileDto">The user's profile data to update.</param>
+        /// <param name="userPicture">The user's new profile picture.</param>
+        /// <returns>A status indicating whether the profile update was successful or not.</returns>
         [HttpPost("updateProfile")]
         public async Task<IActionResult> UpdateProfile([FromBody] UserProfileRequestDto userProfileDto, IFormFile userPicture)
         {
-
-            if (userPicture!=null)
+            if (userPicture != null)
             {
                 var imageUrl = _cloudinaryService.UploadProfilePicture(userPicture);
                 userProfileDto.PhotoUrl = imageUrl;
@@ -98,6 +121,11 @@ namespace VirtualWallet.WEB.Controllers.API
             return StatusCode(StatusCodes.Status200OK, "Profile updated successfully.");
         }
 
+        /// <summary>
+        /// Changes the user's password.
+        /// </summary>
+        /// <param name="model">The password change request data.</param>
+        /// <returns>A status indicating whether the password change was successful or not.</returns>
         [HttpPost("changePassword")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto model)
         {
@@ -117,6 +145,11 @@ namespace VirtualWallet.WEB.Controllers.API
             return StatusCode(StatusCodes.Status200OK, "Password changed successfully.");
         }
 
+        /// <summary>
+        /// Changes the user's email address.
+        /// </summary>
+        /// <param name="model">The email change request data.</param>
+        /// <returns>A status indicating whether the email change was successful or not.</returns>
         [HttpPost("changeEmail")]
         public async Task<IActionResult> ChangeEmail([FromBody] ChangeEmailRequestDto model)
         {
@@ -130,7 +163,11 @@ namespace VirtualWallet.WEB.Controllers.API
             return StatusCode(StatusCodes.Status200OK, "Email changed successfully.");
         }
 
-
+        /// <summary>
+        /// Uploads user verification documents such as Photo ID and License ID.
+        /// </summary>
+        /// <param name="model">The verification documents.</param>
+        /// <returns>A status indicating whether the upload was successful or not.</returns>
         [HttpPost("uploadVerification")]
         public async Task<IActionResult> UploadVerificationDocuments([FromBody] VerificationRequestDto model)
         {
@@ -158,6 +195,11 @@ namespace VirtualWallet.WEB.Controllers.API
             return StatusCode(StatusCodes.Status200OK, "Documents successfully uploaded.");
         }
 
+        /// <summary>
+        /// Blocks a user, changing their role to Blocked and recording the block reason.
+        /// </summary>
+        /// <param name="model">The block record data, including user ID and reason.</param>
+        /// <returns>A status indicating whether the user was successfully blocked or not.</returns>
         [RequireAuthorization]
         [HttpPost("blockUser")]
         public async Task<IActionResult> BlockUser([FromBody] BlockedRecordRequestDto model)
@@ -191,6 +233,11 @@ namespace VirtualWallet.WEB.Controllers.API
             return StatusCode(StatusCodes.Status200OK, $"User {user.Username} has been blocked successfully.");
         }
 
+        /// <summary>
+        /// Unblocks a user, restoring their role to RegisteredUser.
+        /// </summary>
+        /// <param name="model">The unblock record data, including user ID and reason for unblocking.</param>
+        /// <returns>A status indicating whether the user was successfully unblocked or not.</returns>
         [RequireAuthorization(minRequiredRoleLevel: 4)]
         [HttpPost("unblockUser")]
         public async Task<IActionResult> UnblockUser([FromBody] UnblockRecordRequestDto model)
@@ -226,6 +273,10 @@ namespace VirtualWallet.WEB.Controllers.API
             return StatusCode(StatusCodes.Status200OK, "User has been unblocked successfully.");
         }
 
+        /// <summary>
+        /// Retrieves a list of unverified users pending verification.
+        /// </summary>
+        /// <returns>A list of unverified users if found; otherwise, an error message.</returns>
         [RequireAuthorization(minRequiredRoleLevel: 3)]
         [HttpGet("unverifiedUsers")]
         public async Task<IActionResult> GetUnverifiedUsers()
@@ -245,6 +296,11 @@ namespace VirtualWallet.WEB.Controllers.API
             return StatusCode(StatusCodes.Status200OK, unverifiedUsers);
         }
 
+        /// <summary>
+        /// Verifies a user's account.
+        /// </summary>
+        /// <param name="userId">The ID of the user to verify.</param>
+        /// <returns>A status indicating whether the verification was successful or not.</returns>
         [RequireAuthorization(minRequiredRoleLevel: 3)]
         [HttpPost("verifyUser")]
         public async Task<IActionResult> VerifyUser(int userId)
@@ -269,6 +325,11 @@ namespace VirtualWallet.WEB.Controllers.API
             return StatusCode(StatusCodes.Status200OK, "User verified successfully.");
         }
 
+        /// <summary>
+        /// Denies a user's verification request.
+        /// </summary>
+        /// <param name="userId">The ID of the user whose verification is to be denied.</param>
+        /// <returns>A status indicating whether the denial was successful or not.</returns>
         [RequireAuthorization(minRequiredRoleLevel: 3)]
         [HttpPost("denyUserVerification")]
         public async Task<IActionResult> DenyUserVerification(int userId)
@@ -293,6 +354,11 @@ namespace VirtualWallet.WEB.Controllers.API
             return StatusCode(StatusCodes.Status200OK, "User verification denied.");
         }
 
+        /// <summary>
+        /// Sends a friend request from the current user to another user.
+        /// </summary>
+        /// <param name="contactId">The ID of the user to whom the friend request is sent.</param>
+        /// <returns>A status indicating whether the friend request was successfully sent or not.</returns>
         [RequireAuthorization(minRequiredRoleLevel: 2)]
         [HttpPost("sendFriendRequest")]
         public async Task<IActionResult> SendFriendRequest(int contactId)
@@ -308,6 +374,11 @@ namespace VirtualWallet.WEB.Controllers.API
             return StatusCode(StatusCodes.Status200OK, "Friend request sent!");
         }
 
+        /// <summary>
+        /// Accepts a friend request for the current user.
+        /// </summary>
+        /// <param name="contactId">The ID of the user who sent the friend request.</param>
+        /// <returns>A status indicating whether the friend request was successfully accepted or not.</returns>
         [RequireAuthorization(minRequiredRoleLevel: 2)]
         [HttpPost("acceptFriendRequest")]
         public async Task<IActionResult> AcceptFriendRequest(int contactId)
@@ -323,6 +394,11 @@ namespace VirtualWallet.WEB.Controllers.API
             return StatusCode(StatusCodes.Status200OK, "Friend request accepted.");
         }
 
+        /// <summary>
+        /// Denies a friend request for the current user.
+        /// </summary>
+        /// <param name="contactId">The ID of the user who sent the friend request.</param>
+        /// <returns>A status indicating whether the friend request was successfully denied or not.</returns>
         [RequireAuthorization(minRequiredRoleLevel: 2)]
         [HttpPost("denyFriendRequest")]
         public async Task<IActionResult> DenyFriendRequest(int contactId)
@@ -338,6 +414,10 @@ namespace VirtualWallet.WEB.Controllers.API
             return StatusCode(StatusCodes.Status200OK, "Friend request denied.");
         }
 
+        /// <summary>
+        /// Retrieves a list of pending friend requests for the current user.
+        /// </summary>
+        /// <returns>A list of pending friend requests if found; otherwise, an error message.</returns>
         [RequireAuthorization(minRequiredRoleLevel: 3)]
         [HttpGet("pendingFriendRequests")]
         public async Task<IActionResult> GetPendingFriendRequests()
@@ -355,7 +435,11 @@ namespace VirtualWallet.WEB.Controllers.API
             return StatusCode(StatusCodes.Status200OK, pendingRequestsDto);
         }
 
-
+        /// <summary>
+        /// Deletes a user's account after verifying that there are no remaining funds in the user's wallets.
+        /// </summary>
+        /// <param name="id">The ID of the user whose account is to be deleted.</param>
+        /// <returns>A status indicating whether the account deletion was successful or not.</returns>
         [RequireAuthorization(minRequiredRoleLevel: 1)]
         [HttpDelete("deleteAccount/{id}")]
         public async Task<IActionResult> DeleteAccount(int id)
@@ -383,6 +467,11 @@ namespace VirtualWallet.WEB.Controllers.API
             return StatusCode(StatusCodes.Status200OK, "Account deleted successfully.");
         }
 
+        /// <summary>
+        /// Retrieves all users for administrative purposes, with filtering options.
+        /// </summary>
+        /// <param name="userParameters">The query parameters for filtering users.</param>
+        /// <returns>A list of users matching the filter criteria, along with the total user count.</returns>
         [RequireAuthorization(minRequiredRoleLevel: 4)]
         [HttpGet("admin/users")]
         public async Task<IActionResult> AllUsers([FromQuery] UserQueryParameters userParameters)
@@ -402,6 +491,11 @@ namespace VirtualWallet.WEB.Controllers.API
             });
         }
 
+        /// <summary>
+        /// Retrieves all wallet transactions for administrative purposes, with filtering options.
+        /// </summary>
+        /// <param name="walletTransactionParameters">The query parameters for filtering wallet transactions.</param>
+        /// <returns>A list of wallet transactions matching the filter criteria, along with the total transaction count.</returns>
         [RequireAuthorization(minRequiredRoleLevel: 4)]
         [HttpGet("admin/walletTransactions")]
         public async Task<IActionResult> AllWalletTransactions([FromQuery] TransactionQueryParameters walletTransactionParameters)
@@ -421,6 +515,11 @@ namespace VirtualWallet.WEB.Controllers.API
             });
         }
 
+        /// <summary>
+        /// Retrieves all card transactions for administrative purposes, with filtering options.
+        /// </summary>
+        /// <param name="cardTransactionParameters">The query parameters for filtering card transactions.</param>
+        /// <returns>A list of card transactions matching the filter criteria, along with the total transaction count.</returns>
         [RequireAuthorization(minRequiredRoleLevel: 4)]
         [HttpGet("admin/cardTransactions")]
         public async Task<IActionResult> GetCardTransactions([FromQuery] CardTransactionQueryParameters cardTransactionParameters)
@@ -439,6 +538,5 @@ namespace VirtualWallet.WEB.Controllers.API
                 TotalCardTransactionCount = totalCardTransactionCount
             });
         }
-
     }
 }
