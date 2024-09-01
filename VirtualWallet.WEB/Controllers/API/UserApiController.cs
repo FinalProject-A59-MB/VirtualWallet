@@ -3,11 +3,9 @@ using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Services.Contracts;
 using VirtualWallet.DATA.Models.Enums;
-using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.WEB.Models.DTOs.UserDTOs;
 using VirtualWallet.WEB.Models.DTOs.CardDTOs;
 using VirtualWallet.WEB.Models.DTOs.WalletDTOs;
-using VirtualWallet.WEB.Helpers;
 
 namespace VirtualWallet.WEB.Controllers.API
 {

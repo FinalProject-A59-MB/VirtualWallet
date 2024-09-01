@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace VirtualWallet.WEB.Models.DTOs.CardDTOs
+﻿namespace VirtualWallet.WEB.Models.DTOs.CardDTOs
 {
     public class CardRequestDto
     {

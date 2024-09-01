@@ -1,9 +1,7 @@
 ﻿using System.Net;
 using System.Net.Mail;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using VirtualWallet.BUSINESS.Results;
-using VirtualWallet.BUSINESS.Services;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
 

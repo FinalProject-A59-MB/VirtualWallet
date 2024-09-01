@@ -1,11 +1,6 @@
-﻿using CloudinaryDotNet.Actions;
-using Microsoft.AspNetCore.Mvc;
-using VirtualWallet.BUSINESS.Results;
-using VirtualWallet.BUSINESS.Services.Contracts;
-using VirtualWallet.DATA.Models;
+﻿using Microsoft.AspNetCore.Mvc;
 using VirtualWallet.DATA.Services.Contracts;
 using VirtualWallet.WEB.Models.ViewModels.WalletTransactionViewModels;
-using VirtualWallet.WEB.Models.ViewModels.WalletViewModels;
 
 namespace VirtualWallet.WEB.Controllers.MVC
 {

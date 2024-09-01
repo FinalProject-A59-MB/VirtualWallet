@@ -5,12 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Services.Contracts;
-using System.Security.Claims;
 using VirtualWallet.DATA.Models;
-using VirtualWallet.DATA.Helpers;
 using VirtualWallet.WEB.Controllers.MVC;
 using VirtualWallet.WEB.Models.ViewModels.AuthenticationViewModels;
-using VirtualWallet.BUSINESS.Services;
 using VirtualWallet.BUSINESS.Results;
 
 namespace ForumProject.Controllers.MVC

@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.WEB.Controllers.MVC;
 using VirtualWallet.WEB.Models.ViewModels.CardViewModels;
-using VirtualWallet.BUSINESS.Services;
 using VirtualWallet.DATA.Models;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace VirtualWallet.WEB.Controllers
 {

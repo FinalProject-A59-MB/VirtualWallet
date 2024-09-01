@@ -4,8 +4,6 @@ using VirtualWallet.DATA.Repositories.Contracts;
 using Microsoft.EntityFrameworkCore;
 using VirtualWallet.BUSINESS.Resources;
 using VirtualWallet.BUSINESS.Results;
-using VirtualWallet.DATA.Repositories;
-using Microsoft.AspNetCore.Http;
 using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Services.Contracts;
 

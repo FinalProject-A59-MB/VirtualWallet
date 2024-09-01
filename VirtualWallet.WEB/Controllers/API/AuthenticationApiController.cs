@@ -10,7 +10,6 @@ using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Services.Contracts;
 using VirtualWallet.WEB.Models.DTOs.AuthDTOs;
 using VirtualWallet.BUSINESS.Results;
-using Microsoft.EntityFrameworkCore.Update;
 
 namespace VirtualWallet.WEB.Controllers.API
 {

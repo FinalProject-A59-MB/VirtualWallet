@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Services.Contracts;
-using VirtualWallet.WEB.Controllers.MVC;
 
 namespace VirtualWallet.WEB.Controllers.API
 {

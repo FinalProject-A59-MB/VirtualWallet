@@ -1,19 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Security.Claims;
 using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Helpers;
 using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Services.Contracts;
-using System.IdentityModel.Tokens.Jwt;
-using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication;
-using Twilio.Http;
 
 namespace VirtualWallet.BUSINESS.Services
 {

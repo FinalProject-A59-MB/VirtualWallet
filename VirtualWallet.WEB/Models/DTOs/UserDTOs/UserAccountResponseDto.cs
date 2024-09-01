@@ -1,5 +1,4 @@
-﻿using VirtualWallet.DATA.Models;
-using VirtualWallet.DATA.Models.Enums;
+﻿using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.WEB.Models.DTOs.WalletDTOs;
 
 namespace VirtualWallet.WEB.Models.DTOs.UserDTOs

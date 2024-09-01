@@ -1,5 +1,4 @@
 ﻿using VirtualWallet.DATA.Models.Enums;
-using VirtualWallet.DATA.Models;
 
 namespace VirtualWallet.WEB.Helpers
 {

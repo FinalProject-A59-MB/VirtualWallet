@@ -3,13 +3,7 @@ using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Repositories.Contracts;
 using VirtualWallet.BUSINESS.Resources;
-using VirtualWallet.DATA.Repositories;
-using System.Transactions;
 using VirtualWallet.DATA.Models.Enums;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace VirtualWallet.BUSINESS.Services
 {

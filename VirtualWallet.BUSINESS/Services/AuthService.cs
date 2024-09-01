@@ -9,7 +9,6 @@ using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Helpers;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Repositories.Contracts;
-using VirtualWallet.DATA.Services.Contracts;
 
 namespace VirtualWallet.BUSINESS.Services
 {

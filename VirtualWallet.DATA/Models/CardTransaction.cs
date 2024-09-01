@@ -1,5 +1,4 @@
-﻿using VirtualWallet.DATA.Models.Contract;
-using VirtualWallet.DATA.Models.Enums;
+﻿using VirtualWallet.DATA.Models.Enums;
 
 namespace VirtualWallet.DATA.Models
 {

@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using VirtualWallet.DATA.Models.Enums;
+﻿using VirtualWallet.DATA.Models.Enums;
 
 public class CardViewModel
 {

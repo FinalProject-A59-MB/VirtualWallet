@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using VirtualWallet.DATA.Models.Enums;
+﻿using VirtualWallet.DATA.Models.Enums;
 
 namespace VirtualWallet.WEB.Models.DTOs.CardDTOs
 {

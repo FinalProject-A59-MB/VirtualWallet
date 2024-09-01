@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace VirtualWallet.TESTS.BUSINESS.Services.MockRepositories
+﻿namespace VirtualWallet.TESTS.BUSINESS.Services.MockRepositories
 {
     using global::VirtualWallet.DATA.Models.Enums;
     using global::VirtualWallet.DATA.Models;
