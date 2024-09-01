@@ -18,7 +18,7 @@ namespace VirtualWallet.WEB.Controllers.API
     /// </summary>
     [Route("api/authentication")]
     [ApiController]
-    public class AuthenticationController : ControllerBase
+    public class AuthenticationControllerApi : ControllerBase
     {
         private readonly IAuthService _authService;
         private readonly IUserService _userService;
@@ -26,13 +26,13 @@ namespace VirtualWallet.WEB.Controllers.API
         private readonly IDtoMapper _dtoMapper;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AuthenticationController"/> class.
+        /// Initializes a new instance of the <see cref="AuthenticationControllerApi"/> class.
         /// </summary>
         /// <param name="authService">Service for handling authentication.</param>
         /// <param name="userService">Service for handling user-related actions.</param>
         /// <param name="emailService">Service for sending emails.</param>
         /// <param name="dtoMapper">Service for mapping DTOs to models.</param>
-        public AuthenticationController(
+        public AuthenticationControllerApi(
             IAuthService authService,
             IUserService userService,
             IEmailService emailService,

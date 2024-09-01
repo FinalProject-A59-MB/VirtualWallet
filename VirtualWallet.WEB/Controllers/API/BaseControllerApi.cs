@@ -5,7 +5,7 @@ using VirtualWallet.DATA.Models;
 namespace VirtualWallet.WEB.Controllers.API
 {
     [ApiController]
-    public abstract class BaseController : ControllerBase
+    public abstract class BaseControllerApi : ControllerBase
     {
         protected User CurrentUser => HttpContext.Items["CurrentUser"] as User;
 

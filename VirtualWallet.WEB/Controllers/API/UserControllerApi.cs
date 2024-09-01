@@ -15,7 +15,7 @@ namespace VirtualWallet.WEB.Controllers.API
     [Route("api/User")]
     [ApiController]
     [RequireAuthorization(minRequiredRoleLevel: 1)]
-    public class UserController : BaseController
+    public class UserControllerApi : BaseControllerApi
     {
         private readonly IUserService _userService;
         private readonly IDtoMapper _dtoMapper;
@@ -26,7 +26,7 @@ namespace VirtualWallet.WEB.Controllers.API
         private readonly ICardTransactionService _cardTransactionService;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UserController"/> class.
+        /// Initializes a new instance of the <see cref="UserControllerApi"/> class.
         /// </summary>
         /// <param name="userService">Service for managing users.</param>
         /// <param name="dtoMapper">Service for mapping DTOs to models.</param>
@@ -35,7 +35,7 @@ namespace VirtualWallet.WEB.Controllers.API
         /// <param name="authService">Service for managing authentication.</param>
         /// <param name="walletTransactionService">Service for managing wallet transactions.</param>
         /// <param name="cardTransactionService">Service for managing card transactions.</param>
-        public UserController(
+        public UserControllerApi(
             IUserService userService,
             IDtoMapper dtoMapper,
             IWalletService walletService,

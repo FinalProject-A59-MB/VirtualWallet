@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -145,7 +146,8 @@ namespace VirtualWallet.DATA.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     WalletType = table.Column<int>(type: "int", nullable: false),
                     Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Currency = table.Column<int>(type: "int", nullable: false)
+                    Currency = table.Column<int>(type: "int", nullable: false),
+                    PublicId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace VirtualWallet.DATA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240831224356_Initial")]
+    [Migration("20240901183221_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -425,6 +425,9 @@ namespace VirtualWallet.DATA.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("PublicId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");

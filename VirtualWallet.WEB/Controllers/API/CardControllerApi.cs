@@ -12,7 +12,7 @@ namespace VirtualWallet.WEB.Controllers.API
     [Route("api/Card")]
     [ApiController]
     [RequireAuthorization(minRequiredRoleLevel: 2)]
-    public class CardController : BaseController
+    public class CardControllerApi : BaseControllerApi
     {
         private readonly ICardService _cardService;
         private readonly IPaymentProcessorService _paymentProcessorService;
@@ -21,14 +21,14 @@ namespace VirtualWallet.WEB.Controllers.API
         private readonly IDtoMapper _dtoMapper;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CardController"/> class.
+        /// Initializes a new instance of the <see cref="CardControllerApi"/> class.
         /// </summary>
         /// <param name="cardService">Service for managing cards.</param>
         /// <param name="paymentProcessorService">Service for processing payments.</param>
         /// <param name="walletService">Service for managing wallets.</param>
         /// <param name="cardTransactionService">Service for managing card transactions.</param>
         /// <param name="dtoMapper">Service for mapping DTOs to models.</param>
-        public CardController(
+        public CardControllerApi(
             ICardService cardService,
             IPaymentProcessorService paymentProcessorService,
             IWalletService walletService,

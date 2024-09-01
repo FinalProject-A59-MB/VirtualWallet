@@ -9,15 +9,15 @@ namespace VirtualWallet.WEB.Controllers.API
     /// </summary>
     [ApiController]
     [Route("api/wallet")]
-    public class WalletController : ControllerBase
+    public class WalletControllerApi : ControllerBase
     {
         private readonly IWalletService _walletService;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WalletController"/> class.
+        /// Initializes a new instance of the <see cref="WalletControllerApi"/> class.
         /// </summary>
         /// <param name="walletService">Service for managing wallet operations.</param>
-        public WalletController(IWalletService walletService)
+        public WalletControllerApi(IWalletService walletService)
         {
             _walletService = walletService;
         }
