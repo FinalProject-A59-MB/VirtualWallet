@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/VirtualWallet.WEB.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-    <link rel="icon" href="~/favicon.ico" type="image/x-icon"asp-append-version="true" />
+    <link rel="icon" href="~/favicon.ico" type="image/x-icon" asp-append-version="true" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body class="bg-dark-3">
@@ -21,7 +21,6 @@
                 <a class="navbar-brand text-white fw-bold ms-4" asp-area="" asp-controller="Home" asp-action="Index">VaulTora</a>
 
                 <!-- Centered Navigation Links -->
-                <!-- Centered Navigation Links -->
                 <div class="collapse navbar-collapse justify-content-center gap-5">
                     <ul class="navbar-nav justify-content-center gap-3">
                         @if (ViewBag.IsAuthenticated)
@@ -29,16 +28,8 @@
                             <li class="nav-item mx-3">
                                 <a class="nav-link text-white" href="@Url.Action("Index", "Home")">Home</a>
                             </li>
-                            <li class="nav-item mx-3">
-                                <a class="nav-link text-white" href="@Url.Action("About", "Home")">About us</a>
-                            </li>
-                            <li class="nav-item mx-3">
-                                <a class="nav-link text-white" href="@Url.Action("FAQ", "Home")">FAQ</a>
-                            </li>
-                            <li class="nav-item mx-3">
-                                <a class="nav-link text-white" href="@Url.Action("Contacts", "Home")">Contacts</a>
-                            </li>
-                            <!-- Money Transfers Dropdown -->
+
+
                             <li class="nav-item dropdown mx-3">
                                 <a class="nav-link dropdown-toggle text-white" href="#" id="moneyTransfersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Money Transfers
@@ -49,7 +40,6 @@
                                 </ul>
                             </li>
 
-                            <!-- Card Transfers Dropdown -->
                             <li class="nav-item dropdown mx-3">
                                 <a class="nav-link dropdown-toggle text-white" href="#" id="cardTransfersDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Card Transfers
@@ -60,7 +50,6 @@
                                 </ul>
                             </li>
 
-                            <!-- Transaction History Dropdown -->
                             <li class="nav-item dropdown mx-3">
                                 <a class="nav-link dropdown-toggle text-white" href="#" id="transactionHistoryDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     Transaction History
@@ -74,25 +63,24 @@
                         }
                         else
                         {
-                            <!-- Regular Navigation Links -->
                             <li class="nav-item mx-3">
                                 <a class="nav-link text-white" href="@Url.Action("Index", "Home")">Home</a>
                             </li>
                             <li class="nav-item mx-3">
-                                <a class="nav-link text-white" href="@Url.Action("About", "Home")">About us</a>
+                                <a class="nav-link text-white" href="@Url.Action("About", "Home")">About</a>
                             </li>
                             <li class="nav-item mx-3">
                                 <a class="nav-link text-white" href="@Url.Action("FAQ", "Home")">FAQ</a>
                             </li>
                             <li class="nav-item mx-3">
-                                <a class="nav-link text-white" href="@Url.Action("Contacts", "Home")">Contacts</a>
+                                <a class="nav-link text-white" href="@Url.Action("ContactUs", "Home")">Contact Us</a>
                             </li>
                         }
                     </ul>
                 </div>
 
                 <div class="d-flex align-items-center ms-auto me-4">
-       
+
                     @if (ViewBag.IsAuthenticated)
                     {
                         <button class="btn btn-outline-light ms-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#dashboardOffcanvas" aria-controls="dashboardOffcanvas">
@@ -183,11 +171,33 @@
                         <i class="bi bi-bank2 me-2"></i> Card Transactions
                     </a>
                 </li>
-                <li class="nav-item mb-5">
+                <li class="nav-item mb-3">
                     <a class="nav-link text-white" href="@Url.Action("WalletTransactions", "Wallet")">
                         <i class="bi bi-currency-exchange me-2"></i> Wallet Transactions
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="@Url.Action("About", "Home")">
+                        <i class="bi bi-info-square"></i> About
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="@Url.Action("FAQ", "Home")">
+                        <i class="bi bi-question-square"></i> FAQ
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="@Url.Action("ContactUs", "Home")">
+                        <i class="bi bi-building-add"></i> Contact Us
+                    </a>
+                </li>
+                <li class="nav-item mb-5">
+                    <a class="nav-link text-white" href="@Url.Action("Privacy", "Home")">
+                        <i class="bi bi-list-ol"></i> ToS
+                    </a>
+                </li>
+
+
 
                 <li class="nav-item d-flex justify-content-center">
                     <form asp-controller="Authentication" asp-action="Logout" method="post" class="w-100">
@@ -202,7 +212,6 @@
     <div class="bg-dark">
         <main role="main" class="pt-3 pb-3">
             <!-- Start Error Modal -->
-
             @if (TempData["ErrorMessage"] != null && !string.IsNullOrEmpty(TempData["ErrorMessage"].ToString()))
             {
                 <div class="modal fade" id="errorModal" tabindex="-1" role="dialog" aria-labelledby="errorModalLabel" aria-hidden="true">
@@ -267,9 +276,10 @@
 
     </div>
 
-    <footer class="border-top footer text-muted bg-dark-2">
+    <footer class="border-top footer text-muted bg-dark-2 fixed-bottom">
+
         <div class="container">
-            &copy; 2024 - VaulTora - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2024 - VaulTora - <a asp-area="" asp-controller="Home" asp-action="Privacy">Terms of Service</a>
         </div>
     </footer>
 
