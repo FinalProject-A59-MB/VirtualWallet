@@ -72,11 +72,6 @@ namespace VirtualWallet.WEB.Controllers.API
 
             var totalBalanceResult = await _userService.GetTotalBalanceInMainWalletCurrencyAsync(profileDto.Id);
 
-            if (!totalBalanceResult.IsSuccess)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, totalBalanceResult.Error);
-            }
-
             profileDto.TotalBalance = totalBalanceResult.Value.TotalAmount;
 
             return StatusCode(StatusCodes.Status200OK, profileDto);
