@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VirtualWallet.DATA.Models.Enums;
+﻿using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Models;
-using Microsoft.AspNetCore.Identity;
 using VirtualWallet.DATA.Helpers;
 
 namespace VirtualWallet.TESTS.BUSINESS.Services

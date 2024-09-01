@@ -26,7 +26,7 @@ namespace VirtualWallet.BUSINESS.Services
             IWalletRepository walletRepository,
             ICardTransactionRepository cardTransactionRepository,
             IWalletTransactionRepository walletTransactionRepository,
-            IPaymentProcessorService paymentProcessorService, 
+            IPaymentProcessorService paymentProcessorService,
             ICurrencyService currencyService,
             IUserService userService,
             IEmailService emailService)
@@ -48,7 +48,7 @@ namespace VirtualWallet.BUSINESS.Services
 
             try
             {
-                var paymentResult = await _paymentProcessorService.WithdrawFromRealCardAsync(card.PaymentProcessorToken, amount);
+                Result paymentResult = await _paymentProcessorService.WithdrawFromRealCardAsync(card.PaymentProcessorToken, amount);
                 if (!paymentResult.IsSuccess)
                 {
                     return Result<CardTransaction>.Failure("Failed to withdraw funds from the real card.");
@@ -56,7 +56,7 @@ namespace VirtualWallet.BUSINESS.Services
 
                 wallet.Balance += amount;
 
-                var cardTransaction = new CardTransaction
+                CardTransaction cardTransaction = new CardTransaction
                 {
                     User = card.User,
                     UserId = card.UserId,
@@ -99,13 +99,13 @@ namespace VirtualWallet.BUSINESS.Services
 
                 wallet.Balance -= amount + feeAmmount;
 
-                var paymentResult = await _paymentProcessorService.DepositToRealCardAsync(card.PaymentProcessorToken, amount);
+                Result paymentResult = await _paymentProcessorService.DepositToRealCardAsync(card.PaymentProcessorToken, amount);
                 if (!paymentResult.IsSuccess)
                 {
                     return Result<CardTransaction>.Failure("Failed to deposit funds to the real card.");
                 }
 
-                var cardTransaction = new CardTransaction
+                CardTransaction cardTransaction = new CardTransaction
                 {
                     UserId = card.UserId,
                     User = card.User,
@@ -116,7 +116,7 @@ namespace VirtualWallet.BUSINESS.Services
                     TransactionType = TransactionType.Withdrawal,
                     Status = TransactionStatus.Completed,
                     Fee = feeAmmount,
-                    
+
                 };
 
                 await _cardTransactionRepository.AddCardTransactionAsync(cardTransaction);
@@ -145,21 +145,21 @@ namespace VirtualWallet.BUSINESS.Services
             {
                 decimal recipientAmount = amount;
 
-                if(recipientWallet.Currency != senderWallet.Currency)
+                if (recipientWallet.Currency != senderWallet.Currency)
                 {
-                    var result = await _currencyService.GetRatesForCurrencyAsync(senderWallet.Currency);
-                    if(!result.IsSuccess)
+                    Result<CurrencyExchangeRatesResponse> result = await _currencyService.GetRatesForCurrencyAsync(senderWallet.Currency);
+                    if (!result.IsSuccess)
                     {
                         return Result<int>.Failure(result.Error);
                     }
                     CurrencyExchangeRatesResponse rates = result.Value;
 
-                    var rate = GetRate(rates, recipientWallet.Currency);
+                    decimal rate = GetRate(rates, recipientWallet.Currency);
 
                     recipientAmount = amount * rate;
                 }
 
-                var walletTransaction = new WalletTransaction
+                WalletTransaction walletTransaction = new WalletTransaction
                 {
                     SenderId = senderWallet.Id,
                     RecipientId = recipientWallet.Id,
@@ -171,20 +171,20 @@ namespace VirtualWallet.BUSINESS.Services
                     VerificationCode = GenerateVerificationCode()
                 };
 
-                var transactionId = await _walletTransactionRepository.AddWalletTransactionAsync(walletTransaction);
+                int transactionId = await _walletTransactionRepository.AddWalletTransactionAsync(walletTransaction);
 
                 _context.SaveChanges();
 
                 await transaction.CommitAsync();
 
-                var userResult = await _userService.GetUserByIdAsync(recipientWallet.UserId);
+                Result<User> userResult = await _userService.GetUserByIdAsync(recipientWallet.UserId);
 
-                if(!userResult.IsSuccess)
+                if (!userResult.IsSuccess)
                 {
                     throw new Exception(userResult.Error);
                 }
 
-                var emailResult = await _emailService.SendPaymentVerificationEmailAsync(userResult.Value, walletTransaction.VerificationCode);
+                Result emailResult = await _emailService.SendPaymentVerificationEmailAsync(userResult.Value, walletTransaction.VerificationCode);
 
                 if (!emailResult.IsSuccess)
                 {
@@ -217,16 +217,16 @@ namespace VirtualWallet.BUSINESS.Services
 
                 await transaction.CommitAsync();
 
-                var userResult = await _userService.GetUserByIdAsync(recipientWallet.UserId);
+                Result<User> userResult = await _userService.GetUserByIdAsync(recipientWallet.UserId);
 
                 if (!userResult.IsSuccess)
                 {
                     throw new Exception(userResult.Error);
                 }
 
-                var emailResult = await _emailService.SendEmailAsync(
-                    userResult.Value.Email, 
-                    "Money Deposit", 
+                Result emailResult = await _emailService.SendEmailAsync(
+                    userResult.Value.Email,
+                    "Money Deposit",
                     $"You have successfully received {walletTransaction.DepositedAmount} {walletTransaction.Currency} from {senderWallet.Name}");
 
                 if (!emailResult.IsSuccess)
@@ -246,7 +246,7 @@ namespace VirtualWallet.BUSINESS.Services
 
         private decimal GetRate(CurrencyExchangeRatesResponse response, CurrencyType currencyType)
         {
-            string currencyKey = currencyType.ToString(); 
+            string currencyKey = currencyType.ToString();
 
             if (response.Data.TryGetValue(currencyKey, out decimal rate))
             {

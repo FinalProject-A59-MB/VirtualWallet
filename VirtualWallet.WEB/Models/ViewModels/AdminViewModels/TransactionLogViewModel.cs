@@ -1,5 +1,4 @@
-﻿using VirtualWallet.DATA.Models;
-using VirtualWallet.WEB.Models.ViewModels.CardViewModels;
+﻿using VirtualWallet.WEB.Models.ViewModels.CardViewModels;
 using VirtualWallet.WEB.Models.ViewModels.WalletViewModels;
 
 namespace VirtualWallet.WEB.Models.ViewModels.AdminViewModels

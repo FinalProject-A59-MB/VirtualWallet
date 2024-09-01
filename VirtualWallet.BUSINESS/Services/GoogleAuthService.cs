@@ -1,19 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Security.Claims;
 using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Helpers;
 using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Services.Contracts;
-using System.IdentityModel.Tokens.Jwt;
-using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication;
-using Twilio.Http;
 
 namespace VirtualWallet.BUSINESS.Services
 {
@@ -42,19 +34,19 @@ namespace VirtualWallet.BUSINESS.Services
                 return Result<string>.Failure("An error occurred while logging in with Google. Please try again.");
             }
 
-            var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
-            var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            IEnumerable<Claim> claims = result.Principal.Identities.FirstOrDefault()?.Claims;
+            string email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
 
             if (email == null)
             {
                 return Result<string>.Failure("Unable to retrieve email from Google. Please try again.");
             }
 
-            var existingUser = await _userService.GetUserByEmailAsync(email);
+            Result<User> existingUser = await _userService.GetUserByEmailAsync(email);
 
             if (existingUser.Value != null)
             {
-                var token = _authService.GenerateToken(existingUser.Value);
+                string token = _authService.GenerateToken(existingUser.Value);
                 return Result<string>.Success(token);
             }
 
@@ -69,21 +61,21 @@ namespace VirtualWallet.BUSINESS.Services
                 return Result<User>.Failure("An error occurred while registering with Google. Please try again.");
             }
 
-            var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
-            var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-            var firstName = claims?.FirstOrDefault(c => c.Type == ClaimTypes.GivenName)?.Value;
-            var lastName = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Surname)?.Value;
+            IEnumerable<Claim> claims = result.Principal.Identities.FirstOrDefault()?.Claims;
+            string email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            string firstName = claims?.FirstOrDefault(c => c.Type == ClaimTypes.GivenName)?.Value;
+            string lastName = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Surname)?.Value;
 
             if (email == null)
             {
                 return Result<User>.Failure("Unable to retrieve email from Google. Please try again.");
             }
 
-            var existingUser = await _userService.GetUserByEmailAsync(email);
+            Result<User> existingUser = await _userService.GetUserByEmailAsync(email);
 
             if (existingUser.Value == null)
             {
-                var user = new User
+                User user = new User
                 {
                     Email = email,
                     Username = email,
@@ -97,7 +89,7 @@ namespace VirtualWallet.BUSINESS.Services
                     VerificationStatus = UserVerificationStatus.NotVerified
                 };
 
-                var registerResult = await _userService.RegisterUserAsync(user);
+                Result<User> registerResult = await _userService.RegisterUserAsync(user);
 
                 if (!registerResult.IsSuccess)
                 {

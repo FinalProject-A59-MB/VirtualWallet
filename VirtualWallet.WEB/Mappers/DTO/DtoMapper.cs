@@ -1,5 +1,4 @@
 ﻿using VirtualWallet.DATA.Models;
-using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.WEB.Models.DTOs.AuthDTOs;
 using VirtualWallet.WEB.Models.DTOs.CardDTOs;
 using VirtualWallet.WEB.Models.DTOs.UserDTOs;

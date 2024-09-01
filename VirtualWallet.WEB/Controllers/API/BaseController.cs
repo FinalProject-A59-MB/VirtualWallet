@@ -1,13 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
+﻿using Microsoft.AspNetCore.Mvc;
 using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.DATA.Models;
 
 namespace VirtualWallet.WEB.Controllers.API
 {
     [ApiController]
-    public abstract class BaseApiController : ControllerBase
+    public abstract class BaseController : ControllerBase
     {
         protected User CurrentUser => HttpContext.Items["CurrentUser"] as User;
 
@@ -19,7 +17,6 @@ namespace VirtualWallet.WEB.Controllers.API
 
                 if (result != null && !result.IsSuccess)
                 {
-                    // Respond with a 403 Forbidden status and the error message
                     return new ObjectResult(new { Error = result.Error })
                     {
                         StatusCode = StatusCodes.Status403Forbidden
@@ -27,7 +24,7 @@ namespace VirtualWallet.WEB.Controllers.API
                 }
             }
 
-            return null; // Return null if authorization is successful or not applicable
+            return null; 
         }
     }
 }

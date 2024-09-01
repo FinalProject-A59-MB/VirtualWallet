@@ -3,13 +3,7 @@ using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Repositories.Contracts;
 using VirtualWallet.BUSINESS.Resources;
-using VirtualWallet.DATA.Repositories;
-using System.Transactions;
 using VirtualWallet.DATA.Models.Enums;
-using Newtonsoft.Json.Linq;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace VirtualWallet.BUSINESS.Services
 {
@@ -36,28 +30,28 @@ namespace VirtualWallet.BUSINESS.Services
         }
         public async Task<Result<CardTransaction>> DepositAsync(int cardId, int walletId, decimal amount)
         {
-            var cardResult = await _cardRepository.GetCardByIdAsync(cardId);
+            Card cardResult = await _cardRepository.GetCardByIdAsync(cardId);
             if (cardResult == null)
                 return Result<CardTransaction>.Failure(ErrorMessages.CardNotFound);
 
-            var walletResult = await _walletRepository.GetWalletByIdAsync(walletId);
+            Wallet walletResult = await _walletRepository.GetWalletByIdAsync(walletId);
             if (walletResult == null)
                 return Result<CardTransaction>.Failure(ErrorMessages.WalletNotFound);
 
             if (amount <= 0)
                 return Result<CardTransaction>.Failure(ErrorMessages.InvalidDepositAmount);
 
-            var transactionResult = await _transactionHandlingService.ProcessCardToWalletTransactionAsync(cardResult, walletResult, amount);
+            Result<CardTransaction> transactionResult = await _transactionHandlingService.ProcessCardToWalletTransactionAsync(cardResult, walletResult, amount);
             return transactionResult;
         }
 
         public async Task<Result<CardTransaction>> WithdrawAsync(int walletId, int cardId, decimal amount)
         {
-            var walletResult = await _walletRepository.GetWalletByIdAsync(walletId);
+            Wallet walletResult = await _walletRepository.GetWalletByIdAsync(walletId);
             if (walletResult == null)
                 return Result<CardTransaction>.Failure(ErrorMessages.WalletNotFound);
 
-            var cardResult = await _cardRepository.GetCardByIdAsync(cardId);
+            Card cardResult = await _cardRepository.GetCardByIdAsync(cardId);
             if (cardResult == null)
                 return Result<CardTransaction>.Failure(ErrorMessages.CardNotFound);
 
@@ -69,20 +63,20 @@ namespace VirtualWallet.BUSINESS.Services
             // Calculate the fee and the actual amount to withdraw
             if (cardResult.Currency != walletResult.Currency)
             {
-                var feeCalculationResult = await CalculateFeeAsync(amount, walletResult.Currency, cardResult.Currency);
+                Result<Dictionary<string,decimal>> feeCalculationResult = await CalculateFeeAsync(amount, walletResult.Currency, cardResult.Currency);
                 if (!feeCalculationResult.IsSuccess)
                     return Result<CardTransaction>.Failure(feeCalculationResult.Error);
-                var feeAndAmount = feeCalculationResult.Value;
+                Dictionary<string, decimal> feeAndAmount = feeCalculationResult.Value;
                 amountToWithdraw = feeAndAmount["amountToWithdraw"];
                 feeAmount = feeAndAmount["feeAmount"];
             }
 
-            var totalAmountToWithdraw = amountToWithdraw + feeAmount;
+            decimal totalAmountToWithdraw = amountToWithdraw + feeAmount;
 
             if (walletResult.Balance < totalAmountToWithdraw)
                 return Result<CardTransaction>.Failure(ErrorMessages.InsufficientWalletFunds);
 
-            var transactionResult = await _transactionHandlingService.ProcessWalletToCardTransactionAsync(walletResult, cardResult, amountToWithdraw, feeAmount);
+            Result<CardTransaction> transactionResult = await _transactionHandlingService.ProcessWalletToCardTransactionAsync(walletResult, cardResult, amountToWithdraw, feeAmount);
             if (!transactionResult.IsSuccess)
             {
                 return Result<CardTransaction>.Failure(transactionResult.Error);
@@ -99,7 +93,7 @@ namespace VirtualWallet.BUSINESS.Services
 
         public async Task<Result<Dictionary<string, decimal>>> CalculateFeeAsync(decimal amount, CurrencyType fromCurrency, CurrencyType toCurrency)
         {
-            var exchangeRateResult = await _currencyService.GetRatesForCurrencyAsync(fromCurrency);
+            Result<Responses.CurrencyExchangeRatesResponse> exchangeRateResult = await _currencyService.GetRatesForCurrencyAsync(fromCurrency);
 
             if (!exchangeRateResult.IsSuccess)
             {
@@ -117,13 +111,13 @@ namespace VirtualWallet.BUSINESS.Services
             
 
             // Calculate the amount in the target currency
-            var amountInTargetCurrency = amount * exchangeRate;
+            decimal amountInTargetCurrency = amount * exchangeRate;
 
             // Calculate the fee based on the target currency
             decimal feePercentage = (int)toCurrency / 100m;
-            var feeAmount = amountInTargetCurrency * feePercentage;
+            decimal feeAmount = amountInTargetCurrency * feePercentage;
 
-            var result = new Dictionary<string, decimal>
+            Dictionary<string, decimal> result = new Dictionary<string, decimal>
                 {
                     { "amountToWithdraw", amountInTargetCurrency - feeAmount }, 
                     { "feeAmount", feeAmount }
@@ -137,7 +131,7 @@ namespace VirtualWallet.BUSINESS.Services
 
         public async Task<Result<IEnumerable<CardTransaction>>> FilterCardTransactionsAsync(CardTransactionQueryParameters parameters)
         {
-            var query = await _cardTransactionRepository.GetAllCardTransactionsAsync();
+            IEnumerable<CardTransaction> query = await _cardTransactionRepository.GetAllCardTransactionsAsync();
 
             if (parameters.CardId > 0)
             {
@@ -171,7 +165,7 @@ namespace VirtualWallet.BUSINESS.Services
 
             if (!string.IsNullOrEmpty(parameters.SortBy))
             {
-                var sortOrder = parameters.SortOrder?.ToLower() == "asc" ? true : false;
+                bool sortOrder = parameters.SortOrder?.ToLower() == "asc" ? true : false;
 
                 switch (parameters.SortBy)
                 {
@@ -185,10 +179,10 @@ namespace VirtualWallet.BUSINESS.Services
                 }
             }
 
-            var skip = (parameters.PageNumber - 1) * parameters.PageSize;
+            int skip = (parameters.PageNumber - 1) * parameters.PageSize;
             query = query.Skip(skip).Take(parameters.PageSize);
 
-            var transactions = query;
+            IEnumerable < CardTransaction > transactions = query;
 
             return transactions.Any()
                 ? Result<IEnumerable<CardTransaction>>.Success(transactions)
@@ -197,7 +191,7 @@ namespace VirtualWallet.BUSINESS.Services
 
         public async Task<Result<int>> GetCardTransactionTotalCountAsync(CardTransactionQueryParameters filterParameters)
         {
-            var transactions = await _cardTransactionRepository.GetAllCardTransactionsAsync();
+            IEnumerable < CardTransaction > transactions = await _cardTransactionRepository.GetAllCardTransactionsAsync();
 
             if (filterParameters.CardId > 0)
             {
@@ -229,7 +223,7 @@ namespace VirtualWallet.BUSINESS.Services
                 transactions = transactions.Where(t => t.CreatedAt <= filterParameters.CreatedBefore.Value);
             }
 
-            var count = transactions.Count();
+            int count = transactions.Count();
 
             return count != 0
                 ? Result<int>.Success(count)

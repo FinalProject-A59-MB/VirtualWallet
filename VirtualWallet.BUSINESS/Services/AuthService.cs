@@ -9,7 +9,6 @@ using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Helpers;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Repositories.Contracts;
-using VirtualWallet.DATA.Services.Contracts;
 
 namespace VirtualWallet.BUSINESS.Services
 {
@@ -37,13 +36,13 @@ namespace VirtualWallet.BUSINESS.Services
 
         public async Task<Result> ResetPasswordAsync(string email, string token, string newPassword)
         {
-            var validateTokenResult = ValidateToken(token);
+            Result<bool> validateTokenResult = ValidateToken(token);
             if (!validateTokenResult.IsSuccess)
             {
                 return Result.Failure(validateTokenResult.Error);
             }
 
-            var user = await _userRepository.GetUserByEmailAsync(email);
+            User user = await _userRepository.GetUserByEmailAsync(email);
             if (user==null)
             {
                 return Result.Failure("Invalid email.");
@@ -58,11 +57,11 @@ namespace VirtualWallet.BUSINESS.Services
 
         public string GenerateToken(User user)
         {
-            var jwtSettings = _configuration.GetSection("Jwt");
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            IConfigurationSection jwtSettings = _configuration.GetSection("Jwt");
+            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
+            SigningCredentials creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var claims = new List<Claim>
+            List<Claim> claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Username),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
@@ -70,7 +69,7 @@ namespace VirtualWallet.BUSINESS.Services
                 new Claim(ClaimTypes.Name, user.Username)
             };
 
-            var token = new JwtSecurityToken(
+            JwtSecurityToken token = new JwtSecurityToken(
                 issuer: jwtSettings["Issuer"],
                 audience: jwtSettings["Audience"],
                 claims: claims,
@@ -82,9 +81,9 @@ namespace VirtualWallet.BUSINESS.Services
 
         public Result<bool> ValidateToken(string token)
         {
-            var jwtSettings = _configuration.GetSection("Jwt");
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+            IConfigurationSection jwtSettings = _configuration.GetSection("Jwt");
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            byte[] key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
             try
             {
@@ -110,13 +109,13 @@ namespace VirtualWallet.BUSINESS.Services
 
         public Result<int> GetUserIdFromToken(string token)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var jwtSettings = _configuration.GetSection("Jwt");
-            var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            IConfigurationSection jwtSettings = _configuration.GetSection("Jwt");
+            byte[] key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
             try
             {
-                var tokenValidationParameters = new TokenValidationParameters
+                TokenValidationParameters tokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
@@ -130,13 +129,13 @@ namespace VirtualWallet.BUSINESS.Services
 
                 tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken validatedToken);
 
-                var jwtToken = validatedToken as JwtSecurityToken;
+                JwtSecurityToken jwtToken = validatedToken as JwtSecurityToken;
                 if (jwtToken == null)
                 {
                     return Result<int>.Failure("Invalid token format");
                 }
 
-                var userIdClaim = jwtToken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
+                Claim userIdClaim = jwtToken.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier);
                 if (userIdClaim == null)
                 {
                     return Result<int>.Failure("Token does not contain user ID claim");

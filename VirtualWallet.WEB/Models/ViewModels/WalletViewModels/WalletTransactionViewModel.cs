@@ -1,5 +1,4 @@
-﻿using Twilio.Rest.Video.V1.Room.Participant;
-using VirtualWallet.DATA.Models.Enums;
+﻿using VirtualWallet.DATA.Models.Enums;
 
 namespace VirtualWallet.WEB.Models.ViewModels.WalletViewModels
 {

@@ -18,7 +18,7 @@ namespace VirtualWallet.BUSINESS.Services
 
         public async Task<Result<string>> VerifyAndRetrieveTokenAsync(Card card)
         {
-            var realCard = await _realCardRepository.GetByCardNumberAsync(card.CardNumber);
+            RealCard realCard = await _realCardRepository.GetByCardNumberAsync(card.CardNumber);
 
             if (realCard == null)
                 return Result<string>.Failure(ErrorMessages.RealCardNotFound);
@@ -37,7 +37,7 @@ namespace VirtualWallet.BUSINESS.Services
 
         public async Task<Result<CurrencyType>> GetCardCurrency(string paymentProcessorToken)
         {
-            var realCard = await _realCardRepository.GetByPaymentProcessorTokenAsync(paymentProcessorToken);
+            RealCard realCard = await _realCardRepository.GetByPaymentProcessorTokenAsync(paymentProcessorToken);
 
             if (realCard == null)
                 return Result<CurrencyType>.Failure(ErrorMessages.RealCardNotFound);
@@ -47,7 +47,7 @@ namespace VirtualWallet.BUSINESS.Services
 
         public async Task<Result> WithdrawFromRealCardAsync(string paymentProcessorToken, decimal amount)
         {
-            var realCard = await _realCardRepository.GetByPaymentProcessorTokenAsync(paymentProcessorToken);
+            RealCard realCard = await _realCardRepository.GetByPaymentProcessorTokenAsync(paymentProcessorToken);
 
             if (realCard == null)
                 return Result.Failure(ErrorMessages.RealCardTokenNotFound);
@@ -63,7 +63,7 @@ namespace VirtualWallet.BUSINESS.Services
 
         public async Task<Result> DepositToRealCardAsync(string paymentProcessorToken, decimal amount)
         {
-            var realCard = await _realCardRepository.GetByPaymentProcessorTokenAsync(paymentProcessorToken);
+            RealCard realCard = await _realCardRepository.GetByPaymentProcessorTokenAsync(paymentProcessorToken);
 
             if (realCard == null)
                 return Result.Failure(ErrorMessages.RealCardTokenNotFound);
