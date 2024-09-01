@@ -14,11 +14,9 @@ namespace VirtualWallet.WEB.Controllers.API
             _userWalletService = userWalletService;
         }
 
-
-        [HttpGet]
+        [HttpGet("byUserId/{userId}")]
         public async Task<IActionResult> GetUserWalletsByUserId(int userId)
         {
-            
             var result = await _userWalletService.GetUserWalletsByUserIdAsync(userId);
 
             if (!result.IsSuccess)
@@ -29,7 +27,7 @@ namespace VirtualWallet.WEB.Controllers.API
             return Ok(result);
         }
 
-        [HttpGet]
+        [HttpGet("byWalletId/{walletId}")]
         public async Task<IActionResult> GetUserWalletByWalletId(int walletId)
         {
             var result = await _userWalletService.GetUserWalletByWalletIdAsync(walletId);

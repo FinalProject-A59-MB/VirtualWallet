@@ -13,7 +13,7 @@ using VirtualWallet.BUSINESS.Results;
 
 namespace VirtualWallet.WEB.Controllers.API
 {
-    [Route("api/Authentication")]
+    [Route("api/authentication")]
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
@@ -62,7 +62,7 @@ namespace VirtualWallet.WEB.Controllers.API
             }
 
             string token = _authService.GenerateToken(registerResult.Value);
-            string verificationLink = Url.Action("VerifyEmail", "AuthenticationApi", new { token }, Request.Scheme);
+            string verificationLink = Url.Action("VerifyEmail", "Authentication", new { token }, Request.Scheme);
             string emailContent = $"Please verify your email by clicking <a href='{verificationLink}'>here</a>.";
             await _emailService.SendEmailAsync(registerResult.Value.Email, "Email Verification", emailContent);
 
@@ -116,7 +116,7 @@ namespace VirtualWallet.WEB.Controllers.API
             }
 
             string token = _authService.GenerateToken(userResult.Value);
-            string resetLink = Url.Action("ResetPassword", "AuthenticationApi", new { token, email = model.Email }, Request.Scheme);
+            string resetLink = Url.Action("ResetPassword", "Authentication", new { token, email = model.Email }, Request.Scheme);
             string emailContent = $"You can reset your password by clicking <a href='{resetLink}'>here</a>.";
 
             await _emailService.SendEmailAsync(model.Email, "Password Reset", emailContent);
@@ -152,7 +152,7 @@ namespace VirtualWallet.WEB.Controllers.API
         [HttpPost("googleLogin")]
         public IActionResult GoogleLogin()
         {
-            AuthenticationProperties properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleLoginResponse", "AuthenticationApi") };
+            AuthenticationProperties properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleLoginResponse", "Authentication") };
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
 
@@ -190,7 +190,7 @@ namespace VirtualWallet.WEB.Controllers.API
         [HttpPost("googleRegister")]
         public IActionResult GoogleRegister()
         {
-            AuthenticationProperties properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleRegisterResponse", "AuthenticationApi") };
+            AuthenticationProperties properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleRegisterResponse", "Authentication") };
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
 
@@ -237,7 +237,7 @@ namespace VirtualWallet.WEB.Controllers.API
                     }
 
                     string token = _authService.GenerateToken(registerResult.Value);
-                    string verificationLink = Url.Action("VerifyEmail", "AuthenticationApi", new { token }, Request.Scheme);
+                    string verificationLink = Url.Action("VerifyEmail", "Authentication", new { token }, Request.Scheme);
                     string emailContent = $"Please verify your email by clicking <a href='{verificationLink}'>here</a>.";
                     await _emailService.SendEmailAsync(user.Email, "Email Verification", emailContent);
 
