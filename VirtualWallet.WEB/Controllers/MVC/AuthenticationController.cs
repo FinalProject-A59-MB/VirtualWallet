@@ -11,6 +11,7 @@ using VirtualWallet.DATA.Helpers;
 using VirtualWallet.WEB.Controllers.MVC;
 using VirtualWallet.WEB.Models.ViewModels.AuthenticationViewModels;
 using VirtualWallet.BUSINESS.Services;
+using VirtualWallet.BUSINESS.Results;
 
 namespace ForumProject.Controllers.MVC
 {
@@ -59,7 +60,8 @@ namespace ForumProject.Controllers.MVC
                 return View(model);
             }
 
-            var token = _authService.GenerateToken(authResult.Value);
+
+            string token = _authService.GenerateToken(authResult.Value);
             HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
             return RedirectToAction("Index", "Home");
         }
@@ -67,15 +69,15 @@ namespace ForumProject.Controllers.MVC
 
         public IActionResult GoogleLogin()
         {
-            var properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleLoginResponse") };
+            AuthenticationProperties properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleLoginResponse") };
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
 
         public async Task<IActionResult> GoogleLoginResponse()
         {
-            var authenticateResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            AuthenticateResult authenticateResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            var result = await _googleAuthService.ProcessGoogleLoginResponse(authenticateResult);
+            Result<string> result = await _googleAuthService.ProcessGoogleLoginResponse(authenticateResult);
 
             if (!result.IsSuccess)
             {
@@ -91,15 +93,15 @@ namespace ForumProject.Controllers.MVC
 
         public IActionResult GoogleRegister()
         {
-            var properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleRegisterResponse") };
+            AuthenticationProperties properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleRegisterResponse") };
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
 
         public async Task<IActionResult> GoogleRegisterResponse()
         {
-            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            AuthenticateResult result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
-            var registerResult = await _googleAuthService.ProcessGoogleRegisterResponseWithoutUrl(result);
+            Result<User> registerResult = await _googleAuthService.ProcessGoogleRegisterResponseWithoutUrl(result);
 
             if (!registerResult.IsSuccess)
             {
@@ -107,10 +109,10 @@ namespace ForumProject.Controllers.MVC
                 return RedirectToAction("Register", "Authentication");
             }
 
-            var token = _authService.GenerateToken(registerResult.Value);
+            string token = _authService.GenerateToken(registerResult.Value);
             HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
 
-            var verificationLink = Url.Action("VerifyEmail", "Authentication", new { token = token }, Request.Scheme);
+            string verificationLink = Url.Action("VerifyEmail", "Authentication", new { token = token }, Request.Scheme);
             await _emailService.SendVerificationEmailAsync(registerResult.Value, verificationLink);
 
             return RedirectToAction("Index", "Home");
@@ -131,8 +133,8 @@ namespace ForumProject.Controllers.MVC
                 return View(model);
             }
 
-            var userRequest = _viewModelMapper.ToUser(model);
-            var registerResult = await _userService.RegisterUserAsync(userRequest);
+            User userRequest = _viewModelMapper.ToUser(model);
+            Result<User> registerResult = await _userService.RegisterUserAsync(userRequest);
 
             if (!registerResult.IsSuccess)
             {
@@ -141,8 +143,8 @@ namespace ForumProject.Controllers.MVC
             }
 
 
-            var token = _authService.GenerateToken(registerResult.Value);
-            var verificationLink = Url.Action("VerifyEmail", "Authentication", new { token = token }, Request.Scheme);
+            string token = _authService.GenerateToken(registerResult.Value);
+            string verificationLink = Url.Action("VerifyEmail", "Authentication", new { token = token }, Request.Scheme);
 
             var result = await _emailService.SendVerificationEmailAsync(registerResult.Value, verificationLink);
             if (result.IsSuccess)
@@ -159,13 +161,13 @@ namespace ForumProject.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> ResendVerificationEmail(int id)
         {
-            var userResult = await _userService.GetUserByIdAsync(id);
+            Result<User> userResult = await _userService.GetUserByIdAsync(id);
             if (!userResult.IsSuccess)
             {
                 TempData["ErrorMessage"] = userResult.Error;
                 return RedirectToAction("Index", "Home");
             }
-            var token = _authService.GenerateToken(userResult.Value);
+            string token = _authService.GenerateToken(userResult.Value);
             var verificationLink = Url.Action("VerifyEmail", "Authentication", new { token = token }, Request.Scheme);
 
             var result = await _emailService.SendVerificationEmailAsync(userResult.Value, verificationLink);
@@ -180,21 +182,21 @@ namespace ForumProject.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> VerifyEmail(string token)
         {
-            var validateToken = _authService.ValidateToken(token);
+            Result<bool> validateToken = _authService.ValidateToken(token);
             if (!validateToken.IsSuccess)
             {
                 TempData["ErrorMessage"] = validateToken.Error;
                 return View("EmailVerification", false);
             }
 
-            var userId = _authService.GetUserIdFromToken(token);
+            Result<int> userId = _authService.GetUserIdFromToken(token);
             if (!userId.IsSuccess)
             {
                 TempData["ErrorMessage"] = userId.Error;
                 return View("EmailVerification", false);
             }
 
-            var userResult = await _userService.GetUserByIdAsync(userId.Value);
+            Result<User> userResult = await _userService.GetUserByIdAsync(userId.Value);
 
             if (!userResult.IsSuccess)
             {
@@ -202,7 +204,7 @@ namespace ForumProject.Controllers.MVC
                 return View("EmailVerification", false);
             }
 
-            var user = userResult.Value;
+            User user = userResult.Value;
             user.Role = UserRole.EmailVerifiedUser;
             var updateResult = await _userService.UpdateUserAsync(user);
 
@@ -212,7 +214,7 @@ namespace ForumProject.Controllers.MVC
                 return View("EmailVerification", false);
             }
 
-            var newToken = _authService.GenerateToken(user);
+            string newToken = _authService.GenerateToken(user);
             HttpContext.Response.Cookies.Append("jwt", newToken, new CookieOptions { HttpOnly = true });
 
             return View("EmailVerification", true);
@@ -247,10 +249,10 @@ namespace ForumProject.Controllers.MVC
 
             if (userResult.IsSuccess)
             {
-                var user = userResult.Value;
-                var token = _authService.GenerateToken(user);
+                User user = userResult.Value;
+                string token = _authService.GenerateToken(user);
 
-                var resetLink = Url.Action("ResetPassword", "Authentication", new { token, email = model.Email }, Request.Scheme);
+                string resetLink = Url.Action("ResetPassword", "Authentication", new { token, email = model.Email }, Request.Scheme);
                 var emailResult = await _emailService.SendPasswordResetEmailAsync(user, resetLink);
 
                 if (emailResult.IsSuccess)
@@ -275,7 +277,7 @@ namespace ForumProject.Controllers.MVC
         [HttpGet]
         public IActionResult ResetPassword(string token, string email)
         {
-            var model = new ResetPasswordViewModel { Token = token, Email = email };
+            ResetPasswordViewModel model = new ResetPasswordViewModel { Token = token, Email = email };
             return View(model);
         }
 

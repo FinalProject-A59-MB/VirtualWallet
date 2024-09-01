@@ -8,6 +8,7 @@ using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Services.Contracts;
 using VirtualWallet.WEB.Models.ViewModels.CardViewModels;
+using VirtualWallet.WEB.Models.ViewModels.UserViewModels;
 
 namespace VirtualWallet.WEB.Controllers.MVC
 {
@@ -43,7 +44,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
         [HttpGet]
         public IActionResult AddCard(int userId)
         {
-            var model = new CardViewModel { UserId = userId };
+            CardViewModel model = new CardViewModel { UserId = userId };
             return View("AddCard", model);
         }
 
@@ -55,16 +56,16 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 return View(model);
             }
 
-            var card = _viewModelMapper.ToCard(model);
+            Card card = _viewModelMapper.ToCard(model);
 
-            var tokenResult = await _paymentProcessorService.VerifyAndRetrieveTokenAsync(card);
+            Result<string> tokenResult = await _paymentProcessorService.VerifyAndRetrieveTokenAsync(card);
 
             if (!tokenResult.IsSuccess)
             {
                 TempData["ErrorMessage"] = tokenResult.Error;
                 return View("AddCard", model);
             }
-            var currency = await _paymentProcessorService.GetCardCurrency(tokenResult.Value);
+            Result<CurrencyType> currency = await _paymentProcessorService.GetCardCurrency(tokenResult.Value);
             card.Currency = currency.Value;
             card.PaymentProcessorToken = tokenResult.Value;
 
@@ -82,7 +83,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> DeleteCard(int cardId)
         {
-            var cardResult = await _cardService.GetCardByIdAsync(cardId);
+            Result<Card> cardResult = await _cardService.GetCardByIdAsync(cardId);
 
             if (!cardResult.IsSuccess)
             {
@@ -90,7 +91,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 return RedirectToAction("Profile", "User");
             }
 
-            var model = _viewModelMapper.ToCardViewModel(cardResult.Value);
+            CardViewModel model = _viewModelMapper.ToCardViewModel(cardResult.Value);
             return View(model);
         }
 
@@ -111,15 +112,15 @@ namespace VirtualWallet.WEB.Controllers.MVC
         [RequireAuthorization]
         public async Task<IActionResult> Cards()
         {
-            var viewModel = _viewModelMapper.ToUserViewModel(CurrentUser);
+            UserViewModel viewModel = _viewModelMapper.ToUserViewModel(CurrentUser);
 
             return View("UserCardsPartial", viewModel);
         }
 
         public async Task<IActionResult> ViewCard(int cardId)
         {
-            var card = await _cardService.GetCardByIdAsync(cardId);
-            var cardModel = _viewModelMapper.ToCardViewModel(card.Value);
+            Result<Card> card = await _cardService.GetCardByIdAsync(cardId);
+            CardViewModel cardModel = _viewModelMapper.ToCardViewModel(card.Value);
             return View("_CardPartial", cardModel);
         }
 
@@ -133,7 +134,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 TempData["InfoMessage"] = "Currently you do not have any cards. You will first need to add a card.";
                 return RedirectToAction("AddCard", "Card");
             }
-            var model = new CardTransactionViewModel
+            CardTransactionViewModel model = new CardTransactionViewModel
             {
                 ActionTitle = "Deposit Money",
                 FormAction = "ConfirmDeposit",
@@ -157,13 +158,13 @@ namespace VirtualWallet.WEB.Controllers.MVC
 
             var card = await _cardService.GetCardByIdAsync(model.CardId);
             var wallet = await _walletService.GetWalletByIdAsync(model.WalletId);
-            var amountToDeposit = model.Amount;
+            decimal amountToDeposit = model.Amount;
             decimal fee = 0;
 
             var feeResult = await _cardTransactionService.CalculateFeeAsync(model.Amount, card.Value.Currency, wallet.Value.Currency);
             if (feeResult.IsSuccess)
             {
-                var exchangeResult = feeResult.Value;
+                Dictionary<string,decimal> exchangeResult = feeResult.Value;
                 amountToDeposit = exchangeResult["amountToWithdraw"];
                 fee = exchangeResult["feeAmount"];
             }
@@ -188,7 +189,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 return View("CardTransactionFormPartial", model);
             }
 
-            var result = await _cardTransactionService.DepositAsync(model.CardId, model.WalletId, model.Amount);
+            Result<CardTransaction> result = await _cardTransactionService.DepositAsync(model.CardId, model.WalletId, model.Amount);
 
             if (result.IsSuccess)
             {
@@ -211,7 +212,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 TempData["InfoMessage"] = "Currently you do not have any cards. You will first need to add a card.";
                 return RedirectToAction("AddCard", "Card");
             }
-            var model = new CardTransactionViewModel
+            CardTransactionViewModel model = new CardTransactionViewModel
             {
                 ActionTitle = "Withdraw Money",
                 FormAction = "ConfirmWithdraw",
@@ -232,15 +233,15 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 model.Type = TransactionType.Withdrawal;
                 return View("CardTransactionFormPartial", model);
             }
-            var card = await _cardService.GetCardByIdAsync(model.CardId);
-            var wallet = await _walletService.GetWalletByIdAsync(model.WalletId);
+            Result<Card> card = await _cardService.GetCardByIdAsync(model.CardId);
+            Result<Wallet> wallet = await _walletService.GetWalletByIdAsync(model.WalletId);
 
-            var amountToWithdraw = model.Amount;
+            decimal amountToWithdraw = model.Amount;
             decimal fee = 0;
-            var feeResult = await _cardTransactionService.CalculateFeeAsync(model.Amount, wallet.Value.Currency, card.Value.Currency);
+            Result<Dictionary<string,decimal>> feeResult = await _cardTransactionService.CalculateFeeAsync(model.Amount, wallet.Value.Currency, card.Value.Currency);
             if (feeResult.IsSuccess)
             {
-                var exchangeResult = feeResult.Value;
+                Dictionary<string, decimal> exchangeResult = feeResult.Value;
                 amountToWithdraw = exchangeResult["amountToWithdraw"];
                 fee = exchangeResult["feeAmount"];
             }
@@ -265,7 +266,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 return View("CardTransactionFormPartial", model);
             }
 
-            var result = await _cardTransactionService.WithdrawAsync(model.WalletId, model.CardId, model.Amount);
+            Result<CardTransaction> result = await _cardTransactionService.WithdrawAsync(model.WalletId, model.CardId, model.Amount);
 
             if (result.IsSuccess)
             {

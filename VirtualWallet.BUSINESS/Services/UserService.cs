@@ -27,23 +27,23 @@ namespace VirtualWallet.DATA.Services
 
         public async Task<Result<User>> RegisterUserAsync(User userToRegister)
         {
-            var username = userToRegister.Username;
-            var email = userToRegister.Email;
-            var password = userToRegister.Password;
+            string username = userToRegister.Username;
+            string email = userToRegister.Email;
+            string password = userToRegister.Password;
 
-            var emailValidationResult = EmailValidator.Validate(email);
+            Result emailValidationResult = EmailValidator.Validate(email);
             if (!emailValidationResult.IsSuccess)
             {
                 return Result<User>.Failure(emailValidationResult.Error);
             }
 
-            var passwordValidationResult = PasswordValidator.Validate(password);
+            Result passwordValidationResult = PasswordValidator.Validate(password);
             if (!passwordValidationResult.IsSuccess)
             {
                 return Result<User>.Failure(passwordValidationResult.Error);
             }
 
-            var existingUser = await _userRepository.GetUserByUsernameAsync(username);
+            User existingUser = await _userRepository.GetUserByUsernameAsync(username);
             if (existingUser != null)
             {
                 return Result<User>.Failure("Username already exists.");
@@ -61,7 +61,7 @@ namespace VirtualWallet.DATA.Services
 
             await _userRepository.AddUserAsync(userToRegister);
 
-            var userProfile = new UserProfile
+            UserProfile userProfile = new UserProfile
             {
                 UserId = userToRegister.Id,
                 FirstName = "",
@@ -77,13 +77,13 @@ namespace VirtualWallet.DATA.Services
 
         public async Task<Result<IEnumerable<User>>> GetUsers()
         {
-            var users = await _userRepository.GetAllUsers();
+            IEnumerable<User> users = await _userRepository.GetAllUsers();
             return Result<IEnumerable<User>>.Success(users);
         }
 
         public async Task<Result<User>> GetUserByIdAsync(int userId)
         {
-            var user = await _userRepository.GetUserByIdAsync(userId);
+            User user = await _userRepository.GetUserByIdAsync(userId);
             if (user == null)
             {
                 return Result<User>.Failure("User not found.");
@@ -93,7 +93,7 @@ namespace VirtualWallet.DATA.Services
 
         public async Task<Result<User>> GetUserByUsernameAsync(string userName)
         {
-            var user = await _userRepository.GetUserByUsernameAsync(userName);
+            User user = await _userRepository.GetUserByUsernameAsync(userName);
             if (user == null)
             {
                 return Result<User>.Failure("User not found.");
@@ -103,7 +103,7 @@ namespace VirtualWallet.DATA.Services
 
         public async Task<Result<User>> GetUserByEmailAsync(string userName)
         {
-            var user = await _userRepository.GetUserByEmailAsync(userName);
+            User user = await _userRepository.GetUserByEmailAsync(userName);
             if (user == null)
             {
                 return Result<User>.Failure("User not found.");
@@ -113,7 +113,7 @@ namespace VirtualWallet.DATA.Services
 
         public async Task<Result<UserProfile>> GetUserProfileAsync(int userId)
         {
-            var userProfile = await _userRepository.GetUserProfileAsync(userId);
+            UserProfile userProfile = await _userRepository.GetUserProfileAsync(userId);
             if (userProfile == null)
             {
                 return Result<UserProfile>.Failure("User profile not found.");
@@ -135,7 +135,7 @@ namespace VirtualWallet.DATA.Services
 
         public async Task<Result> DeleteUserAsync(int userId)
         {
-            var user = await _userRepository.GetUserByIdAsync(userId);
+            User user = await _userRepository.GetUserByIdAsync(userId);
             if (user == null)
             {
                 return Result.Failure("User not found.");
@@ -147,14 +147,14 @@ namespace VirtualWallet.DATA.Services
 
         public async Task<Result> SendFriendRequestAsync(int userId, int contactId)
         {
-            var existingRequest = await _userRepository.GetUserContactAsync(userId, contactId);
+            UserContact existingRequest = await _userRepository.GetUserContactAsync(userId, contactId);
 
             if (existingRequest != null)
             {
                 return Result.Failure("Friend request already sent.");
             }
 
-            var senderContact = new UserContact
+            UserContact senderContact = new UserContact
             {
                 UserId = userId,
                 ContactId = contactId,
@@ -163,7 +163,7 @@ namespace VirtualWallet.DATA.Services
                 Status = FriendRequestStatus.Pending
             };
 
-            var receiverContact = new UserContact
+            UserContact receiverContact = new UserContact
             {
                 UserId = contactId,
                 ContactId = userId,
@@ -180,7 +180,7 @@ namespace VirtualWallet.DATA.Services
 
         public async Task<Result> AcceptFriendRequestAsync(int userId, int contactId)
         {
-            var friendRequest = await _userRepository.GetUserContactAsync(contactId, userId);
+            UserContact friendRequest = await _userRepository.GetUserContactAsync(contactId, userId);
 
             if (friendRequest == null || friendRequest.Status != FriendRequestStatus.Pending)
             {
@@ -190,7 +190,7 @@ namespace VirtualWallet.DATA.Services
             friendRequest.Status = FriendRequestStatus.Accepted;
             await _userRepository.UpdateContactAsync(friendRequest);
 
-            var reciprocalFriendRequest = await _userRepository.GetUserContactAsync(userId, contactId);
+            UserContact reciprocalFriendRequest = await _userRepository.GetUserContactAsync(userId, contactId);
 
             if (reciprocalFriendRequest == null)
             {
@@ -217,19 +217,19 @@ namespace VirtualWallet.DATA.Services
 
         public async Task<Result<IEnumerable<UserContact>>> GetPendingFriendRequestsAsync(int userId)
         {
-            var requests = await _userRepository.GetPendingFriendRequestsAsync(userId);
+            IEnumerable<UserContact> requests = await _userRepository.GetPendingFriendRequestsAsync(userId);
             return Result<IEnumerable<UserContact>>.Success(requests);
         }
 
         public async Task<Result<IEnumerable<User>>> GetFriendsAsync(int userId)
         {
-            var friends = await _userRepository.GetUserContactsAsync(userId);
+            List<User> friends = await _userRepository.GetUserContactsAsync(userId);
             return Result<IEnumerable<User>>.Success(friends);
         }
 
         public async Task<Result> DenyFriendRequestAsync(int userId, int contactId)
         {
-            var friendRequest = await _userRepository.GetUserContactAsync(contactId, userId);
+            UserContact friendRequest = await _userRepository.GetUserContactAsync(contactId, userId);
 
             if (friendRequest == null || friendRequest.Status != FriendRequestStatus.Pending)
             {
@@ -248,7 +248,7 @@ namespace VirtualWallet.DATA.Services
                 return Result<IEnumerable<User>>.Failure("Search term cannot be empty.");
             }
 
-            var users = await _userRepository.SearchUsersAsync(searchTerm);
+            IEnumerable<User> users = await _userRepository.SearchUsersAsync(searchTerm);
 
             if (users == null || !users.Any())
             {
@@ -261,7 +261,7 @@ namespace VirtualWallet.DATA.Services
 
         public async Task<Result> UpdateContact(int userId, int contactId, string description)
         {
-            var contact = await _userRepository.GetUserContactAsync(userId, contactId);
+            UserContact contact = await _userRepository.GetUserContactAsync(userId, contactId);
 
             if (contact == null)
             {
@@ -276,20 +276,20 @@ namespace VirtualWallet.DATA.Services
 
         public async Task<Result> ChangePasswordAsync(int userId, string currentPassword, string newPassword)
         {
-            var userResult = await GetUserByIdAsync(userId);
+            Result<User> userResult = await GetUserByIdAsync(userId);
             if (!userResult.IsSuccess)
             {
                 return Result.Failure("User not found.");
             }
 
-            var user = userResult.Value;
+            User user = userResult.Value;
 
             if (!PasswordHasher.VerifyPassword(currentPassword, user.Password))
             {
                 return Result.Failure("Current password is incorrect.");
             }
 
-            var hashedNewPassword = PasswordHasher.HashPassword(newPassword);
+            string hashedNewPassword = PasswordHasher.HashPassword(newPassword);
 
             user.Password = hashedNewPassword;
             await _userRepository.UpdateUserAsync(user);
@@ -300,20 +300,20 @@ namespace VirtualWallet.DATA.Services
 
         public async Task<Result> ChangeEmailAsync(int userId, string newEmail, string currentPassword)
         {
-            var userResult = await GetUserByIdAsync(userId);
+            Result<User> userResult = await GetUserByIdAsync(userId);
             if (!userResult.IsSuccess)
             {
                 return Result.Failure("User not found.");
             }
 
-            var user = userResult.Value;
+            User user = userResult.Value;
 
             if (!PasswordHasher.VerifyPassword(currentPassword, user.Password))
             {
                 return Result.Failure("Current password is incorrect.");
             }
 
-            var existingUser = await _userRepository.GetUserByEmailAsync(newEmail);
+            User existingUser = await _userRepository.GetUserByEmailAsync(newEmail);
             if (existingUser != null && existingUser.Id != userId)
             {
                 return Result.Failure("Email is already in use by another account.");
@@ -327,7 +327,7 @@ namespace VirtualWallet.DATA.Services
 
         public async Task<Result<IEnumerable<User>>> FilterUsersAsync(UserQueryParameters parameters)
         {
-            var query = await _userRepository.GetAllUsers();
+            IEnumerable<User> query = await _userRepository.GetAllUsers();
 
             if (!string.IsNullOrEmpty(parameters.Username))
             {
@@ -354,10 +354,10 @@ namespace VirtualWallet.DATA.Services
                 query = query.Where(u => u.Role == parameters.Role);
             }
 
-            var skip = (parameters.PageNumber - 1) * parameters.PageSize;
+            int skip = (parameters.PageNumber - 1) * parameters.PageSize;
             query = query.Skip(skip).Take(parameters.PageSize);
 
-            var users = query;
+            IEnumerable<User> users = query;
 
             return users.Any()
                 ? Result<IEnumerable<User>>.Success(users)
@@ -367,7 +367,7 @@ namespace VirtualWallet.DATA.Services
 
         public async Task<Result<int>> GetTotalUserCountAsync(UserQueryParameters parameters)
         {
-            var query = await _userRepository.GetAllUsers();
+            IEnumerable<User> query = await _userRepository.GetAllUsers();
 
             if (!string.IsNullOrEmpty(parameters.Username))
             {
@@ -384,7 +384,7 @@ namespace VirtualWallet.DATA.Services
                 query = query.Where(u => u.UserProfile.PhoneNumber.Contains(parameters.PhoneNumber));
             }
 
-            var count =  query.Count();
+            int count =  query.Count();
 
             return count != 0
                 ? Result<int>.Success(count)
@@ -393,20 +393,20 @@ namespace VirtualWallet.DATA.Services
 
         public async Task<Result<(decimal TotalAmount, CurrencyType Currency)>> GetTotalBalanceInMainWalletCurrencyAsync(int userId)
         {
-            var userResult = await GetUserByIdAsync(userId);
+            Result<User> userResult = await GetUserByIdAsync(userId);
             if (!userResult.IsSuccess)
             {
                 return Result<(decimal TotalAmount, CurrencyType Currency)>.Failure("User not found.");
             }
 
-            var user = userResult.Value;
+            User user = userResult.Value;
 
             if (user.MainWallet == null)
             {
                 return Result<(decimal TotalAmount, CurrencyType Currency)>.Failure("User does not have a main wallet set.");
             }
 
-            var mainWalletCurrency = user.MainWallet.Currency;
+            CurrencyType mainWalletCurrency = user.MainWallet.Currency;
             decimal totalAmount = 0m;
 
             foreach (var wallet in user.Wallets)
@@ -423,7 +423,7 @@ namespace VirtualWallet.DATA.Services
                         return Result<(decimal TotalAmount, CurrencyType Currency)>.Failure(conversionResult.Error);
                     }
 
-                    var conversionRates = conversionResult.Value.Data;
+                    Dictionary<string,decimal> conversionRates = conversionResult.Value.Data;
                     if (!conversionRates.TryGetValue(mainWalletCurrency.ToString(), out var rate))
                     {
                         return Result<(decimal TotalAmount, CurrencyType Currency)>.Failure($"Conversion rate for {mainWalletCurrency} not found.");

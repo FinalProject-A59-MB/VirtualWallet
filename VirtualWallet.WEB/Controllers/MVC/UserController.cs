@@ -49,7 +49,7 @@ namespace ForumProject.Controllers.MVC
             if (id.HasValue & id != 0)
             {
 
-                var result = await _userService.GetUserByIdAsync(id.Value);
+                Result<User> result = await _userService.GetUserByIdAsync(id.Value);
 
                 if (!result.IsSuccess)
                 {
@@ -78,7 +78,7 @@ namespace ForumProject.Controllers.MVC
 
         public IActionResult EditProfile()
         {
-            var profile = _modelMapper.ToUserProfileViewModel(CurrentUser.UserProfile);
+            UserProfileViewModel profile = _modelMapper.ToUserProfileViewModel(CurrentUser.UserProfile);
             profile.UserId = CurrentUser.Id;
 
             return View(profile);
@@ -91,26 +91,26 @@ namespace ForumProject.Controllers.MVC
             {
                 return View("EditProfile", userProfilemodel);
             }
-            var username = userProfilemodel.UserName;
+            string username = userProfilemodel.UserName;
             if (userProfilemodel.file != null)
             {
-                var imageUrl = _cloudinaryService.UploadProfilePicture(userProfilemodel.file);
+                string imageUrl = _cloudinaryService.UploadProfilePicture(userProfilemodel.file);
                 userProfilemodel.PhotoUrl = imageUrl;
             }
-            var userProfil = _modelMapper.ToUserProfile(userProfilemodel);
+            UserProfile userProfil = _modelMapper.ToUserProfile(userProfilemodel);
             var userResult = await _userService.GetUserByIdAsync(userProfilemodel.UserId);
-            var user = userResult.Value;
+            User user = userResult.Value;
             user.UserProfile = userProfil;
             user.Username = username;
             await _userService.UpdateUserAsync(user);
-            var token = _authService.GenerateToken(user);
+            string token = _authService.GenerateToken(user);
             HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
             return RedirectToAction("Profile");
         }
 
         public IActionResult ChangePassword(int userId)
         {
-            var model = new ChangePasswordViewModel
+            ChangePasswordViewModel model = new ChangePasswordViewModel
             {
                 UserId = userId,
             };
@@ -123,7 +123,7 @@ namespace ForumProject.Controllers.MVC
         {
             if (!ModelState.IsValid)
             {
-                var errors = ModelState.Values
+                List<string> errors = ModelState.Values
                 .SelectMany(v => v.Errors)
                 .Select(e => e.ErrorMessage)
                 .ToList();
@@ -136,7 +136,7 @@ namespace ForumProject.Controllers.MVC
             }
 
 
-            var userId = CurrentUser.Id;
+            int userId = CurrentUser.Id;
             var result = await _userService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword);
 
             if (!result.IsSuccess)
@@ -153,7 +153,7 @@ namespace ForumProject.Controllers.MVC
         public IActionResult ChangeEmail(int userId)
         {
 
-            var model = new ChangeEmailViewModel
+            ChangeEmailViewModel model = new ChangeEmailViewModel
             {
                 UserId = userId,
             };
@@ -166,7 +166,7 @@ namespace ForumProject.Controllers.MVC
         {
             if (!ModelState.IsValid)
             {
-                var errors = ModelState.Values
+                List<string> errors = ModelState.Values
                 .SelectMany(v => v.Errors)
                 .Select(e => e.ErrorMessage)
                 .ToList();
@@ -177,7 +177,7 @@ namespace ForumProject.Controllers.MVC
                 return RedirectToAction("Profile", "User");
             }
 
-            var userId = CurrentUser.Id;
+            int userId = CurrentUser.Id;
             var result = await _userService.ChangeEmailAsync(userId, model.NewEmail, model.CurrentPassword);
 
             if (!result.IsSuccess)
@@ -203,12 +203,12 @@ namespace ForumProject.Controllers.MVC
                 return View(model);
             }
 
-            var user = HttpContext.Items["CurrentUser"] as User;
+            User user = HttpContext.Items["CurrentUser"] as User;
 
-            var photoIdUrl = _cloudinaryService.UploadProfilePicture(model.PhotoId);
+            string photoIdUrl = _cloudinaryService.UploadProfilePicture(model.PhotoId);
             user.PhotoIdUrl = photoIdUrl;
 
-            var licenseIdUrl = _cloudinaryService.UploadProfilePicture(model.LicenseId);
+            string licenseIdUrl = _cloudinaryService.UploadProfilePicture(model.LicenseId);
             user.FaceIdUrl = licenseIdUrl;
 
             user.VerificationStatus = UserVerificationStatus.PendingVerification;
@@ -235,7 +235,7 @@ namespace ForumProject.Controllers.MVC
                 return RedirectToAction("ManageUsers");
             }
 
-            var model = new BlockUserViewModel
+            BlockUserViewModel model = new BlockUserViewModel
             {
                 UserId = userId,
                 Username = userResult.Value.Username
@@ -249,7 +249,7 @@ namespace ForumProject.Controllers.MVC
         [HttpPost]
         public async Task<IActionResult> BlockUser(BlockUserViewModel model)
         {
-            var user = await _userService.GetUserByIdAsync(model.UserId);
+            Result<User> user = await _userService.GetUserByIdAsync(model.UserId);
             if (!user.IsSuccess)
             {
                 TempData["ErrorMessage"] = user.Error;
@@ -258,7 +258,7 @@ namespace ForumProject.Controllers.MVC
 
             user.Value.Role = UserRole.Blocked;
 
-            var blockRecord = new BlockedRecord
+            BlockedRecord blockRecord = new BlockedRecord
             {
                 UserId = model.UserId,
                 Reason = model.Reason,
@@ -279,14 +279,14 @@ namespace ForumProject.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> UnblockUser(int userId)
         {
-            var user = await _userService.GetUserByIdAsync(userId);
+            Result<User> user = await _userService.GetUserByIdAsync(userId);
             if (!user.IsSuccess)
             {
                 TempData["ErrorMessage"] = user.Error;
                 return RedirectToAction("ManageUsers");
             }
 
-            var model = new BlockUserViewModel
+            BlockUserViewModel model = new BlockUserViewModel
             {
                 UserId = userId,
                 Username = user.Value.Username
@@ -304,7 +304,7 @@ namespace ForumProject.Controllers.MVC
                 return View("UnblockUser", model);
             }
 
-            var user = await _userService.GetUserByIdAsync(model.UserId);
+            Result<User> user = await _userService.GetUserByIdAsync(model.UserId);
             if (!user.IsSuccess)
             {
                 TempData["ErrorMessage"] = user.Error;
@@ -332,8 +332,8 @@ namespace ForumProject.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> UnverifiedUsers()
         {
-            var users = await _userService.GetUsers();
-            var unverifiedUsers = users.Value
+            Result<IEnumerable<User>> users = await _userService.GetUsers();
+            List<UserVerificationViewModel> unverifiedUsers = users.Value
                 .Where(u => u.VerificationStatus == UserVerificationStatus.PendingVerification)
                 .Select(_modelMapper.ToUserVerificationViewModel).ToList();
 
@@ -346,7 +346,7 @@ namespace ForumProject.Controllers.MVC
         [HttpPost]
         public async Task<IActionResult> VerifyUser(int userId)
         {
-            var user = await _userService.GetUserByIdAsync(userId);
+            Result<User> user = await _userService.GetUserByIdAsync(userId);
             if (user != null)
             {
                 user.Value.VerificationStatus = UserVerificationStatus.Verified;
@@ -360,7 +360,7 @@ namespace ForumProject.Controllers.MVC
         [HttpPost]
         public async Task<IActionResult> DenyUserVerification(int userId)
         {
-            var user = await _userService.GetUserByIdAsync(userId);
+            Result<User> user = await _userService.GetUserByIdAsync(userId);
             if (user != null)
             {
                 user.Value.VerificationStatus = UserVerificationStatus.NotVerified;
@@ -374,7 +374,7 @@ namespace ForumProject.Controllers.MVC
         [HttpPost]
         public async Task<IActionResult> SendFriendRequest(int contactId)
         {
-            var userId = CurrentUser.Id;
+            int userId = CurrentUser.Id;
             var result = await _userService.SendFriendRequestAsync( userId, contactId);
 
             if (!result.IsSuccess)
@@ -391,7 +391,7 @@ namespace ForumProject.Controllers.MVC
         [HttpPost]
         public async Task<IActionResult> AcceptFriendRequest(int contactId)
         {
-            var userId = CurrentUser.Id;
+            int userId = CurrentUser.Id;
             var result = await _userService.AcceptFriendRequestAsync(userId, contactId);
 
             if (!result.IsSuccess)
@@ -407,7 +407,7 @@ namespace ForumProject.Controllers.MVC
         [HttpPost]
         public async Task<IActionResult> DenyFriendRequest(int contactId)
         {
-            var userId = CurrentUser.Id;
+            int userId = CurrentUser.Id;
             var result = await _userService.DenyFriendRequestAsync(userId, contactId);
 
             if (!result.IsSuccess)
@@ -422,8 +422,8 @@ namespace ForumProject.Controllers.MVC
         [RequireAuthorization(minRequiredRoleLevel: 3)]
         public async Task<IActionResult> PendingFriendRequests()
         {
-            var userId = CurrentUser.Id;
-            var result = await _userService.GetPendingFriendRequestsAsync(userId);
+            int userId = CurrentUser.Id;
+            Result<IEnumerable<UserContact>> result = await _userService.GetPendingFriendRequestsAsync(userId);
 
             if (!result.IsSuccess)
             {
@@ -451,7 +451,7 @@ namespace ForumProject.Controllers.MVC
                 return View(Enumerable.Empty<UserViewModel>());
             }
 
-            var result = await _userService.SearchUsersAsync(searchTerm);
+            Result<IEnumerable<User>> result = await _userService.SearchUsersAsync(searchTerm);
 
             if (!result.IsSuccess)
             {
@@ -459,7 +459,7 @@ namespace ForumProject.Controllers.MVC
                 return View(Enumerable.Empty<UserViewModel>());
             }
 
-            var userViewModels = result.Value.Select(_modelMapper.ToUserViewModel);
+            IEnumerable<UserViewModel> userViewModels = result.Value.Select(_modelMapper.ToUserViewModel);
 
             return View(userViewModels);
         }
@@ -472,7 +472,7 @@ namespace ForumProject.Controllers.MVC
                 TempData["InfoMessage"] = "Currently you do not have any cards. You will first need to add a card.";
                 return RedirectToAction("AddCard", "Card", new { userId = CurrentUser.Id });
             }
-            var viewModel = _modelMapper.ToUserViewModel(CurrentUser);
+            UserViewModel viewModel = _modelMapper.ToUserViewModel(CurrentUser);
 
             return View("UserCards", viewModel);
         }
@@ -480,9 +480,9 @@ namespace ForumProject.Controllers.MVC
         [RequireAuthorization(minRequiredRoleLevel: 2)]
         public async Task<IActionResult> Wallets()
         {
-            var user = CurrentUser;
+            User user = CurrentUser;
 
-            var userViewModel = _modelMapper.ToUserViewModel(user);
+            UserViewModel userViewModel = _modelMapper.ToUserViewModel(user);
 
             return View("UserWallets", userViewModel);
         }
@@ -491,7 +491,7 @@ namespace ForumProject.Controllers.MVC
         [HttpPost]
         public async Task<IActionResult> UpdateFriendDescription(int contactId, string description)
         {
-            var userId = CurrentUser.Id;
+            int userId = CurrentUser.Id;
             var result = await _userService.UpdateContact(userId, contactId, description);
 
             if (!result.IsSuccess)
@@ -506,19 +506,19 @@ namespace ForumProject.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> DeleteAccount(int id)
         {
-            var user = await _userService.GetUserByIdAsync(id);
+            Result<User> user = await _userService.GetUserByIdAsync(id);
             if (!user.IsSuccess)
             {
                 TempData["ErrorMessage"] = user.Error;
                 return RedirectToAction("Profile", new { id = id });
             }
-            var totalAmmout = user.Value.Wallets.Select(w => w.Balance).Sum();
+            decimal totalAmmout = user.Value.Wallets.Select(w => w.Balance).Sum();
             if (totalAmmout > 0)
             {
                 TempData["ErrorMessage"] = "There are still funds in your wallets.\nPlease Withdraw all funds from your wallets before you can proceed.";
                 return RedirectToAction("Profile", new { id = id });
             }
-            var model = new DeleteAccountViewModel
+            DeleteAccountViewModel model = new DeleteAccountViewModel
             {
                 Id = user.Value.Id,
                 Username = user.Value.Username,
@@ -549,29 +549,29 @@ namespace ForumProject.Controllers.MVC
         [HttpGet]
         public async Task<IActionResult> AdminPanel(UserQueryParameters userParameters, TransactionQueryParameters walletTransactionParameters, CardTransactionQueryParameters cardTransactionParameters)
         {
-            var usersResult = await _userService.FilterUsersAsync(userParameters);
-            var userViewModels = usersResult.IsSuccess
+            Result<IEnumerable<User>> usersResult = await _userService.FilterUsersAsync(userParameters);
+            IEnumerable<UserViewModel> userViewModels = usersResult.IsSuccess
                 ? usersResult.Value.Select(_modelMapper.ToUserViewModel).ToList()
                 : Enumerable.Empty<UserViewModel>();
 
-            var totalUserCountResult = await _userService.GetTotalUserCountAsync(userParameters);
-            var totalUserCount = totalUserCountResult.IsSuccess ? totalUserCountResult.Value : 0;
+            Result<int> totalUserCountResult = await _userService.GetTotalUserCountAsync(userParameters);
+            int totalUserCount = totalUserCountResult.IsSuccess ? totalUserCountResult.Value : 0;
 
-            var walletTransactionsResult = await _walletTransactionService.FilterWalletTransactionsAsync(walletTransactionParameters);
-            var walletTransactionViewModels = walletTransactionsResult.IsSuccess
+            Result<IEnumerable<WalletTransaction>> walletTransactionsResult = await _walletTransactionService.FilterWalletTransactionsAsync(walletTransactionParameters);
+            IEnumerable<WalletTransactionViewModel> walletTransactionViewModels = walletTransactionsResult.IsSuccess
                 ? walletTransactionsResult.Value.Select(_modelMapper.ToWalletTransactionViewModel).ToList()
                 : Enumerable.Empty<WalletTransactionViewModel>();
 
-            var totalWalletTransactionCountResult = await _walletTransactionService.GetTotalCountAsync(walletTransactionParameters);
-            var totalWalletTransactionCount = totalWalletTransactionCountResult.IsSuccess ? totalWalletTransactionCountResult.Value : 0;
+            Result<int> totalWalletTransactionCountResult = await _walletTransactionService.GetTotalCountAsync(walletTransactionParameters);
+            int totalWalletTransactionCount = totalWalletTransactionCountResult.IsSuccess ? totalWalletTransactionCountResult.Value : 0;
 
-            var cardTransactionsResult = await _cardTransactionService.FilterCardTransactionsAsync(cardTransactionParameters);
-            var cardTransactionViewModels = cardTransactionsResult.IsSuccess
+            Result<IEnumerable<CardTransaction>> cardTransactionsResult = await _cardTransactionService.FilterCardTransactionsAsync(cardTransactionParameters);
+            IEnumerable<CardTransactionViewModel> cardTransactionViewModels = cardTransactionsResult.IsSuccess
                 ? cardTransactionsResult.Value.Select(_modelMapper.ToCardTransactionViewModel).ToList()
                 : Enumerable.Empty<CardTransactionViewModel>();
 
-            var totalCardTransactionCountResult = await _cardTransactionService.GetCardTransactionTotalCountAsync(cardTransactionParameters);
-            var totalCardTransactionCount = totalCardTransactionCountResult.IsSuccess ? totalCardTransactionCountResult.Value : 0;
+            Result<int> totalCardTransactionCountResult = await _cardTransactionService.GetCardTransactionTotalCountAsync(cardTransactionParameters);
+            int totalCardTransactionCount = totalCardTransactionCountResult.IsSuccess ? totalCardTransactionCountResult.Value : 0;
 
             var viewModel = new AdminPanelViewModel
             {

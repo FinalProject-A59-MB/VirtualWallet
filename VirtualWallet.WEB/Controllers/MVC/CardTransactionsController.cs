@@ -32,7 +32,7 @@ namespace VirtualWallet.WEB.Controllers
         [HttpGet]
         public async Task<IActionResult> Index([FromQuery] CardTransactionQueryParameters filterParameters)
         {
-            var cardsResult = await _cardService.GetUserCardsAsync(CurrentUser.Id);
+            Result<IEnumerable<Card>> cardsResult = await _cardService.GetUserCardsAsync(CurrentUser.Id);
             if (!cardsResult.IsSuccess)
             {
                 TempData["InfoMessage"] = "Currently, you do not have any cards. You will first need to add a card.";
@@ -41,7 +41,7 @@ namespace VirtualWallet.WEB.Controllers
 
             await SetupViewBagForCardTransactionsAsync(filterParameters);
 
-            var transactionViewModels = await GetTransactionViewModelsAsync(filterParameters);
+            List<CardTransactionViewModel> transactionViewModels = await GetTransactionViewModelsAsync(filterParameters);
             if (transactionViewModels == null)
             {
                 TempData["ErrorMessage"] = "An error occurred while retrieving your transactions.";

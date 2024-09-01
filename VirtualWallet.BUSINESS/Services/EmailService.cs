@@ -18,9 +18,9 @@ public class SmtpEmailService : IEmailService
 
     public async Task<Result> SendEmailAsync(string toEmail, string subject, string message)
     {
-        var smtpSettings = _configuration.GetSection("EmailSettings");
+        IConfigurationSection smtpSettings = _configuration.GetSection("EmailSettings");
 
-        var smtpClient = new SmtpClient(smtpSettings["SmtpServer"])
+        SmtpClient smtpClient = new SmtpClient(smtpSettings["SmtpServer"])
         {
             Port = int.Parse(smtpSettings["SmtpPort"]),
             Credentials = new NetworkCredential(smtpSettings["SmtpUsername"], smtpSettings["SmtpPassword"]),
@@ -29,7 +29,7 @@ public class SmtpEmailService : IEmailService
 
         using (smtpClient)
         {
-            var mailMessage = new MailMessage
+            MailMessage mailMessage = new MailMessage
             {
                 From = new MailAddress(smtpSettings["SmtpUsername"]),
                 Subject = subject,
@@ -47,14 +47,14 @@ public class SmtpEmailService : IEmailService
 
     public async Task<Result> SendVerificationEmailAsync(User user, string verificationLink)
     {
-        var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "VirtualWallet.BUSINESS", "Resources", "EmailTemplates", "VerificationEmailTemplate.html");
+        string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "VirtualWallet.BUSINESS", "Resources", "EmailTemplates", "VerificationEmailTemplate.html");
 
         if (!File.Exists(templatePath))
         {
             return Result.Failure("Email template not found.");
         }
 
-        var emailTemplate = await File.ReadAllTextAsync(templatePath);
+        string emailTemplate = await File.ReadAllTextAsync(templatePath);
 
         string emailContent = emailTemplate.Replace("{{Username}}", user.Username)
                                            .Replace("{{VerificationLink}}", verificationLink);
@@ -67,14 +67,14 @@ public class SmtpEmailService : IEmailService
 
     public async Task<Result> SendPasswordResetEmailAsync(User user, string resetLink)
     {
-        var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "VirtualWallet.BUSINESS", "Resources", "EmailTemplates", "PasswordResetTemplate.html");
+        string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "VirtualWallet.BUSINESS", "Resources", "EmailTemplates", "PasswordResetTemplate.html");
 
         if (!File.Exists(templatePath))
         {
             return Result.Failure("Email template not found.");
         }
 
-        var emailTemplate = await File.ReadAllTextAsync(templatePath);
+        string emailTemplate = await File.ReadAllTextAsync(templatePath);
 
         string emailContent = emailTemplate.Replace("{{Username}}", user.Username)
                                            .Replace("{{ResetLink}}", resetLink);
@@ -86,14 +86,14 @@ public class SmtpEmailService : IEmailService
 
     public async Task<Result> SendPaymentVerificationEmailAsync(User user, string verificationCode)
     {
-        var templatePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "VirtualWallet.BUSINESS", "Resources", "EmailTemplates", "PaymentVerificationEmailTemplate.html");
+        string templatePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "VirtualWallet.BUSINESS", "Resources", "EmailTemplates", "PaymentVerificationEmailTemplate.html");
 
         if (!File.Exists(templatePath))
         {
             return Result.Failure("Email template not found.");
         }
 
-        var emailTemplate = await File.ReadAllTextAsync(templatePath);
+        string emailTemplate = await File.ReadAllTextAsync(templatePath);
 
         string emailContent = emailTemplate.Replace("{{Username}}", user.Username)
                                            .Replace("{{VerificationCode}}", verificationCode);
