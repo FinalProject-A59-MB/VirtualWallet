@@ -111,9 +111,22 @@ namespace VirtualWallet.WEB.Controllers.MVC
 
         [HttpGet]
         [RequireAuthorization]
-        public IActionResult DepositExternally()
+        public async Task<IActionResult> DepositExternally()
         {
-            return View();
+            var result = await _walletService.GetWalletsByUserIdAsync(CurrentUser.Id);
+
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+                return RedirectToAction("Wallets", "User");
+            }
+
+            var vm = new DepositViewModel()
+            {
+                From = result.Value.Select(x => _viewModelMapper.ToWalletViewModel(x)),
+            };
+
+            return View(vm);
         }
 
         [HttpPost]
@@ -125,10 +138,10 @@ namespace VirtualWallet.WEB.Controllers.MVC
             if (!result.IsSuccess)
             {
                 TempData["ErrorMessage"] = result.Error;
-
             }
 
             return result.Value;
         }
+
     }
 }

@@ -7,7 +7,7 @@ using VirtualWallet.WEB.Models.DTOs.WalletDTOs;
 namespace VirtualWallet.WEB.Controllers.MVC
 {
     public class WalletController : BaseController
-    { 
+    {
         private readonly IWalletService _walletService;
         private readonly IDtoMapper _dtoMapper;
         private readonly IViewModelMapper _viewModelMapper;
@@ -21,6 +21,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
 
 
         [HttpGet]
+        [RequireAuthorization]
         public async Task<IActionResult> Index(int id)
         {
             var result = await _walletService.GetWalletByIdAsync(id);
@@ -31,7 +32,10 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 return RedirectToAction("Wallets", "User");
             }
 
-            return View(result.Value);
+            ViewBag.IsUserWalletAdmin = CurrentUser.Id == result.Value.UserId;
+
+            var vm = _viewModelMapper.ToWalletViewModel(result.Value);
+            return View(vm);
         }
 
         [HttpGet]
@@ -46,11 +50,17 @@ namespace VirtualWallet.WEB.Controllers.MVC
         [RequireAuthorization]
         public async Task<IActionResult> Add(WalletRequestDto wallet)
         {
+            if (wallet.WalletType == DATA.Models.Enums.WalletType.Main)
+            {
+                TempData["ErrorMessage"] = "You already have a Main wallet.";
+                return RedirectToAction("Wallets", "User");
+            }
+
             wallet.UserId = CurrentUser.Id;
 
             Result<int> result = await _walletService.AddWalletAsync(_dtoMapper.ToWalletRequestDto(wallet));
 
-            if(!result.IsSuccess)
+            if (!result.IsSuccess)
             {
                 TempData["ErrorMessage"] = result.Error;
                 return RedirectToAction("Wallets", "User");
@@ -96,6 +106,58 @@ namespace VirtualWallet.WEB.Controllers.MVC
             }
 
             return RedirectToAction("Wallets", "User");
+        }
+
+        [HttpGet]
+        [RequireAuthorization]
+        public async Task<int> GetWalletIdByPublicId(Guid publicId)
+        {
+            var result = await _walletService.GetWalletIdByPublicIdAsync(publicId);
+
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+            }
+
+            return result.Value;
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> AddUser(int id)
+        {
+            Result<Wallet> wallet = await _walletService.GetWalletByIdAsync(id);
+
+            ViewBag.WalletId = id;
+            return View(wallet.Value);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddUser(int walletId, string username)
+        {
+            var result = await _walletService.AddUserToJointWalletAsync(walletId, username);
+
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+            }
+
+            ViewBag.WalletId = walletId;
+
+            return RedirectToAction("Index", new { id = walletId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveUser(int walletId, string username)
+        {
+            var result = await _walletService.RemoveUserFromJointWalletAsync(walletId, username);
+
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+            }
+
+            return RedirectToAction("Index", new { id = walletId });
         }
     }
 }

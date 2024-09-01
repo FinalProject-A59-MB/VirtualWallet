@@ -4,8 +4,7 @@
     {
         Main,
         Standart,
-        Joint,
-        Savings
+        Joint
     }
 
 }

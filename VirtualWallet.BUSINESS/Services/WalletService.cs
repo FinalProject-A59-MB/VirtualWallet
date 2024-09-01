@@ -1,5 +1,6 @@
 ﻿using VirtualWallet.BUSINESS.Resources;
 using VirtualWallet.BUSINESS.Results;
+using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Repositories.Contracts;
 using VirtualWallet.DATA.Services.Contracts;
@@ -10,12 +11,15 @@ namespace VirtualWallet.DATA.Services
     {
         private readonly IWalletRepository _walletRepository;
         private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
 
         public WalletService(IWalletRepository walletRepository,
-            IUserService userService)
+            IUserService userService,
+            IEmailService emailService)
         {
             _walletRepository = walletRepository;
             _userService = userService;
+            _emailService = emailService;
         }
         public async Task<Result<int>> AddWalletAsync(Wallet wallet)
         {
@@ -23,6 +27,8 @@ namespace VirtualWallet.DATA.Services
             {
                 return Result<int>.Failure(ErrorMessages.InvalidWalletInformation);
             }
+
+            wallet.PublicId = Guid.NewGuid();
 
             var newWalletId = await _walletRepository.AddWalletAsync(wallet);
 
@@ -94,5 +100,74 @@ namespace VirtualWallet.DATA.Services
             return Result.Success();
         }
 
+        public async Task<Result<int>> GetWalletIdByPublicIdAsync(Guid publicId)
+        {
+            var wallet = await _walletRepository.GetWalletByPublicIdAsync(publicId);
+
+            if (wallet == null)
+            {
+                return Result<int>.Failure(ErrorMessages.WalletNotFound);
+            }
+
+            return Result<int>.Success(wallet.Id);
+        }
+
+        public async Task<Result> AddUserToJointWalletAsync(int walletId, string username)
+        {
+            var walletResult = await GetWalletByIdAsync(walletId);
+
+            if (!walletResult.IsSuccess)
+            {
+                return Result.Failure(ErrorMessages.WalletNotFound);
+            }
+
+            if(walletResult.Value.WalletType != Models.Enums.WalletType.Joint)
+            {
+                return Result.Failure(ErrorMessages.InvalidWalletInformation);
+            }
+
+
+            var userResult = await _userService.GetUserByUsernameAsync(username);
+
+            if (!userResult.IsSuccess)
+            {
+                return Result.Failure(ErrorMessages.UserNotFound);
+            }
+
+            await _walletRepository.AddUserToJointWalletAsync(walletId, userResult.Value.Id);
+
+            await _emailService.SendEmailAsync(userResult.Value.Email, "You were added to a wallet.", $"You were added to {walletResult.Value.Name}.");
+
+            return Result.Success();
+        }
+
+        public async Task<Result> RemoveUserFromJointWalletAsync(int walletId, string username)
+        {
+            var walletResult = await GetWalletByIdAsync(walletId);
+
+            if (!walletResult.IsSuccess)
+            {
+                return Result.Failure(ErrorMessages.WalletNotFound);
+            }
+
+            if (walletResult.Value.WalletType != Models.Enums.WalletType.Joint)
+            {
+                return Result.Failure(ErrorMessages.InvalidWalletInformation);
+            }
+
+
+            var userResult = await _userService.GetUserByUsernameAsync(username);
+
+            if (!userResult.IsSuccess)
+            {
+                return Result.Failure(ErrorMessages.UserNotFound);
+            }
+
+            await _walletRepository.RemoveUserFromJointWalletAsync(walletId, userResult.Value.Id);
+
+            await _emailService.SendEmailAsync(userResult.Value.Email, "You were removed from a wallet.", $"You were removed from {walletResult.Value.Name}.");
+
+            return Result.Success();
+        }
     }
 }

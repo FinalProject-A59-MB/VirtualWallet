@@ -1,25 +1,21 @@
 ﻿@using VirtualWallet.DATA.Models
-@model Wallet
+@model WalletViewModel
 @section Scripts {
     <script src="~/js/wallet.js"></script>
 }
 
 
-
-
-
 <div class="container my-5">
-
-
 
     <div class="card bg-dark-3 text-white h-100 shadow-sm animate__animated animate__fadeInUp">
         <div class="card-body d-flex flex-column justify-content-between">
-            
+
             <div class="mb-4">
                 <div class="d-flex align-items-center mb-3">
                     <i class="bi bi-wallet2 display-4 text-info me-3"></i>
                     <h1>@Model.Name</h1>
                 </div>
+                <p class="card-text">PublicId: <span class="fw-bold"> @Model.PublicId</span></p>
                 <p class="card-text">Wallet Type: <span class="fw-bold">@Model.WalletType</span></p>
                 <p class="card-text">Currency: <span class="fw-bold">@Model.Currency</span></p>
                 <p class="card-text">Balance: <span class="fw-bold">@Model.Balance</span></p>
@@ -30,35 +26,79 @@
                 <button class="btn btn-danger delete-wallet ml-3" data-id="@Model.Id">Delete</button>
             </div>
 
+            @if (Model.WalletType == WalletType.Joint)
+            {
+                <div class="table table-responsive mt-5">
+                    <h2 class="text-light text-center mb-3">Joint Users</h2>
+                    <table class="table table-striped text-light">
+                        <thead class="text-center">
+                            <tr>
+                                <th>Username</th>
+                                <th>Role</th>
+                                <th>Joined Date</th>
+                                <th>
+                                    @if (ViewBag.IsUserWalletAdmin)
+                                    {
+                                        <a class="btn btn-success" asp-action="AddUser" asp-controller="Wallet" asp-route-id="@Model.Id">Add User</a>
+                                    }
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var userWallet in Model.JointUsers)
+                            {
+                                <tr class="text-light">
+                                    <td>@userWallet.Username</td>
+                                    <td>@userWallet.Role</td>
+                                    <td>@userWallet.JoinedDate</td>
+                                    <td>
+                                        @if (ViewBag.IsUserWalletAdmin)
+                                        {
+                                            <a href="javascript:void(0);" class="btn btn-danger" 
+                                            onclick="removeUser('@Model.Id', '@userWallet.Username')">Remove User</a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            <div class="table table-responsive mt-5">
+                <h2 class="text-light text-center mb-3">Transactions history</h2>
+                <table class="table table-striped text-light">
+                    <thead class="text-center">
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Currency</th>
+                            <th>Status</th>
+                            <th>Sender</th>
+                            <th>Receiver</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var transaction in Model.WalletTransactions)
+                        {
+                            <tr class="text-light">
+                                <td>@transaction.CreatedAt</td>
+                                <td>@transaction.Amount</td>
+                                <td>@transaction.Currency</td>
+                                <td>@transaction.Status</td>
+                                <td>@transaction.Sender</td>
+                                <td>@transaction.Recipient</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+
         </div>
     </div>
 
 
 
 
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Description</th>
-                    <th>Status</th>
-                    <th>Amount</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var transaction in Model.WalletTransactions)
-                {
-                    <tr>
-                        <td>@transaction.CreatedAt.ToString("MMM dd, yyyy")</td>
-                        <td>@transaction.DepositedAmount.ToString("C")</td>
-                        <td>@transaction.Currency</td>
-                        <td>@transaction.Status</td>
-                        <td>@transaction.Sender.Name</td>
-                        <td>@transaction.Recipient.Name</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
 </div>

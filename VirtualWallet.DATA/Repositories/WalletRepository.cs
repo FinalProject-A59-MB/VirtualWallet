@@ -27,7 +27,7 @@ namespace VirtualWallet.DATA.Repositories
 
         public async Task<Wallet> GetWalletByIdAsync(int id)
         {
-            var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(w => w.Id == id);
+            var wallet = await _dbContext.Wallets.Include(x => x.UserWallets).ThenInclude(x => x.User).FirstOrDefaultAsync(w => w.Id == id);
 
             var listOfSentTransactions = await _dbContext.WalletTransactions.Where(x => x.SenderId == id).ToListAsync();
             var listOfRecievedTransactions = await _dbContext.WalletTransactions.Where(x => x.RecipientId == id && x.Status == TransactionStatus.Completed).ToListAsync();
@@ -83,6 +83,35 @@ namespace VirtualWallet.DATA.Repositories
             var walletToUpdate = await GetWalletByIdAsync(wallet.Id);
 
             walletToUpdate.Name = wallet.Name;
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<Wallet> GetWalletByPublicIdAsync(Guid publicId)
+        {
+            var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(x => x.PublicId == publicId);
+
+            return wallet;
+        }
+
+        public async Task AddUserToJointWalletAsync(int walletId, int userId)
+        {
+            await _dbContext.UserWallets.AddAsync(new UserWallet()
+            {
+                WalletId = walletId,
+                UserId = userId,
+                Role = UserWalletRole.Member,
+                JoinedDate = DateTime.UtcNow,
+            });
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task RemoveUserFromJointWalletAsync(int walletId, int userId)
+        {
+            var userWallet = _dbContext.UserWallets.FirstOrDefault(x => x.WalletId == walletId && x.UserId == userId);
+
+            _dbContext.UserWallets.Remove(userWallet);
+
             await _dbContext.SaveChangesAsync();
         }
     }
