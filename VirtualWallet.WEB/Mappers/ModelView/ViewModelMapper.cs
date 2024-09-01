@@ -136,7 +136,20 @@ public class ViewModelMapper : IViewModelMapper
             Name = wallet.Name,
             WalletType = wallet.WalletType,
             Balance = wallet.Balance,
-            Currency = wallet.Currency
+            Currency = wallet.Currency,
+            PublicId = wallet.PublicId,
+            WalletTransactions = wallet.WalletTransactions?.Select(x => ToWalletTransactionViewModel(x)),
+            JointUsers = wallet.UserWallets?.Select(x => ToUserWalletViewModel(x))
+        };
+    }
+
+    public UserWalletViewModel ToUserWalletViewModel(UserWallet wallet)
+    {
+        return new UserWalletViewModel
+        {
+            Username = wallet.User?.Username ?? "@null",
+            Role = wallet.Role.ToString(),
+            JoinedDate = wallet.JoinedDate.ToString("MM/yy")
         };
     }
 
@@ -204,8 +217,8 @@ public class ViewModelMapper : IViewModelMapper
         {
             Id = transaction.Id,
             CreatedAt = transaction.CreatedAt,
-            Sender = transaction.Sender.Name,
-            Recipient = transaction.Recipient.Name,
+            Sender = transaction.Sender?.Name,
+            Recipient = transaction.Recipient?.Name,
             Amount = transaction.DepositedAmount,
             Currency = transaction.Currency.ToString(),
             Status = transaction.Status,

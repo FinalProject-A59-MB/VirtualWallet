@@ -17,4 +17,64 @@
             });
         }
     });
+
+    $('#submit-add-user').on('click', function () {
+
+        var walletId = $('#wallet-id').val();
+        var username = $('#username').val();
+
+        $.ajax({
+            url: '/Wallet/AddUser',
+            type: 'POST',
+            data: {
+                walletId: walletId,
+                username: username,
+            },
+            success: function (result) {
+                window.location.href = "/Wallet/Index/" + walletId
+            },
+            error: function (xhr, status, error) {
+                alert("Failed to add user. Please try again.");
+            }
+        });
+
+    });
+
+    $('#submit-add-user').on('click', function () {
+
+        var walletId = $('#wallet-id').val();
+        var username = $('#username').val();
+
+        $.ajax({
+            url: '/Wallet/AddUser',
+            type: 'POST',
+            data: {
+                walletId: walletId,
+                username: username,
+            },
+            success: function (result) {
+                window.location.href = "/Wallet/Index/" + walletId
+            },
+        });
+
+    });
+
 });
+
+
+function removeUser(walletId, username) {
+    $.ajax({
+        url: '/Wallet/RemoveUser',
+        type: 'POST',
+        data: {
+            walletId: walletId,
+            username: username
+        },
+        success: function (response) {
+            window.location.href = "/Wallet/Index/" + walletId
+        },
+        error: function (xhr, status, error) {
+            alert("Error removing user: " + error);
+        }
+    });
+}
