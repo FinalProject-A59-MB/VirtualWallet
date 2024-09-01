@@ -5,7 +5,7 @@ namespace VirtualWallet.WEB.Controllers.API
 {
     [ApiController]
     [Route("api/userWallet")]
-    public class UserWalletController : BaseApiController
+    public class UserWalletController : BaseController
     {
         private readonly IUserWalletService _userWalletService;
 

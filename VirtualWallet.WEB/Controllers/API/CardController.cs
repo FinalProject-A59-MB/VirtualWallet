@@ -6,10 +6,10 @@ using VirtualWallet.WEB.Models.DTOs.CardDTOs;
 
 namespace VirtualWallet.WEB.Controllers.API
 {
-    [Route("api/[controller]")]
+    [Route("api/Card")]
     [ApiController]
     [RequireAuthorization(minRequiredRoleLevel: 2)]
-    public class CardApiController : BaseApiController
+    public class CardController : BaseController
     {
         private readonly ICardService _cardService;
         private readonly IPaymentProcessorService _paymentProcessorService;
@@ -17,7 +17,7 @@ namespace VirtualWallet.WEB.Controllers.API
         private readonly ICardTransactionService _cardTransactionService;
         private readonly IDtoMapper _dtoMapper;
 
-        public CardApiController(
+        public CardController(
             ICardService cardService,
             IPaymentProcessorService paymentProcessorService,
             IWalletService walletService,

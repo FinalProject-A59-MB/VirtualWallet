@@ -13,16 +13,16 @@ using VirtualWallet.BUSINESS.Results;
 
 namespace VirtualWallet.WEB.Controllers.API
 {
-    [Route("api/[controller]")]
+    [Route("api/Authentication")]
     [ApiController]
-    public class AuthenticationApiController : ControllerBase
+    public class AuthenticationController : ControllerBase
     {
         private readonly IAuthService _authService;
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
         private readonly IDtoMapper _dtoMapper;
 
-        public AuthenticationApiController(
+        public AuthenticationController(
             IAuthService authService,
             IUserService userService,
             IEmailService emailService,
