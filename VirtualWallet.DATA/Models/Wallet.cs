@@ -11,7 +11,6 @@ namespace VirtualWallet.DATA.Models
         public WalletType WalletType { get; set; }
         public decimal Balance { get; set; }
         public CurrencyType Currency { get; set; }
-        public Guid PublicId { get; set; }
         public ICollection<UserWallet> UserWallets { get; set; }
         public ICollection<WalletTransaction> WalletTransactions { get; set; }
         public ICollection<CardTransaction> CardTransactions { get; set; }

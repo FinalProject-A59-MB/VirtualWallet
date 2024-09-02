@@ -140,16 +140,23 @@ namespace VirtualWallet.WEB.Controllers.MVC
         }
 
         [HttpPost]
-        public async Task<int> Deposit(int senderWalletId, int recipientWalletId, decimal amount)
+        public async Task<IActionResult> Deposit(int senderWalletId, int recipientWalletId, decimal amount)
         {
+            if (senderWalletId == recipientWalletId)
+            {
+                TempData["ErrorMessage"] = "Sender and recipient can't be the same wallet!";
+                return StatusCode(500, "Sender and recipient can't be the same wallet!");
+            }
+
             var result = await _walletTransactionService.DepositStep1Async(senderWalletId, recipientWalletId, amount);
 
             if (!result.IsSuccess)
             {
                 TempData["ErrorMessage"] = result.Error;
+                return StatusCode(500, result.Error);
             }
 
-            return result.Value;
+            return Ok(result.Value);
         }
 
         [HttpPost]

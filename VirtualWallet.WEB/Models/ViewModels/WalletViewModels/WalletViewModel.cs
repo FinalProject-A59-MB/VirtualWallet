@@ -9,7 +9,6 @@ namespace VirtualWallet.WEB.Models.ViewModels.WalletViewModels
         public WalletType WalletType { get; set; }
         public decimal Balance { get; set; }
         public CurrencyType Currency { get; set; }
-        public Guid PublicId { get; set; }
         public IEnumerable<WalletTransactionViewModel> WalletTransactions { get; set; } = Enumerable.Empty<WalletTransactionViewModel>();
         public IEnumerable<UserWalletViewModel> JointUsers { get; set; } = Enumerable.Empty<UserWalletViewModel>();
     }

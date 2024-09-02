@@ -21,6 +21,7 @@
                 },
                 error: function (xhr, status, error) {
                     alert("Failed to send payment. Please try again.");
+                    location.reload();
                 }
             });
         }

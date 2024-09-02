@@ -138,7 +138,6 @@ public class ViewModelMapper : IViewModelMapper
             WalletType = wallet.WalletType,
             Balance = wallet.Balance,
             Currency = wallet.Currency,
-            PublicId = wallet.PublicId,
             WalletTransactions = wallet.WalletTransactions?.Select(x => ToWalletTransactionViewModel(x)),
             JointUsers = wallet.UserWallets?.Select(x => ToUserWalletViewModel(x))
         };

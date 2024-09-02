@@ -8,6 +8,7 @@ namespace VirtualWallet.DATA.Models
         public int Id { get; set; }
         public decimal WithdrownAmount { get; set; }
         public decimal DepositedAmount { get; set; }
+        public decimal FeeAmount { get; set; }
         public DateTime CreatedAt { get; set; }
         public CurrencyType Currency { get; set; }
         public TransactionStatus Status { get; set; }
