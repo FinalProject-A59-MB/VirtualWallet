@@ -1,4 +1,5 @@
-﻿using VirtualWallet.BUSINESS.Results;
+﻿using Microsoft.AspNetCore.Cors.Infrastructure;
+using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.BUSINESS.Services.Responses;
 using VirtualWallet.DATA.Models;
@@ -143,21 +144,33 @@ namespace VirtualWallet.BUSINESS.Services
 
             try
             {
+                decimal feeAmount = 0;
+
                 decimal recipientAmount = amount;
 
                 if (recipientWallet.Currency != senderWallet.Currency)
                 {
-                    Result<CurrencyExchangeRatesResponse> result = await _currencyService.GetRatesForCurrencyAsync(senderWallet.Currency);
-                    if (!result.IsSuccess)
+                    Result<CurrencyExchangeRatesResponse> ratesResult = await _currencyService.GetRatesForCurrencyAsync(senderWallet.Currency);
+
+                    if (!ratesResult.IsSuccess)
                     {
-                        return Result<int>.Failure(result.Error);
+                        return Result<int>.Failure(ratesResult.Error);
                     }
-                    CurrencyExchangeRatesResponse rates = result.Value;
 
-                    decimal rate = GetRate(rates, recipientWallet.Currency);
+                    Result<Dictionary<string, decimal>> feeCalculationResult = await CalculateFeeAsync(amount, recipientWallet.Currency, senderWallet.Currency);
 
-                    recipientAmount = amount * rate;
+                    if (!feeCalculationResult.IsSuccess)
+                    {
+                        return Result<int>.Failure(feeCalculationResult.Error);
+                    }
+
+                    feeAmount = feeCalculationResult.Value["feeAmount"];
+
+                    decimal rate = GetRate(ratesResult.Value, recipientWallet.Currency);
+
+                    recipientAmount = amount * rate + feeAmount;
                 }
+
 
                 WalletTransaction walletTransaction = new WalletTransaction
                 {
@@ -168,7 +181,8 @@ namespace VirtualWallet.BUSINESS.Services
                     Currency = recipientWallet.Currency,
                     WithdrownAmount = amount,
                     DepositedAmount = recipientAmount,
-                    VerificationCode = GenerateVerificationCode()
+                    VerificationCode = GenerateVerificationCode(),
+                    FeeAmount = feeAmount,
                 };
 
                 int transactionId = await _walletTransactionRepository.AddWalletTransactionAsync(walletTransaction);
@@ -261,6 +275,43 @@ namespace VirtualWallet.BUSINESS.Services
             Random random = new Random();
             int verificationCode = random.Next(1000, 10000); // Generates a random number between 1000 and 9999
             return verificationCode.ToString();
+        }
+
+
+        private async Task<Result<Dictionary<string, decimal>>> CalculateFeeAsync(decimal amount, CurrencyType fromCurrency, CurrencyType toCurrency)
+        {
+            var exchangeRateResult = await _currencyService.GetRatesForCurrencyAsync(fromCurrency);
+
+            if (!exchangeRateResult.IsSuccess)
+            {
+                return Result<Dictionary<string, decimal>>.Failure(exchangeRateResult.Error);
+            }
+            decimal exchangeRate;
+            // Get the exchange rate for the target currency
+            try
+            {
+                exchangeRate = exchangeRateResult.Value.Data[toCurrency.ToString()];
+            }
+            catch (Exception ex)
+            {
+                return Result<Dictionary<string, decimal>>.Failure(ex.Message);
+            }
+
+
+            // Calculate the amount in the target currency
+            decimal amountInTargetCurrency = amount * exchangeRate;
+
+            // Calculate the fee based on the target currency
+            decimal feePercentage = (int)toCurrency / 100m;
+            decimal feeAmount = amountInTargetCurrency * feePercentage;
+
+            Dictionary<string, decimal> result = new Dictionary<string, decimal>
+                {
+                    { "amountToWithdraw", amountInTargetCurrency - feeAmount },
+                    { "feeAmount", feeAmount }
+                };
+
+            return Result<Dictionary<string, decimal>>.Success(result);
         }
     }
 }

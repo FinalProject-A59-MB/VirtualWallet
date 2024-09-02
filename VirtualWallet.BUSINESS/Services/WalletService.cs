@@ -21,14 +21,13 @@ namespace VirtualWallet.DATA.Services
             _userService = userService;
             _emailService = emailService;
         }
+
         public async Task<Result<int>> AddWalletAsync(Wallet wallet)
         {
             if (wallet == null)
             {
                 return Result<int>.Failure(ErrorMessages.InvalidWalletInformation);
             }
-
-            wallet.PublicId = Guid.NewGuid();
 
             var newWalletId = await _walletRepository.AddWalletAsync(wallet);
 
