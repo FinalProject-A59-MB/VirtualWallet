@@ -100,9 +100,9 @@ namespace VirtualWallet.DATA.Services
             return Result.Success();
         }
 
-        public async Task<Result<int>> GetWalletIdByPublicIdAsync(Guid publicId)
+        public async Task<Result<int>> GetWalletIdByUserDetailsAsync(string details)
         {
-            var wallet = await _walletRepository.GetWalletByPublicIdAsync(publicId);
+            var wallet = await _walletRepository.GetWalletByUserDetailsAsync(details);
 
             if (wallet == null)
             {

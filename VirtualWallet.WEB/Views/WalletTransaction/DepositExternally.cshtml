@@ -7,7 +7,7 @@
 }
 
 
-<div class="container">
+<div class="container-inputs">
 
     @if (!Model.From.Any())
     {
@@ -16,35 +16,30 @@
 
     @if (Model.From.Any())
     {
+        <h1>Add Transaction Details</h1>
 
-        <div class="container">
+        <div class="form-group">
+            <label class="control-label">From</label>
+            <select class="form-control" id="input-from">
+                @foreach (var wallet in Model.From)
+                {
+                    <option value="@wallet.Id">@wallet.Name (@wallet.Balance @wallet.Currency)</option>
+                }
+            </select>
+        </div>
 
-            <h1>Add Transaction Details</h1>
+        <div class="form-group">
+            <label class="control-label">Receiver (Username/Email)</label>
+            <input class="form-control" id="input-to" />
+        </div>
 
-            <div class="form-group">
-                <label class="control-label">From</label>
-                <select class="form-control" id="input-from">
-                    @foreach (var wallet in Model.From)
-                    {
-                        <option value="@wallet.Id">@wallet.Name (@wallet.Balance @wallet.Currency)</option>
-                    }
-                </select>
-            </div>
+        <div class="form-group">
+            <label class="control-label">Amount</label>
+            <input class="form-control" id="input-amount" />
+        </div>
 
-            <div class="form-group">
-                <label class="control-label">Receiver (PublicId)</label>
-                <input class="form-control" id="input-to" />
-            </div>
-
-            <div class="form-group">
-                <label class="control-label">Amount</label>
-                <input class="form-control" id="input-amount" />
-            </div>
-
-            <div class="form-group mt-3">
-                <button type="submit" class="btn btn-primary" id="submit-deposit-externally">Submit</button>
-            </div>
-
+        <div class="form-group mt-3">
+            <button type="submit" class="btn btn-primary" id="submit-deposit-externally">Submit</button>
         </div>
     }
 </div>

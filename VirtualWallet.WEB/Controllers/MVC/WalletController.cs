@@ -6,6 +6,7 @@ using VirtualWallet.WEB.Models.DTOs.WalletDTOs;
 
 namespace VirtualWallet.WEB.Controllers.MVC
 {
+    [RequireAuthorization(minRequiredRoleLevel: 1)]
     public class WalletController : BaseController
     {
         private readonly IWalletService _walletService;
@@ -21,7 +22,6 @@ namespace VirtualWallet.WEB.Controllers.MVC
 
 
         [HttpGet]
-        [RequireAuthorization]
         public async Task<IActionResult> Index(int id)
         {
             var result = await _walletService.GetWalletByIdAsync(id);
@@ -39,7 +39,6 @@ namespace VirtualWallet.WEB.Controllers.MVC
         }
 
         [HttpGet]
-        [RequireAuthorization]
         public IActionResult Add()
         {
             var model = new WalletRequestDto();
@@ -47,7 +46,6 @@ namespace VirtualWallet.WEB.Controllers.MVC
         }
 
         [HttpPost]
-        [RequireAuthorization]
         public async Task<IActionResult> Add(WalletRequestDto wallet)
         {
             if (wallet.WalletType == DATA.Models.Enums.WalletType.Main)
@@ -109,10 +107,9 @@ namespace VirtualWallet.WEB.Controllers.MVC
         }
 
         [HttpGet]
-        [RequireAuthorization]
-        public async Task<int> GetWalletIdByPublicId(Guid publicId)
+        public async Task<int> GetWalletIdByUserDetails(string details)
         {
-            var result = await _walletService.GetWalletIdByPublicIdAsync(publicId);
+            var result = await _walletService.GetWalletIdByUserDetailsAsync(details);
 
             if (!result.IsSuccess)
             {
@@ -121,7 +118,6 @@ namespace VirtualWallet.WEB.Controllers.MVC
 
             return result.Value;
         }
-
 
         [HttpGet]
         public async Task<IActionResult> AddUser(int id)

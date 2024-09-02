@@ -1,35 +1,40 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CloudinaryDotNet;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Immutable;
+using Twilio.Jwt.AccessToken;
+using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Services.Contracts;
 using VirtualWallet.WEB.Models.ViewModels.WalletTransactionViewModels;
 
 namespace VirtualWallet.WEB.Controllers.MVC
 {
+    [RequireAuthorization(minRequiredRoleLevel: 2)]
     public class WalletTransactionController : BaseController
     {
         private readonly IWalletTransactionService _walletTransactionService;
         private readonly IWalletService _walletService;
         private readonly IViewModelMapper _viewModelMapper;
+        private readonly IEmailService _emailService;
 
         public WalletTransactionController(IWalletTransactionService walletTransactionService,
             IWalletService walletService,
-            IViewModelMapper viewModelMapper)
+            IViewModelMapper viewModelMapper,
+            IEmailService emailService)
         {
             _walletTransactionService = walletTransactionService;
             _walletService = walletService;
             _viewModelMapper = viewModelMapper;
+            _emailService = emailService;
         }
 
 
         [HttpGet]
-        [RequireAuthorization]
         public IActionResult Index()
         {
             return View();
         }
 
-
         [HttpGet]
-        [RequireAuthorization]
         public async Task<IActionResult> Details(int id)
         {
             var result = await _walletTransactionService.GetTransactionByIdAsync(id);
@@ -44,7 +49,6 @@ namespace VirtualWallet.WEB.Controllers.MVC
         }
 
         [HttpGet]
-        [RequireAuthorization]
         public async Task<IActionResult> VerifyPayment(int id)
         {
             var result = await _walletTransactionService.GetTransactionByIdAsync(id);
@@ -59,7 +63,6 @@ namespace VirtualWallet.WEB.Controllers.MVC
         }
 
         [HttpPost]
-        [RequireAuthorization]
         public async Task<IActionResult> VerifyPayment(int transactionId, string code)
         {
             var result = await _walletTransactionService.GetTransactionByIdAsync(transactionId);
@@ -89,7 +92,6 @@ namespace VirtualWallet.WEB.Controllers.MVC
         }
 
         [HttpGet]
-        [RequireAuthorization]
         public async Task<IActionResult> DepositInternally()
         {
             var result = await _walletService.GetWalletsByUserIdAsync(CurrentUser.Id);
@@ -110,7 +112,6 @@ namespace VirtualWallet.WEB.Controllers.MVC
         }
 
         [HttpGet]
-        [RequireAuthorization]
         public async Task<IActionResult> DepositExternally()
         {
             var result = await _walletService.GetWalletsByUserIdAsync(CurrentUser.Id);
@@ -129,8 +130,13 @@ namespace VirtualWallet.WEB.Controllers.MVC
             return View(vm);
         }
 
+        [HttpGet]
+        public IActionResult RequestDeposit()
+        {
+            return View();
+        }
+
         [HttpPost]
-        [RequireAuthorization]
         public async Task<int> Deposit(int senderWalletId, int recipientWalletId, decimal amount)
         {
             var result = await _walletTransactionService.DepositStep1Async(senderWalletId, recipientWalletId, amount);
@@ -139,6 +145,41 @@ namespace VirtualWallet.WEB.Controllers.MVC
             {
                 TempData["ErrorMessage"] = result.Error;
             }
+
+            return result.Value;
+        }
+
+        [HttpPost]
+        public async Task<int> RequestDeposit(int senderWalletId, decimal amount, string description)
+        {
+            var myMainWalletIdResult = await _walletService.GetWalletIdByUserDetailsAsync(CurrentUser.Username);
+
+            var result = await _walletTransactionService.DepositStep1Async(senderWalletId, myMainWalletIdResult.Value, amount);
+
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+            }
+
+            var senderWalletResult = await _walletService.GetWalletByIdAsync(senderWalletId);
+
+            if (!senderWalletResult.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+            }
+
+            var senderEmail = senderWalletResult.Value?.User?.Email;
+
+
+            if (string.IsNullOrEmpty(senderEmail))
+            {
+                TempData["ErrorMessage"] = "Incorrect user information.";
+            }
+
+            string transactionUrl = Url.Action("VerifyPayment", "WalletTransaction", new { id = result.Value }, Request.Scheme);
+            string anchorTag = $"<a href=\"{transactionUrl}\">View Transaction</a>";
+
+            await _emailService.SendEmailAsync(senderEmail, $"{CurrentUser.Username} is requesting payment", $"{CurrentUser.Username} sent you a payment request for {amount} BGN with a description: {description}. Please confirm the payment at {anchorTag}");
 
             return result.Value;
         }

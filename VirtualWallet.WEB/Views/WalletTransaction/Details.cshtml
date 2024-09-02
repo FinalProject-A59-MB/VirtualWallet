@@ -1,4 +1,35 @@
 ﻿@using VirtualWallet.WEB.Models.ViewModels.WalletViewModels
 @model WalletTransactionViewModel
 
+@section Scripts {
+    <link href="~/css/wallettrasactionsuccess.css" rel="stylesheet" />
+}
 
+<div class="success-page">
+
+    @if (Model.Status == TransactionStatus.Completed)
+    {
+        <div class="unique-card bg-dark">
+            <div class="card bg-dark">
+                <div class="circle">
+                    <i class="checkmark">✓</i>
+                </div>
+                <h1>Success</h1>
+                <p class="text-light">Transaction was successful!</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="unique-card bg-dark">
+            <div class="card bg-dark">
+                <div class="circle">
+                    <i class="checkmark">✓</i>
+                </div>
+                <h1>Success</h1>
+                <p class="text-light">Transaction request sent!</p>
+            </div>
+        </div>
+    }
+
+</div>

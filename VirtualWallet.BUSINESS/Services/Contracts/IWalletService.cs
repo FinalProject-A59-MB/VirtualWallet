@@ -12,7 +12,7 @@ namespace VirtualWallet.DATA.Services.Contracts
         Task<Result<int>> AddWalletAsync(Wallet wallet);
         Task<Result> UpdateWalletAsync(Wallet wallet);
         Task<Result> RemoveWalletAsync(int walletId);
-        Task<Result<int>> GetWalletIdByPublicIdAsync(Guid publicId);
+        Task<Result<int>> GetWalletIdByUserDetailsAsync(string details);
         Task<Result> AddUserToJointWalletAsync(int walletId, string username);
         Task<Result> RemoveUserFromJointWalletAsync(int walletId, string username);
     }
