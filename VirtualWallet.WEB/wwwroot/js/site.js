@@ -132,10 +132,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const issuerBackgrounds = {
         "american_express": "linear-gradient(10deg, #2f1152, #6a27a1)",
-        "visa": "linear-gradient(10deg, #1f2857, #2b3d88)",
+        "visa": "linear-gradient(10deg, #1f2857, #5e75d6)",
         "diners": "linear-gradient(10deg, #2b4145, #546d72)",
-        "discover": "linear-gradient(10deg, #4a3525, #7f563d)",
-        "jcb": "linear-gradient(10deg, #06364d, #1e5f7a)",
+        "discover": "linear-gradient(10deg, #4a3525, #d69a76)",
+        "jcb": "linear-gradient(10deg, #06364d, #6ab8d9)",
         "maestro": "linear-gradient(10deg, #541010, #c98181)",
         "mastercard": "linear-gradient(10deg, #542711, #915b41)",
     };
