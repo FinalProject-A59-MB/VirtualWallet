@@ -81,6 +81,8 @@ namespace ForumProject.Controllers.MVC
 
             return View(profile);
         }
+
+
         [RequireAuthorization(minRequiredRoleLevel: 2)]
         [HttpPost]
         public async Task<IActionResult> UpdateProfile(UserProfileViewModel userProfilemodel)
@@ -100,7 +102,13 @@ namespace ForumProject.Controllers.MVC
             User user = userResult.Value;
             user.UserProfile = userProfil;
             user.Username = username;
-            await _userService.UpdateUserAsync(user);
+            var result = await _userService.UpdateUserAsync(user);
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+                return View("EditProfile", userProfilemodel);
+            }
+            TempData["SuccessMessage"] = "Profile succesfully updated";
             string token = _authService.GenerateToken(user);
             HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
             return RedirectToAction("Profile");
@@ -462,7 +470,7 @@ namespace ForumProject.Controllers.MVC
             return View(userViewModels);
         }
 
-        [RequireAuthorization(minRequiredRoleLevel: 2)]
+        [RequireAuthorization(minRequiredRoleLevel: 1)]
         public async Task<IActionResult> Cards()
         {
             if (!CurrentUser.Cards.Any())
@@ -475,7 +483,7 @@ namespace ForumProject.Controllers.MVC
             return View("UserCards", viewModel);
         }
 
-        [RequireAuthorization(minRequiredRoleLevel: 2)]
+        [RequireAuthorization(minRequiredRoleLevel: 1)]
         public async Task<IActionResult> Wallets()
         {
             User user = CurrentUser;

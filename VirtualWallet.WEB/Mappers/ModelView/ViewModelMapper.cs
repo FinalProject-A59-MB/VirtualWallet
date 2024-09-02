@@ -51,6 +51,7 @@ public class ViewModelMapper : IViewModelMapper
             PostalCode = model.PostalCode,
             PhotoUrl = model.PhotoUrl,
             UserId = model.UserId,
+            DateOfBirth = model.DateOfBirth,
         };
     }
 

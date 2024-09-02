@@ -14,7 +14,7 @@
         CreatedBefore = ViewBag.FilterParameters?.CreatedBefore,
         SortBy = ViewBag.FilterParameters?.SortBy,
         SortOrder = ViewBag.FilterParameters?.SortOrder,
-        TransactionType = ViewBag.FilterParameters?.TransactionType // New filter for transaction type
+        TransactionType = ViewBag.FilterParameters?.TransactionType
     };
 }
 
@@ -34,7 +34,7 @@
                                         <th scope="col">Amount</th>
                                         <th scope="col">Type</th>
                                         <th scope="col">Wallet</th>
-                                        <th scope="col">Fee</th>
+                                        <th scope="col">Fee*</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -42,7 +42,7 @@
                                     {
                                         @foreach (var transaction in Model)
                                         {
-                                            var fee = transaction.Fee ?? 0;
+                                            var fee = transaction.Fee ?? 0.00m;
                                             <tr>
                                                 <td>@transaction.Card.CardNumber</td>
                                                 <td>@transaction.CreatedAt.ToString("MMM dd, yyyy")</td>
@@ -62,10 +62,12 @@
                                 </tbody>
                             </table>
                         </div>
+                        <p>
+                            * A nominal service fee will be applied to withdrawal transactions in cases where the currency of the wallet differs from that of the destination card.
+                        </p>
 
                     </div>
                 </div>
-
                 <nav aria-label="Page navigation" class="mt-4">
                     @PaginationHelper.GeneratePaginationLinks(Url, totalPages, pageNumber, "Index", routeValues)
                 </nav>

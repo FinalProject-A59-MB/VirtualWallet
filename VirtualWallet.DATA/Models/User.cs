@@ -26,5 +26,4 @@ namespace VirtualWallet.DATA.Models
         public BlockedRecord? BlockedRecord { get; set; }
     }
 
-
 }

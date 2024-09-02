@@ -21,25 +21,26 @@
 
                         <div class="mb-3">
                             <label asp-for="FirstName" class="form-label">First Name</label>
-                            <input asp-for="FirstName" class="form-control bg-dark-3 text-white" />
+                            <input asp-for="FirstName" class="form-control bg-dark-3 text-white" type="text" />
                             <span asp-validation-for="FirstName" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="LastName" class="form-label">Last Name</label>
-                            <input asp-for="LastName" class="form-control bg-dark-3 text-white" />
+                            <input asp-for="LastName" class="form-control bg-dark-3 text-white" type="text" />
                             <span asp-validation-for="LastName" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
-                            <input asp-for="PhoneNumber" class="form-control bg-dark-3 text-white" />
+                            <input asp-for="PhoneNumber" class="form-control bg-dark-3 text-white" type="number" />
                             <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                         </div>
 
-                        <div class="mb-4">
-                            <label class="form-label">Profile Picture</label>
-                            <input type="file" name="profilePicture" class="form-control bg-dark-3 text-white" />
+                        <div class="mb-3">
+                            <label asp-for="DateOfBirth" class="form-label">Date of Birth</label>
+                            <input asp-for="DateOfBirth" class="form-control bg-dark-3 text-white" type="date" />
+                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
                         </div>
                     </div>
 
@@ -53,19 +54,19 @@
 
                         <div class="mb-3">
                             <label asp-for="City" class="form-label">City</label>
-                            <input asp-for="City" class="form-control bg-dark-3 text-white" />
+                            <input asp-for="City" class="form-control bg-dark-3 text-white" type="text" />
                             <span asp-validation-for="City" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="State" class="form-label">State</label>
-                            <input asp-for="State" class="form-control bg-dark-3 text-white" />
+                            <input asp-for="State" class="form-control bg-dark-3 text-white" type="text" />
                             <span asp-validation-for="State" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
                             <label asp-for="Country" class="form-label">Country</label>
-                            <input asp-for="Country" class="form-control bg-dark-3 text-white" />
+                            <input asp-for="Country" class="form-control bg-dark-3 text-white" type="text" />
                             <span asp-validation-for="Country" class="text-danger"></span>
                         </div>
 
@@ -77,8 +78,19 @@
                     </div>
                 </div>
 
+                <!-- Profile Picture Section -->
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <div class="mb-4">
+                            <label class="form-label">Profile Picture</label>
+                            <input asp-for="file" class="form-control bg-dark-3 text-white" type="file" style="max-width: 50%; margin: 0 auto;" />
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Hidden UserId -->
                 <input asp-for="UserId" type="hidden" />
+                <input asp-for="PhotoUrl" type="hidden" />
 
                 <!-- Submit Button -->
                 <div class="text-center">
@@ -88,8 +100,6 @@
                 <div class="text-center">
                     <a href="@Url.Action("Profile", "User", new { id = Model.UserId })" class="btn btn-outline-secondary w-50 mt-3">Back to Profile</a>
                 </div>
-
-
             </form>
         </div>
     </div>

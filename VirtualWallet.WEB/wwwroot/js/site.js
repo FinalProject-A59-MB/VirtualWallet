@@ -117,3 +117,42 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+// add logo and change background color for cards in user/cards
+document.addEventListener("DOMContentLoaded", function () {
+    const issuerLogos = {
+        "amex": "/images/cardLogos/american-express.svg",
+        "visa": "/images/cardLogos/visa.svg",
+        "diners": "/images/cardLogos/diners.svg",
+        "discover": "/images/cardLogos/discover.svg",
+        "jcb": "/images/cardLogos/jcb.svg",
+        "maestro": "/images/cardLogos/maestro.svg",
+        "mastercard": "/images/cardLogos/mastercard.svg",
+    };
+
+    const issuerBackgrounds = {
+        "amex": "linear-gradient(10deg, #2f1152, #6a27a1)",  // Example gradient for Amex
+        "visa": "linear-gradient(10deg, #1f2857, #2b3d88)",   // Example gradient for Visa
+        "diners": "linear-gradient(10deg, #2b4145, #546d72)", // Example gradient for Diners Club
+        "discover": "linear-gradient(10deg, #4a3525, #7f563d)",// Example gradient for Discover
+        "jcb": "linear-gradient(10deg, #06364d, #1e5f7a)",    // Example gradient for JCB
+        "maestro": "linear-gradient(10deg, #541010, #c98181)",// Example gradient for Maestro
+        "mastercard": "linear-gradient(10deg, #542711, #915b41)", // Example gradient for Mastercard
+    };
+
+    document.querySelectorAll(".issuer-logo").forEach(function (img) {
+        const issuer = img.getAttribute("data-issuer").toLowerCase();
+
+        if (issuerLogos[issuer]) {
+            img.setAttribute("src", issuerLogos[issuer]);
+        } else {
+            img.setAttribute("alt", "No logo available");
+        }
+
+        const cardElement = img.closest('.card');
+        if (issuerBackgrounds[issuer]) {
+            cardElement.style.setProperty('background', issuerBackgrounds[issuer], 'important');
+        }
+    });
+});
+

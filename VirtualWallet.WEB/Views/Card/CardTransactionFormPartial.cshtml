@@ -1,27 +1,37 @@
 ﻿@model CardTransactionViewModel
 
-<div class="transaction-area area-padding fix">
+<div class="transaction-area area-padding fix position-relative">
     <div class="transaction-overlay"></div>
     <div class="d-table w-100 h-100">
         <div class="d-table-cell align-middle">
             <div class="container w-50">
                 <div class="row justify-content-center">
                     <div class="col-md-8 col-sm-10 col-xs-12">
-                        <div class="transaction-form bg-dark-1 p-5 rounded shadow animate__animated animate__fadeIn">
-                            <h4 class="transaction-title text-center mb-4">@Model.ActionTitle</h4>
+                        <div class="transaction-form bg-dark-1 p-5 rounded shadow-lg animate__animated animate__fadeIn">
+                            <div class="progress mb-4" style="height: 1.5rem; background-color: #2c2f33; border-radius: 10px; overflow: hidden; position: relative;">
+                                <div class="progress-bar bg-warning text-dark fw-bold text-center" role="progressbar" style="width: 50%; font-size: 1rem; line-height: 1.5rem; text-align: left; padding-left: 10px;">
+                                    Step 1
+                                </div>
+                                <div class="progress-bar bg-dark text-light fw-bold text-center" role="progressbar" style="width: 50%; background-color: #2c2f33; font-size: 1rem; line-height: 1.5rem; text-align: right; padding-right: 10px;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                    Step 2
+                                </div>
+                            </div>
+
+
+                            <h4 class="transaction-title text-center text-warning mb-4">@Model.ActionTitle</h4>
                             <form asp-action="@Model.FormAction" method="post">
                                 <input type="hidden" name="ActionTitle" value="@Model.ActionTitle" />
                                 <input type="hidden" name="FormAction" value="@Model.FormAction" />
                                 <input type="hidden" name="Type" value="@Model.Type" />
 
                                 <div class="mb-4">
-                                    <label for="amount" class="form-label">Amount</label>
-                                    <input type="number" id="amount" name="Amount" class="form-control" placeholder="Enter amount" required step="0.01" min="0" />
+                                    <label for="amount" class="form-label text-light">Amount</label>
+                                    <input type="number" id="amount" name="Amount" class="form-control bg-dark-2 text-white border-0 shadow-sm" placeholder="Enter amount" required step="0.01" min="0" />
                                 </div>
 
                                 <div class="mb-4">
-                                    <label for="wallet" class="form-label">Select Wallet</label>
-                                    <select name="WalletId" id="wallet" class="form-select" required>
+                                    <label for="wallet" class="form-label text-light">Select Wallet</label>
+                                    <select name="WalletId" id="wallet" class="form-select bg-dark-2 text-white border-0 shadow-sm" required>
                                         @foreach (var wallet in ViewBag.Wallets)
                                         {
                                             <option value="@wallet.Id">@wallet.Name (@wallet.Currency)</option>
@@ -30,21 +40,25 @@
                                 </div>
 
                                 <div class="mb-4">
-                                    <label for="card" class="form-label">Select Card</label>
-                                    <select name="CardId" id="card" class="form-select" required>
+                                    <label for="card" class="form-label text-light">Select Card</label>
+                                    <select name="CardId" id="card" class="form-select bg-dark-2 text-white border-0 shadow-sm" required>
                                         @foreach (var card in ViewBag.Cards)
                                         {
-                                            <option value="@card.Id">@card.CardNumber</option>
+                                            <option value="@card.Id">@card.CardNumber (@card.Currency)</option>
                                         }
                                     </select>
                                 </div>
 
                                 <div class="text-center">
-                                    <button type="submit" class="btn btn-outline-success w-100">Submit</button>
+                                    <button type="submit" class="btn btn-success w-100 py-2">
+                                        <i class="fas fa-check"></i> Submit
+                                    </button>
                                 </div>
 
                                 <div class="text-center mt-4">
-                                    <a href="@Url.Action("Profile", "User", new { id = ViewBag.UserId })" class="btn btn-outline-secondary w-50">Back to Profile</a>
+                                    <a href="@Url.Action("Profile", "User", new { id = ViewBag.UserId })" class="btn btn-outline-secondary w-50 py-2">
+                                        <i class="fas fa-arrow-left"></i> Back to Profile
+                                    </a>
                                 </div>
                             </form>
                         </div>
