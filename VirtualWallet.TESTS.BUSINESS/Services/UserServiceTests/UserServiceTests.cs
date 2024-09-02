@@ -15,6 +15,7 @@ namespace VirtualWallet.TESTS.BUSINESS.Services.UserServiceTests
     {
         private Mock<IUserRepository> _userRepositoryMock;
         private Mock<ICurrencyService> _currencyServiceMock;
+        private Mock<IWalletRepository> _walletServiceMock;
         private UserService _userService;
 
         [TestInitialize]
@@ -22,7 +23,8 @@ namespace VirtualWallet.TESTS.BUSINESS.Services.UserServiceTests
         {
             _userRepositoryMock = new Mock<IUserRepository>();
             _currencyServiceMock = new Mock<ICurrencyService>();
-            _userService = new UserService(_userRepositoryMock.Object, _currencyServiceMock.Object);
+            _walletServiceMock = new Mock<IWalletRepository>();
+            _userService = new UserService(_userRepositoryMock.Object, _currencyServiceMock.Object, _walletServiceMock.Object);
         }
 
         [TestMethod]

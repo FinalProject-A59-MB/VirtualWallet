@@ -137,61 +137,64 @@ namespace VirtualWallet.DATA.Context
                 context.SaveChanges();
 
             }
-
-            var realCardTemplates = context.RealCards.ToList();
-            var indicesList = Enumerable.Range(0, context.RealCards.Count()).ToList();
-            var shuffledIndices = indicesList.OrderBy(x => _random.Next()).ToList();
-            var indicesStack = new Stack<int>(shuffledIndices);
-
-            foreach (var user in context.Users)
+            if (!context.Wallets.Any())
             {
-                for (int i = 0; i < 2 && indicesStack.Count > 0; i++)
+
+                var realCardTemplates = context.RealCards.ToList();
+                var indicesList = Enumerable.Range(0, context.RealCards.Count()).ToList();
+                var shuffledIndices = indicesList.OrderBy(x => _random.Next()).ToList();
+                var indicesStack = new Stack<int>(shuffledIndices);
+
+                foreach (var user in context.Users)
                 {
-                    var templateIndex = indicesStack.Pop();
-                    var template = realCardTemplates[templateIndex];
-
-                    var card = new Card
+                    for (int i = 0; i < 2 && indicesStack.Count > 0; i++)
                     {
-                        CardHolderName = $"{template.CardHolderName}",
-                        CardNumber = $"{new string('*', 12)}{template.CardNumber.Substring(template.CardNumber.Length - 4)}",
-                        Issuer = template.Issuer,
-                        ExpirationDate = template.ExpirationDate,
-                        Cvv = template.Cvv,
-                        CardType = template.CardType,
-                        Currency = template.Currency,
-                        PaymentProcessorToken = template.PaymentProcessorToken,
-                    };
+                        var templateIndex = indicesStack.Pop();
+                        var template = realCardTemplates[templateIndex];
 
-                    user.Cards.Add(card);
-                    var mainCard = user.Cards.First();
-                    var wallet = new Wallet
-                    {
-                        Name = $"{user.Username}'s Main Wallet",
-                        Balance = (decimal)(_random.NextDouble() * (1000 - 100) + 100),
-                        Currency = mainCard.Currency,
-                        UserId = user.Id,
-                        WalletType = WalletType.Main
+                        var card = new Card
+                        {
+                            CardHolderName = $"{template.CardHolderName}",
+                            CardNumber = $"{new string('*', 12)}{template.CardNumber.Substring(template.CardNumber.Length - 4)}",
+                            Issuer = template.Issuer,
+                            ExpirationDate = template.ExpirationDate,
+                            Cvv = template.Cvv,
+                            CardType = template.CardType,
+                            Currency = template.Currency,
+                            PaymentProcessorToken = template.PaymentProcessorToken,
+                        };
 
-                    };
+                        user.Cards.Add(card);
+                        var mainCard = user.Cards.First();
+                        var wallet = new Wallet
+                        {
+                            Name = $"{user.Username}'s Main Wallet",
+                            Balance = (decimal)(_random.NextDouble() * (1000 - 100) + 100),
+                            Currency = mainCard.Currency,
+                            UserId = user.Id,
+                            WalletType = WalletType.Main
 
-                    if (user.MainWallet == null)
-                    {
-                        user.MainWallet = wallet;
+                        };
+
+                        if (user.MainWallet == null)
+                        {
+                            user.MainWallet = wallet;
+                        }
+                        else
+                        {
+                            wallet.Name = $"{user.Username}'s Standart Wallet";
+                            wallet.WalletType = WalletType.Standart;
+                            wallet.Currency = GetRandomCurrency(mainCard.Currency);
+                            user.Wallets.Add(wallet);
+                        }
                     }
-                    else
-                    {
-                        wallet.Name = $"{user.Username}'s Standart Wallet";
-                        wallet.WalletType = WalletType.Standart;
-                        wallet.Currency = GetRandomCurrency(mainCard.Currency);
-                        user.Wallets.Add(wallet);
-                    }
+
+
+
                 }
 
-                
-                
+                context.SaveChanges();
             }
-
-            context.SaveChanges();
 
         }
 
