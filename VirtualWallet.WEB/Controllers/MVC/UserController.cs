@@ -490,6 +490,15 @@ namespace ForumProject.Controllers.MVC
 
             UserViewModel userViewModel = _modelMapper.ToUserViewModel(user);
 
+            var result = await _walletService.GetWalletsByUserIdAsync(user.Id);
+
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+            }
+
+            userViewModel.Wallets = result.Value.Select(x => _modelMapper.ToWalletViewModel(x)).ToList();    
+
             return View("UserWallets", userViewModel);
         }
 
