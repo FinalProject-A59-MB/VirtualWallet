@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SendGrid.Helpers.Mail;
+using System.Linq.Expressions;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Repositories.Contracts;
@@ -136,5 +138,104 @@ namespace VirtualWallet.DATA.Repositories
 
             await _dbContext.SaveChangesAsync();
         }
+
+        //    public async Task<ICollection<WalletTransaction>> FilterByAsync(WalletTransactionQueryParameters filterParameters, int? userId = null)
+        //    {
+        //        var transactions = _dbContext.WalletTransactions.AsQueryable();
+
+        //        if (userId.HasValue)
+        //        {
+        //            transactions = transactions.Where(t => t.SenderId == userId.Value || t.RecipientId == userId.Value);
+        //        }
+
+        //        if (filterParameters.WalletId.HasValue)
+        //        {
+        //            transactions = transactions.Where(t => t.WalletId == filterParameters.WalletId.Value);
+        //        }
+        //        if (filterParameters.MinAmount.HasValue)
+        //        {
+        //            transactions = transactions.Where(t => t.Amount >= filterParameters.MinAmount.Value);
+        //        }
+        //        if (filterParameters.MaxAmount.HasValue)
+        //        {
+        //            transactions = transactions.Where(t => t.Amount <= filterParameters.MaxAmount.Value);
+        //        }
+        //        if (filterParameters.CreatedAfter.HasValue)
+        //        {
+        //            transactions = transactions.Where(t => t.CreatedAt >= filterParameters.CreatedAfter.Value);
+        //        }
+        //        if (filterParameters.CreatedBefore.HasValue)
+        //        {
+        //            transactions = transactions.Where(t => t.CreatedAt <= filterParameters.CreatedBefore.Value);
+        //        }
+        //        if (filterParameters.TransactionType.HasValue)
+        //        {
+        //            transactions = transactions.Where(t => t.TransactionType == filterParameters.TransactionType.Value);
+        //        }
+        //        if (filterParameters.Status.HasValue)
+        //        {
+        //            transactions = transactions.Where(t => t.Status == filterParameters.Status.Value);
+        //        }
+
+        //        var sortPropertyMapping = new Dictionary<string, Expression<Func<WalletTransaction, object>>>()
+        //{
+        //    { "CreatedAt", t => t.CreatedAt },
+        //    { "Amount", t => t.Amount }
+        //};
+
+        //        if (!string.IsNullOrEmpty(filterParameters.SortBy) && sortPropertyMapping.ContainsKey(filterParameters.SortBy))
+        //        {
+        //            transactions = filterParameters.SortOrder.ToLower() == "asc"
+        //                ? transactions.OrderBy(sortPropertyMapping[filterParameters.SortBy])
+        //                : transactions.OrderByDescending(sortPropertyMapping[filterParameters.SortBy]);
+        //        }
+
+        //        var skip = (filterParameters.PageNumber - 1) * filterParameters.PageSize;
+
+        //        return await transactions.Skip(skip).Take(filterParameters.PageSize).ToListAsync();
+        //    }
+
+        //    public async Task<int> GetTotalCountAsync(WalletTransactionQueryParameters filterParameters, int? userId = null)
+        //    {
+        //        var transactions = _context.WalletTransactions.AsQueryable();
+
+        //        if (userId.HasValue)
+        //        {
+        //            transactions = transactions.Where(t => t.SenderId == userId.Value || t.RecipientId == userId.Value);
+        //        }
+
+        //        if (filterParameters.WalletId.HasValue)
+        //        {
+        //            transactions = transactions.Where(t => t.WalletId == filterParameters.WalletId.Value);
+        //        }
+        //        if (filterParameters.MinAmount.HasValue)
+        //        {
+        //            transactions = transactions.Where(t => t.Amount >= filterParameters.MinAmount.Value);
+        //        }
+        //        if (filterParameters.MaxAmount.HasValue)
+        //        {
+        //            transactions = transactions.Where(t => t.Amount <= filterParameters.MaxAmount.Value);
+        //        }
+        //        if (filterParameters.CreatedAfter.HasValue)
+        //        {
+        //            transactions = transactions.Where(t => t.CreatedAt >= filterParameters.CreatedAfter.Value);
+        //        }
+        //        if (filterParameters.CreatedBefore.HasValue)
+        //        {
+        //            transactions = transactions.Where(t => t.CreatedAt <= filterParameters.CreatedBefore.Value);
+        //        }
+        //        if (filterParameters.TransactionType.HasValue)
+        //        {
+        //            transactions = transactions.Where(t => t.TransactionType == filterParameters.TransactionType.Value);
+        //        }
+        //        if (filterParameters.Status.HasValue)
+        //        {
+        //            transactions = transactions.Where(t => t.Status == filterParameters.Status.Value);
+        //        }
+
+        //        return await transactions.CountAsync();
+        //    }
+
+        //}
     }
 }
