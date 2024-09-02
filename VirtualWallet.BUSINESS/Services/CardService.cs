@@ -16,7 +16,7 @@ namespace VirtualWallet.BUSINESS.Services
         private readonly IWalletService _walletService;
 
         public CardService(
-            ICardRepository cardRepository, 
+            ICardRepository cardRepository,
             ICardTransactionRepository cardTransactionRepository,
             IWalletService walletService)
         {
@@ -33,6 +33,8 @@ namespace VirtualWallet.BUSINESS.Services
                 : Result<Card>.Failure(ErrorMessages.CardNotFound);
         }
 
+
+
         public async Task<Result<IEnumerable<Card>>> GetUserCardsAsync(int userId)
         {
             List<Card> cards = await _cardRepository.GetCardsByUserId(userId).ToListAsync();
@@ -46,6 +48,12 @@ namespace VirtualWallet.BUSINESS.Services
             if (user == null || card == null)
             {
                 return Result.Failure("Invalid user or card information.");
+            }
+
+            var cardResult = _cardRepository.GetCardByTokenAsync(card.PaymentProcessorToken);
+            if (cardResult == null)
+            {
+                return Result.Failure("This card is already added to our system.");
             }
 
             if (!user.MainWalletId.HasValue)
@@ -66,6 +74,8 @@ namespace VirtualWallet.BUSINESS.Services
 
                 user.MainWalletId = wallet.Id;
             }
+
+
 
             user.Cards.Add(card);
             await _cardRepository.AddCardAsync(card);
@@ -109,16 +119,18 @@ namespace VirtualWallet.BUSINESS.Services
                 : Result<IEnumerable<CardTransaction>>.Failure("No Transactions found");
         }
 
-        public async Task<Result<IEnumerable<CardTransaction>>> FilterByAsync(CardTransactionQueryParameters filterParameters,int? userid=null)
-        {   ICollection<CardTransaction> result = await _cardRepository.FilterByAsync(filterParameters,userid);
+        public async Task<Result<IEnumerable<CardTransaction>>> FilterByAsync(CardTransactionQueryParameters filterParameters, int? userid = null)
+        {
+            ICollection<CardTransaction> result = await _cardRepository.FilterByAsync(filterParameters, userid);
             return result.Any()
                 ? Result<IEnumerable<CardTransaction>>.Success(result)
                 : Result<IEnumerable<CardTransaction>>.Failure("No Transactions found");
         }
 
         public async Task<Result<int>> GetTotalCountAsync(CardTransactionQueryParameters filterParameters, int? userId = null)
-        {   int result = await _cardRepository.GetTotalCountAsync(filterParameters,userId);
-            return result!=0
+        {
+            int result = await _cardRepository.GetTotalCountAsync(filterParameters, userId);
+            return result != 0
                 ? Result<int>.Success(result)
                 : Result<int>.Failure("No Transactions found");
         }
