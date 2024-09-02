@@ -33,6 +33,12 @@ namespace VirtualWallet.DATA.Repositories
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
+        public async Task<Card?> GetCardByTokenAsync(string token)
+        {
+            return await GetCardsWithDetails()
+                .FirstOrDefaultAsync(c => c.PaymentProcessorToken == token);
+        }
+
         public async Task AddCardAsync(Card card)
         {
             card.CardNumber = ObfuscateCardNumber(card.CardNumber);

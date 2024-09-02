@@ -130,7 +130,7 @@
                         </svg>
                     </div>
                     <div class="field-container">
-                        <input asp-for="ExpirationDate" class="form-control" type="text"/>
+                        <input asp-for="ExpirationDate" class="form-control" type="text" placeholder="MM/YY"/>
                         <span asp-validation-for="ExpirationDate" class="text-danger"></span>
                     </div>
                     <div class="field-container">
@@ -147,10 +147,10 @@
         </div>
 
         <div class="d-flex gap-4 justify-content-center mb-3">
-            <div class="form-group text-center mt-3">
+            <div class="form-group text-center">
                 <button type="button" class="btn btn-outline-success" onclick="submitForm()">Add Card</button>
             </div>
-            <div class="form-group text-center mt-3">
+            <div class="form-group text-center">
                 <button type="button" class="btn btn-outline-danger" onclick="window.location.href='@Url.Action("Profile", "User")'">Cancel</button>
             </div>
         </div>

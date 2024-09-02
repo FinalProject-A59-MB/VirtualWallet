@@ -9,7 +9,7 @@ using VirtualWallet.WEB.Models.ViewModels.UserViewModels;
 
 namespace VirtualWallet.WEB.Controllers.MVC
 {
-    [RequireAuthorization(minRequiredRoleLevel: 2)]
+    [RequireAuthorization(minRequiredRoleLevel: 1)]
 
     public class CardController : BaseController
     {
@@ -19,7 +19,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
         private readonly IViewModelMapper _viewModelMapper;
         private readonly IWalletService _walletService;
         private readonly ICardTransactionService _cardTransactionService;
-        [RequireAuthorization(minRequiredRoleLevel: 2)]
+        [RequireAuthorization(minRequiredRoleLevel: 1)]
 
         public CardController(
             ICardService cardService,
@@ -36,7 +36,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
             _walletService = walletService;
             _cardTransactionService = cardTransactionService;
         }
-        [RequireAuthorization(minRequiredRoleLevel: 2)]
+        [RequireAuthorization(minRequiredRoleLevel: 1)]
 
         [HttpGet]
         public IActionResult AddCard(int userId)

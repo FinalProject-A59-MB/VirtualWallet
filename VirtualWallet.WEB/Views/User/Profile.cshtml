@@ -10,6 +10,11 @@
     bool areFriends = Model.Contacts.Any(c => c.ContactId == ViewBag.UserId && c.Status == FriendRequestStatus.Accepted);
     bool blocked = Model.Role == UserRole.Blocked.ToString();
     var mainCurrency = Model.MainWallet == null ? "$" : Model.MainWallet.Currency.ToString();
+
+    decimal totalBalance = Model.TotalBalance.HasValue
+        ? decimal.Round(Model.TotalBalance.Value, 2, MidpointRounding.AwayFromZero)
+        : 0.00m;
+
 }
 
 <div class="container @(canViewFullProfile ? "" : "w-50") bg-dark-1 py-5">
@@ -45,7 +50,7 @@
                         <div class="col-md-6 d-flex flex-column justify-content-between">
                             <!-- Total Balance with Wallet Icon -->
                             <div class="card bg-dark-3 text-white mb-4 shadow-sm">
-                                <div class="d-flex justify-content-center align-items-center">
+                                <div class="d-flex justify-content-center">
                                     <div class="card-body d-flex align-items-center">
                                         <a href="@Url.Action("Wallets", "User")" style="color: white;">
                                             <i class="bi bi-wallet2 display-3 me-3"></i>
@@ -53,7 +58,7 @@
                                         
                                         <div>
                                             <h5>Total Balance</h5>
-                                            <h3>@mainCurrency @Model.TotalBalance.ToString()</h3>
+                                            <h3>@mainCurrency @totalBalance</h3>
                                         </div>
                                     </div>
                                     <div class="card-body d-flex align-items-center">
@@ -218,7 +223,7 @@
                 <div class="d-flex gap-4 w-75 mx-auto">
                     <!-- User Image -->
                     <div class="col-md-@(canViewFullProfile ? "4" : "6") d-flex flex-column align-items-center mb-4 card bg-dark-3 text-white mb-4 shadow-sm p-3">
-                        <img src="@Model.UserProfile.PhotoUrl" alt="Profile Picture" class="img-thumbnail mb-3 shadow-lg" style="max-width: 100%;">
+                        <img src="@Model.UserProfile.PhotoUrl" alt="Profile Picture" class="img-thumbnail mb-3 shadow-lg" style="max-height: 200px; max-width: 100%;">
                         @if (canViewFullProfile)
                         {
                             <a href="@Url.Action("EditProfile", "User", new { userId = Model.Id })" class="btn btn-secondary">Edit Profile</a>

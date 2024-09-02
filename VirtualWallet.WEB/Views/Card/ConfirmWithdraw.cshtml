@@ -6,37 +6,65 @@
         ? decimal.Round(Model.Fee.Value, 2, MidpointRounding.AwayFromZero)
         : "0.00";
     dynamic amount = decimal.Round(Model.Amount, 2, MidpointRounding.AwayFromZero);
-
 }
 
-<div class="d-flex justify-content-center align-items-center">
-    <div class="card mb-4 w-50 mx-auto">
-        <div class="card-body bg-dark-1 text-center">
-            <h3 class="text-warning">@Model.ActionTitle</h3>
-            <h3>Are you sure you want to withdraw:</h3>
-            <h2><strong>@amount @Model.Card.Currency</strong></h2>
-            <h3>from your wallet</h3>
-            <h2><strong>@Model.Wallet.Name (@Model.Wallet.Currency)</strong></h2>
-            <h3>to the card</h3>
-            <h2><strong>@Model.Card.CardNumber (@Model.Card.Currency)</strong> ?</h2>
-            <h4 class="text-warning mt-3">
-                The transaction fee will be
-                <strong>@fee @Model.Card.Currency</strong>.
-            </h4>
+<div class="transaction-area area-padding fix position-relative">
+    <div class="transaction-overlay"></div>
+    <div class="d-table w-100 h-100">
+        <div class="d-table-cell align-middle">
+            <div class="container w-50">
+                <div class="row justify-content-center">
+                    <div class="col-md-8 col-sm-10 col-xs-12">
+                        <div class="d-flex flex-column justify-content-center align-items-center text-center transaction-form bg-dark-1 p-5 rounded shadow-lg animate__animated animate__fadeIn">
+                            <div class="progress mb-4" style="width: 100%; height: 1.5rem; background-color: #2c2f33; border-radius: 10px; overflow: hidden; position: relative;">
+                                <div class="progress-bar bg-success text-dark fw-bold text-left" role="progressbar" style="width: 50%; font-size: 1rem; line-height: 1.5rem; padding-left: 10px;">
+                                    Step 1
+                                </div>
+                                <div class="progress-bar bg-warning text-dark fw-bold text-right" role="progressbar" style="width: 50%; background-color: #2c2f33; font-size: 1rem; line-height: 1.5rem; padding-right: 10px;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                                    Step 2
+                                </div>
+                            </div>
 
-            <div class="mt-4">
-                <form asp-action="WithdrawFromWallet" method="post" class="d-inline-block">
-                    @Html.HiddenFor(m => m.WalletId)
-                    @Html.HiddenFor(m => m.CardId)
-                    @Html.HiddenFor(m => m.Amount)
-                    @Html.HiddenFor(m => m.Fee)
-                    <button type="submit" class="btn btn-success">
-                        <i class="fas fa-check"></i> Yes, proceed
-                    </button>
-                </form>
-                <a href="@Url.Action("Withdraw", "Card")" class="btn btn-secondary ms-2">
-                    <i class="fas fa-times"></i> Go back
-                </a>
+                            <h3 class="text-warning mb-4">@Model.ActionTitle</h3>
+                            <h4 class="mb-4">Please confirm your withdrawal details</h4>
+
+                            <div class="mb-3 p-1 border rounded bg-dark-2 w-100">
+                                <h5 class="text-muted">Amount to Withdraw:</h5>
+                                <h3 class="fw-bold text-white">@amount @Model.Card.Currency</h3>
+                            </div>
+
+                            <div class="mb-3 p-1 border rounded bg-dark-2 w-100">
+                                <h5 class="text-muted">Source Wallet:</h5>
+                                <h3 class="fw-bold text-white">@Model.Wallet.Name (@Model.Wallet.Currency)</h3>
+                            </div>
+
+                            <div class="mb-3 p-1 border rounded bg-dark-2 w-100">
+                                <h5 class="text-muted">Destination Card:</h5>
+                                <h3 class="fw-bold text-white">@Model.Card.CardNumber (@Model.Card.Currency)</h3>
+                            </div>
+
+                            <div class="mb-3 p-1 border rounded bg-dark-2 w-100">
+                                <h5 class="text-warning">Transaction Fee:</h5>
+                                <h4 class="fw-bold text-white">@fee @Model.Card.Currency</h4>
+                            </div>
+
+                            <div class="mt-4 d-flex justify-content-center">
+                                <form asp-action="WithdrawFromWallet" method="post" class="d-inline-block">
+                                    @Html.HiddenFor(m => m.WalletId)
+                                    @Html.HiddenFor(m => m.CardId)
+                                    @Html.HiddenFor(m => m.Amount)
+                                    @Html.HiddenFor(m => m.Fee)
+                                    <button type="submit" class="btn btn-success btn-lg me-2">
+                                        <i class="fas fa-check"></i> Yes, proceed
+                                    </button>
+                                </form>
+                                <a href="@Url.Action("Withdraw", "Card")" class="btn btn-secondary btn-lg ms-2">
+                                    <i class="fas fa-times"></i> Go back
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

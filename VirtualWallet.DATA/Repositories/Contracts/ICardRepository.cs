@@ -19,5 +19,7 @@ namespace VirtualWallet.DATA.Repositories.Contracts
 
         Task<int> GetTotalCountAsync(CardTransactionQueryParameters filterParameters, int? userId = null);
 
+        Task<Card?> GetCardByTokenAsync(string token);
+
     }
 }
