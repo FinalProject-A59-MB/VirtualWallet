@@ -128,7 +128,11 @@
                                     <div class="@(canViewFullProfile ? "col-md-6" : "")">
                                         <h5 class="mb-3 text-info">Account Information</h5>
                                         <p><strong class="text-info">Username:</strong> @Model.Username</p>
-                                        <p><strong class="text-info">Email:</strong> @Model.Email</p>
+                                        @if (canViewFullProfile || areFriends)
+                                        {
+                                            <p><strong class="text-info">Email:</strong> @Model.Email</p>
+                                        }
+                                        
                                         @if (Model.Role == UserRole.RegisteredUser.ToString())
                                         {
                                             <a href="@Url.Action("ResendVerificationEmail","Authentication",new{id = Model.Id})">Resend verification email.</a>
@@ -235,10 +239,22 @@
                         <h4 class="mb-3 text-info">Personal Information</h4>
                         <p><strong class="text-info">First Name:</strong> @Model.UserProfile.FirstName</p>
                         <p><strong class ="text-info">Last Name:</strong> @Model.UserProfile.LastName</p>
-                        <p><strong class="text-info">Date of Birth:</strong> @Model.UserProfile.DateOfBirth.ToString("MMMM dd, yyyy")</p>
-                        @if (canViewFullProfile)
+                        @if (canViewFullProfile || areFriends)
                         {
-                            <p><strong class="text-info">Phone Number:</strong> @Model.UserProfile.PhoneNumber</p>
+                            <p>
+                                <strong class="text-info">Date of Birth:</strong>
+                                @if (Model.UserProfile.DateOfBirth.HasValue)
+                                {
+                                    @Model.UserProfile.DateOfBirth.Value.ToString("MMMM dd, yyyy")
+                                }
+                                else
+                                {
+                                    @string.Empty;
+                                }
+                            </p>
+
+
+                            <p><strong class="text-info">Phone Number:</strong> @PhoneNumberHelper.FormatPhoneNumber(Model.UserProfile.PhoneNumber)</p>
                         }
                     </div>
 
