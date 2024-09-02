@@ -177,7 +177,7 @@ namespace VirtualWallet.BUSINESS.Services
 
                 await transaction.CommitAsync();
 
-                Result<User> userResult = await _userService.GetUserByIdAsync(recipientWallet.UserId);
+                Result<User> userResult = await _userService.GetUserByIdAsync(senderWallet.UserId);
 
                 if (!userResult.IsSuccess)
                 {

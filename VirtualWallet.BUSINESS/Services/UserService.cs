@@ -4,6 +4,7 @@ using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Helpers;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Models.Enums;
+using VirtualWallet.DATA.Repositories;
 using VirtualWallet.DATA.Repositories.Contracts;
 using VirtualWallet.DATA.Services.Contracts;
 
@@ -13,14 +14,16 @@ namespace VirtualWallet.DATA.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly ICurrencyService _currencyService;
+        private readonly IWalletRepository _walletRepository;
 
         public UserService(
             IUserRepository userRepository,
-            ICurrencyService currencyService
-            )
+            ICurrencyService currencyService,
+            IWalletRepository walletRepository)
         {
             _userRepository = userRepository;
             _currencyService = currencyService;
+            _walletRepository = walletRepository;
         }
 
         public async Task<Result<User>> RegisterUserAsync(User userToRegister)
@@ -66,6 +69,15 @@ namespace VirtualWallet.DATA.Services
                 LastName = "",
             };
             await _userRepository.AddUserProfileAsync(userProfile);
+
+            await _walletRepository.AddWalletAsync(new Wallet()
+            {
+                Name = "Main wallet",
+                WalletType = WalletType.Main,
+                Currency = CurrencyType.BGN,
+                UserId = userToRegister.Id,
+                Balance = 0,
+            });
 
             userToRegister.UserProfile = userProfile;
 

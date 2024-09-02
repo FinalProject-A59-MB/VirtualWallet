@@ -185,7 +185,7 @@
                                 <a href="@Url.Action("Index", "WalletTransaction", new { recipientId = Model.Id })" class="btn btn-primary btn mb-2 me-2">Send Money</a>
                                 @if (@areFriends)
                                 {
-                                    <a href="@Url.Action("RequestMoney", "Transaction", new { senderId = Model.Id })" class="btn btn-primary btn mb-2 me-2">Request Money</a>
+                                    <a href="@Url.Action("RequestDeposit", "WalletTransaction", new { senderId = Model.Id })" class="btn btn-primary btn mb-2 me-2">Request Money</a>
                                 }
                                 @if (!areFriends)
                                 {
