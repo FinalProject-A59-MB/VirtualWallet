@@ -2,9 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Immutable;
 using Twilio.Jwt.AccessToken;
+using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
+using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Services.Contracts;
 using VirtualWallet.WEB.Models.ViewModels.WalletTransactionViewModels;
+using VirtualWallet.WEB.Models.ViewModels.WalletViewModels;
 
 namespace VirtualWallet.WEB.Controllers.MVC
 {
@@ -184,5 +187,52 @@ namespace VirtualWallet.WEB.Controllers.MVC
             return result.Value;
         }
 
+        //[HttpGet]
+        //public async Task<IActionResult> Index([FromQuery] WalletTransactionQueryParameters filterParameters)
+        //{
+        //    Result<IEnumerable<Wallet>> walletsResult = await _walletService.GetUserWalletsAsync(CurrentUser.Id);
+        //    if (!walletsResult.IsSuccess)
+        //    {
+        //        TempData["InfoMessage"] = "Currently, you do not have any wallets. You will first need to create a wallet.";
+        //        return RedirectToAction("CreateWallet", "Wallet");
+        //    }
+
+        //    await SetupViewBagForWalletTransactionsAsync(filterParameters);
+
+        //    List<WalletTransactionViewModel> transactionViewModels = await GetTransactionViewModelsAsync(filterParameters);
+        //    if (transactionViewModels == null)
+        //    {
+        //        TempData["InfoMessage"] = "No transactions found with current parameters";
+        //        transactionViewModels = new List<WalletTransactionViewModel>();
+        //    }
+
+        //    return View("~/Views/Wallet/WalletTransactions.cshtml", transactionViewModels);
+        //}
+
+        //private async Task SetupViewBagForWalletTransactionsAsync(WalletTransactionQueryParameters filterParameters)
+        //{
+        //    var totalCountResult = await _walletTransactionService.GetTotalCountAsync(filterParameters, CurrentUser.Id);
+        //    ViewBag.TotalCount = totalCountResult.IsSuccess ? totalCountResult.Value : 0;
+        //    ViewBag.PageSize = filterParameters.PageSize;
+        //    ViewBag.PageNumber = filterParameters.PageNumber;
+        //    ViewBag.FilterParameters = filterParameters;
+
+        //    var walletsResult = await _walletService.GetUserWalletsAsync(CurrentUser.Id);
+        //    if (walletsResult.IsSuccess)
+        //    {
+        //        ViewBag.Wallets = walletsResult.Value.Select(_viewModelMapper.ToWalletViewModel).ToList();
+        //    }
+        //}
+
+        //private async Task<List<WalletTransactionViewModel>> GetTransactionViewModelsAsync(WalletTransactionQueryParameters filterParameters)
+        //{
+        //    var transactionsResult = await _walletTransactionService.FilterByAsync(filterParameters, CurrentUser.Id);
+        //    if (transactionsResult.IsSuccess)
+        //    {
+        //        return transactionsResult.Value.Select(_viewModelMapper.ToWalletTransactionViewModel).ToList();
+        //    }
+        //    return null;
+        //}
     }
+
 }
