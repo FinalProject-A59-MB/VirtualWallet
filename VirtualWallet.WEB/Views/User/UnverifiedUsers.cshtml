@@ -24,7 +24,7 @@
                     {
                         <tr class="text-center text-xl-center">
                             <td>
-                                <a href="@Url.Action("Profile","User",new {id = user.UserId})">User</a>
+                                <a href="@Url.Action("Profile","User",new {id = user.UserId})">@user.Username</a>
                             </td>
                             <td>
                                 <a href="@user.PhotoIdUrl">Photo Id</a>

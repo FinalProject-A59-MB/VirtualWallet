@@ -39,5 +39,7 @@ namespace VirtualWallet.DATA.Repositories.Contracts
         public Task<bool> IsContactExistsAsync(int userId, int contactId);
 
         public Task<IEnumerable<UserContact>> GetPendingFriendRequestsAsync(int userId);
+
+        Task<User?> GetUserByPhoneAsync(string phone);
     }
 }

@@ -41,7 +41,7 @@ namespace VirtualWallet.WEB.Controllers
             List<CardTransactionViewModel> transactionViewModels = await GetTransactionViewModelsAsync(filterParameters);
             if (transactionViewModels == null)
             {
-                TempData["ErrorMessage"] = "An error occurred while retrieving your transactions.";
+                TempData["InfoMessage"] = "No transactions found with current parameters";
                 transactionViewModels = new List<CardTransactionViewModel>();
             }
 

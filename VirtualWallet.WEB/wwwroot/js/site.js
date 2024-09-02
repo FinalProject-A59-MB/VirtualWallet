@@ -117,3 +117,42 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     });
 });
+
+// add logo and change background color for cards in user/cards
+document.addEventListener("DOMContentLoaded", function () {
+    const issuerLogos = {
+        "american_express": "/images/cardLogos/american-express.svg",
+        "visa": "/images/cardLogos/visa.svg",
+        "diners": "/images/cardLogos/diners.svg",
+        "discover": "/images/cardLogos/discover.svg",
+        "jcb": "/images/cardLogos/jcb.svg",
+        "maestro": "/images/cardLogos/maestro.svg",
+        "mastercard": "/images/cardLogos/mastercard.svg",
+    };
+
+    const issuerBackgrounds = {
+        "american_express": "linear-gradient(10deg, #2f1152, #6a27a1)",
+        "visa": "linear-gradient(10deg, #1f2857, #5e75d6)",
+        "diners": "linear-gradient(10deg, #2b4145, #546d72)",
+        "discover": "linear-gradient(10deg, #4a3525, #d69a76)",
+        "jcb": "linear-gradient(10deg, #06364d, #6ab8d9)",
+        "maestro": "linear-gradient(10deg, #541010, #c98181)",
+        "mastercard": "linear-gradient(10deg, #542711, #915b41)",
+    };
+
+    document.querySelectorAll(".issuer-logo").forEach(function (img) {
+        const issuer = img.getAttribute("data-issuer").toLowerCase();
+
+        if (issuerLogos[issuer]) {
+            img.setAttribute("src", issuerLogos[issuer]);
+        } else {
+            img.setAttribute("alt", "No logo available");
+        }
+
+        const cardElement = img.closest('.card');
+        if (issuerBackgrounds[issuer]) {
+            cardElement.style.setProperty('background', issuerBackgrounds[issuer], 'important');
+        }
+    });
+});
+

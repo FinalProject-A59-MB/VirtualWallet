@@ -133,12 +133,28 @@ namespace VirtualWallet.DATA.Services
 
         public async Task<Result> UpdateUserAsync(User user)
         {
+            var userToupdate = await _userRepository.GetUserByPhoneAsync(user.UserProfile.PhoneNumber);
+            if (userToupdate != null && userToupdate.Id != user.Id)
+            {
+                return Result.Failure("User with that phone number already exists.");
+            }
+
+            userToupdate = await _userRepository.GetUserByUsernameAsync(user.Username);
+            if (userToupdate != null && userToupdate.Id != user.Id)
+            {
+                return Result.Failure("User with that username already exists.");
+            }
             await _userRepository.UpdateUserAsync(user);
             return Result.Success();
         }
 
         public async Task<Result> UpdateUserProfileAsync(UserProfile userProfile)
         {
+            var user = await _userRepository.GetUserByPhoneAsync(userProfile.PhoneNumber);
+            if (user != null && userProfile.Id != user.Id)
+            {
+                return Result.Failure("User with that phone number already exists.");
+            }
             await _userRepository.UpdateUserProfileAsync(userProfile);
             return Result.Success();
         }

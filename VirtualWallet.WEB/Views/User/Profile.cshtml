@@ -10,6 +10,11 @@
     bool areFriends = Model.Contacts.Any(c => c.ContactId == ViewBag.UserId && c.Status == FriendRequestStatus.Accepted);
     bool blocked = Model.Role == UserRole.Blocked.ToString();
     var mainCurrency = Model.MainWallet == null ? "$" : Model.MainWallet.Currency.ToString();
+
+    decimal totalBalance = Model.TotalBalance.HasValue
+        ? decimal.Round(Model.TotalBalance.Value, 2, MidpointRounding.AwayFromZero)
+        : 0.00m;
+
 }
 
 <div class="container @(canViewFullProfile ? "" : "w-50") bg-dark-1 py-5">
@@ -45,7 +50,7 @@
                         <div class="col-md-6 d-flex flex-column justify-content-between">
                             <!-- Total Balance with Wallet Icon -->
                             <div class="card bg-dark-3 text-white mb-4 shadow-sm">
-                                <div class="d-flex justify-content-center align-items-center">
+                                <div class="d-flex justify-content-center">
                                     <div class="card-body d-flex align-items-center">
                                         <a href="@Url.Action("Wallets", "User")" style="color: white;">
                                             <i class="bi bi-wallet2 display-3 me-3"></i>
@@ -53,7 +58,7 @@
                                         
                                         <div>
                                             <h5>Total Balance</h5>
-                                            <h3>@mainCurrency @Model.TotalBalance.ToString()</h3>
+                                            <h3>@mainCurrency @totalBalance</h3>
                                         </div>
                                     </div>
                                     <div class="card-body d-flex align-items-center">
@@ -123,7 +128,11 @@
                                     <div class="@(canViewFullProfile ? "col-md-6" : "")">
                                         <h5 class="mb-3 text-info">Account Information</h5>
                                         <p><strong class="text-info">Username:</strong> @Model.Username</p>
-                                        <p><strong class="text-info">Email:</strong> @Model.Email</p>
+                                        @if (canViewFullProfile || areFriends)
+                                        {
+                                            <p><strong class="text-info">Email:</strong> @Model.Email</p>
+                                        }
+                                        
                                         @if (Model.Role == UserRole.RegisteredUser.ToString())
                                         {
                                             <a href="@Url.Action("ResendVerificationEmail","Authentication",new{id = Model.Id})">Resend verification email.</a>
@@ -218,7 +227,7 @@
                 <div class="d-flex gap-4 w-75 mx-auto">
                     <!-- User Image -->
                     <div class="col-md-@(canViewFullProfile ? "4" : "6") d-flex flex-column align-items-center mb-4 card bg-dark-3 text-white mb-4 shadow-sm p-3">
-                        <img src="@Model.UserProfile.PhotoUrl" alt="Profile Picture" class="img-thumbnail mb-3 shadow-lg" style="max-width: 100%;">
+                        <img src="@Model.UserProfile.PhotoUrl" alt="Profile Picture" class="img-thumbnail mb-3 shadow-lg" style="max-height: 200px; max-width: 100%;">
                         @if (canViewFullProfile)
                         {
                             <a href="@Url.Action("EditProfile", "User", new { userId = Model.Id })" class="btn btn-secondary">Edit Profile</a>
@@ -230,10 +239,22 @@
                         <h4 class="mb-3 text-info">Personal Information</h4>
                         <p><strong class="text-info">First Name:</strong> @Model.UserProfile.FirstName</p>
                         <p><strong class ="text-info">Last Name:</strong> @Model.UserProfile.LastName</p>
-                        <p><strong class="text-info">Date of Birth:</strong> @Model.UserProfile.DateOfBirth.ToString("MMMM dd, yyyy")</p>
-                        @if (canViewFullProfile)
+                        @if (canViewFullProfile || areFriends)
                         {
-                            <p><strong class="text-info">Phone Number:</strong> @Model.UserProfile.PhoneNumber</p>
+                            <p>
+                                <strong class="text-info">Date of Birth:</strong>
+                                @if (Model.UserProfile.DateOfBirth.HasValue)
+                                {
+                                    @Model.UserProfile.DateOfBirth.Value.ToString("MMMM dd, yyyy")
+                                }
+                                else
+                                {
+                                    @string.Empty;
+                                }
+                            </p>
+
+
+                            <p><strong class="text-info">Phone Number:</strong> @PhoneNumberHelper.FormatPhoneNumber(Model.UserProfile.PhoneNumber)</p>
                         }
                     </div>
 

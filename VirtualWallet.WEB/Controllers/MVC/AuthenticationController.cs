@@ -57,6 +57,11 @@ namespace ForumProject.Controllers.MVC
                 return View(model);
             }
 
+            if (authResult.Value.Role == UserRole.Blocked)
+            {
+                TempData["InfoMessage"] = "Your account has been blocked and access to our servicess for you is restricted. For more information, please contact us at Vaultora@gmail.com.";
+            }
+
 
             string token = _authService.GenerateToken(authResult.Value);
             HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
