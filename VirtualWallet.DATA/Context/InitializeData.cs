@@ -163,23 +163,35 @@ namespace VirtualWallet.DATA.Context
                     };
 
                     user.Cards.Add(card);
+                    var mainCard = user.Cards.First();
+                    var wallet = new Wallet
+                    {
+                        Name = $"{user.Username}'s Main Wallet",
+                        Balance = (decimal)(_random.NextDouble() * (1000 - 100) + 100),
+                        Currency = mainCard.Currency,
+                        UserId = user.Id,
+                        WalletType = WalletType.Main
+
+                    };
+
+                    if (user.MainWallet == null)
+                    {
+                        user.MainWallet = wallet;
+                    }
+                    else
+                    {
+                        wallet.Name = $"{user.Username}'s Standart Wallet";
+                        wallet.WalletType = WalletType.Standart;
+                        wallet.Currency = GetRandomCurrency(mainCard.Currency);
+                        user.Wallets.Add(wallet);
+                    }
                 }
 
-                var mainCard = user.Cards.First();
-                var wallet = new Wallet
-                {
-                    Name = $"{user.Username}'s Main Wallet",
-                    Balance = (decimal)(_random.NextDouble() * (1000 - 100) + 100), 
-                    Currency = mainCard.Currency,
-                    UserId = user.Id
-                };
-
-                user.MainWallet = wallet;
+                
+                
             }
 
             context.SaveChanges();
-
-
 
         }
 
@@ -193,6 +205,17 @@ namespace VirtualWallet.DATA.Context
             };
 
             return options[num];
+        }
+
+        private static CurrencyType GetRandomCurrency(CurrencyType excludedCurrency)
+        {
+            var availableCurrencies = Enum.GetValues(typeof(CurrencyType)).Cast<CurrencyType>()
+                                          .Where(c => c != excludedCurrency)
+                                          .ToList();
+
+            var randomCurrency = availableCurrencies[_random.Next(availableCurrencies.Count)];
+
+            return randomCurrency;
         }
     }
 

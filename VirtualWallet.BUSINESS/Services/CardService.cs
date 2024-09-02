@@ -51,7 +51,7 @@ namespace VirtualWallet.BUSINESS.Services
             }
 
             var cardResult = _cardRepository.GetCardByTokenAsync(card.PaymentProcessorToken);
-            if (cardResult == null)
+            if (cardResult != null)
             {
                 return Result.Failure("This card is already added to our system.");
             }
