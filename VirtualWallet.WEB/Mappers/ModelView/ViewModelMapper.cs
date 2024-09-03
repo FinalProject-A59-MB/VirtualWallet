@@ -18,7 +18,7 @@ public class ViewModelMapper : IViewModelMapper
             Username = model.Username,
             Email = model.Email,
             Password = model.Password,
-            
+
         };
     }
 
@@ -40,7 +40,7 @@ public class ViewModelMapper : IViewModelMapper
     {
         return new UserProfile
         {
-            
+
             FirstName = model.FirstName,
             LastName = model.LastName,
             PhoneNumber = model.PhoneNumber,
@@ -133,6 +133,7 @@ public class ViewModelMapper : IViewModelMapper
     {
         return new WalletViewModel
         {
+            UserId = wallet.UserId,
             Id = wallet.Id,
             Name = wallet.Name,
             WalletType = wallet.WalletType,
@@ -157,6 +158,7 @@ public class ViewModelMapper : IViewModelMapper
     {
         return new Wallet
         {
+            UserId = model.UserId,
             Id = model.Id,
             Name = model.Name,
             WalletType = model.WalletType,
@@ -178,7 +180,7 @@ public class ViewModelMapper : IViewModelMapper
             Wallet = model.Wallet,
             TransactionType = model.Type,
             Fee = model.Fee,
-            
+
         };
     }
 
@@ -217,14 +219,35 @@ public class ViewModelMapper : IViewModelMapper
         {
             Id = transaction.Id,
             CreatedAt = transaction.CreatedAt,
-            Sender = transaction.Sender?.Name,
-            Recipient = transaction.Recipient?.Name,
-            Amount = transaction.DepositedAmount,
-            Currency = transaction.Currency.ToString(),
+            Sender = transaction.Sender,
+            Recipient = transaction.Recipient,
+            AmountReceived = transaction.AmountReceived,
+            AmountSent = transaction.AmountSent,
+            CurrencyReceived = transaction.CurrencyReceived,
+            CurrencySent = transaction.CurrencySent,
             Status = transaction.Status,
         };
     }
 
+    public WalletTransaction ToWalletTransaction(WalletTransactionViewModel transaction)
+    {
+        return new WalletTransaction
+        {
+            Id = transaction.Id,
+            SenderId = transaction.SenderId,
+            RecipientId = transaction.RecipientId,
+            AmountReceived = transaction.AmountReceived,
+            AmountSent = transaction.AmountSent,
+            CreatedAt = transaction.CreatedAt,
+            CurrencyReceived = transaction.CurrencyReceived,
+            CurrencySent = transaction.CurrencySent,
+            Status = transaction.Status,
+            Recipient= transaction.Recipient,
+            Sender=transaction.Sender,
+            VerificationCode = transaction.VerificationCode,
+        };
+
+    }
 }
 
 

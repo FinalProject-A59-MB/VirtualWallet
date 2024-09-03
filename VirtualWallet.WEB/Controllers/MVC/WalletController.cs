@@ -67,30 +67,38 @@ namespace VirtualWallet.WEB.Controllers.MVC
             return RedirectToAction("Index", new { id = result.Value });
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Update(int id)
+        [HttpPost]
+        public async Task<IActionResult> UpdateWallet(int id, string name)
         {
             Result<Wallet> wallet = await _walletService.GetWalletByIdAsync(id);
-
-            return View(wallet.Value);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Update(WalletRequestDto wallet)
-        {
-            int userId = 0;
-
-            wallet.UserId = userId;
-
-            var result = await _walletService.UpdateWalletAsync(_dtoMapper.ToWalletRequestDto(wallet));
-
+            var walletToUpdate = wallet.Value;
+            walletToUpdate.Name = name;
+            var result = await _walletService.UpdateWalletAsync(walletToUpdate);
             if (!result.IsSuccess)
             {
                 TempData["ErrorMessage"] = result.Error;
+                return RedirectToAction("Index", "Wallet", new { id = id });
             }
 
-            return RedirectToAction("Index", new { id = wallet.Id });
+            return RedirectToAction("Index","Wallet", new { id = id });
         }
+
+        //[HttpPost]
+        //public async Task<IActionResult> Update(WalletRequestDto wallet)
+        //{
+        //    int userId = 0;
+
+        //    wallet.UserId = userId;
+
+        //    var result = await _walletService.UpdateWalletAsync(_dtoMapper.ToWalletRequestDto(wallet));
+
+        //    if (!result.IsSuccess)
+        //    {
+        //        TempData["ErrorMessage"] = result.Error;
+        //    }
+
+        //    return RedirectToAction("Index", new { id = wallet.Id });
+        //}
 
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)

@@ -5,6 +5,7 @@ using VirtualWallet.BUSINESS.Services.Responses;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Repositories.Contracts;
+using VirtualWallet.DATA.Services;
 using VirtualWallet.DATA.Services.Contracts;
 
 namespace VirtualWallet.BUSINESS.Services
@@ -47,14 +48,14 @@ namespace VirtualWallet.BUSINESS.Services
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
 
+            Result paymentResult = await _paymentProcessorService.WithdrawFromRealCardAsync(card.PaymentProcessorToken, amount);
+            if (!paymentResult.IsSuccess)
+            {
+                return Result<CardTransaction>.Failure("Failed to withdraw funds from the real card.");
+            }
+
             try
             {
-                Result paymentResult = await _paymentProcessorService.WithdrawFromRealCardAsync(card.PaymentProcessorToken, amount);
-                if (!paymentResult.IsSuccess)
-                {
-                    return Result<CardTransaction>.Failure("Failed to withdraw funds from the real card.");
-                }
-
                 wallet.Balance += amount;
 
                 CardTransaction cardTransaction = new CardTransaction
@@ -131,187 +132,36 @@ namespace VirtualWallet.BUSINESS.Services
             {
                 await transaction.RollbackAsync();
 
-                // Refund the amount to the wallet if transaction fails
-                await _paymentProcessorService.WithdrawFromRealCardAsync(card.PaymentProcessorToken, amount);
-
                 return Result<CardTransaction>.Failure($"Transaction failed: {ex.Message}");
             }
         }
 
-        public async Task<Result<int>> ProcessWalletToWalletTransactionStep1Async(Wallet senderWallet, Wallet recipientWallet, decimal amount)
+        public async Task<Result<WalletTransaction>> ProcessWalletToWalletTransactionAsync(WalletTransaction transactionToProcess)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
 
             try
             {
-                decimal feeAmount = 0;
 
-                decimal recipientAmount = amount;
+                transactionToProcess.Sender.Balance -= transactionToProcess.AmountSent;
+                transactionToProcess.Recipient.Balance += transactionToProcess.AmountReceived;
+                await _walletRepository.UpdateWalletAsync(transactionToProcess.Sender);
+                await _walletRepository.UpdateWalletAsync(transactionToProcess.Recipient);
 
-                if (recipientWallet.Currency != senderWallet.Currency)
-                {
-                    Result<CurrencyExchangeRatesResponse> ratesResult = await _currencyService.GetRatesForCurrencyAsync(senderWallet.Currency);
-
-                    if (!ratesResult.IsSuccess)
-                    {
-                        return Result<int>.Failure(ratesResult.Error);
-                    }
-
-                    Result<Dictionary<string, decimal>> feeCalculationResult = await CalculateFeeAsync(amount, recipientWallet.Currency, senderWallet.Currency);
-
-                    if (!feeCalculationResult.IsSuccess)
-                    {
-                        return Result<int>.Failure(feeCalculationResult.Error);
-                    }
-
-                    feeAmount = feeCalculationResult.Value["feeAmount"];
-
-                    decimal rate = GetRate(ratesResult.Value, recipientWallet.Currency);
-
-                    recipientAmount = amount * rate + feeAmount;
-                }
-
-
-                WalletTransaction walletTransaction = new WalletTransaction
-                {
-                    SenderId = senderWallet.Id,
-                    RecipientId = recipientWallet.Id,
-                    CreatedAt = DateTime.UtcNow,
-                    Status = TransactionStatus.Pending,
-                    Currency = recipientWallet.Currency,
-                    WithdrownAmount = amount,
-                    DepositedAmount = recipientAmount,
-                    VerificationCode = GenerateVerificationCode(),
-                    FeeAmount = feeAmount,
-                };
-
-                int transactionId = await _walletTransactionRepository.AddWalletTransactionAsync(walletTransaction);
-
-                _context.SaveChanges();
+                transactionToProcess.Status = TransactionStatus.Completed;
+                transactionToProcess.CreatedAt = DateTime.UtcNow;
+                await _walletTransactionRepository.UpdateWalletTransactionAsync(transactionToProcess);
 
                 await transaction.CommitAsync();
 
-                Result<User> userResult = await _userService.GetUserByIdAsync(senderWallet.UserId);
-
-                if (!userResult.IsSuccess)
-                {
-                    throw new Exception(userResult.Error);
-                }
-
-                Result emailResult = await _emailService.SendPaymentVerificationEmailAsync(userResult.Value, walletTransaction.VerificationCode);
-
-                if (!emailResult.IsSuccess)
-                {
-                    throw new Exception(emailResult.Error);
-                }
-
-                return Result<int>.Success(transactionId);
+                return Result<WalletTransaction>.Success(transactionToProcess);
             }
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
 
-                return Result<int>.Failure($"Transaction failed: {ex.Message}");
+                return Result<WalletTransaction>.Failure($"Transaction failed: {ex.Message}");
             }
-        }
-
-        public async Task<Result<int>> ProcessWalletToWalletTransactionStep2Async(Wallet senderWallet, Wallet recipientWallet, WalletTransaction walletTransaction)
-        {
-            using var transaction = await _context.Database.BeginTransactionAsync();
-
-            try
-            {
-                senderWallet.Balance -= walletTransaction.WithdrownAmount;
-
-                recipientWallet.Balance += walletTransaction.DepositedAmount;
-
-                walletTransaction.Status = TransactionStatus.Completed;
-
-                _context.SaveChanges();
-
-                await transaction.CommitAsync();
-
-                Result<User> userResult = await _userService.GetUserByIdAsync(recipientWallet.UserId);
-
-                if (!userResult.IsSuccess)
-                {
-                    throw new Exception(userResult.Error);
-                }
-
-                Result emailResult = await _emailService.SendEmailAsync(
-                    userResult.Value.Email,
-                    "Money Deposit",
-                    $"You have successfully received {walletTransaction.DepositedAmount} {walletTransaction.Currency} from {senderWallet.Name}");
-
-                if (!emailResult.IsSuccess)
-                {
-                    throw new Exception(emailResult.Error);
-                }
-
-                return Result<int>.Success(walletTransaction.Id);
-            }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-
-                return Result<int>.Failure($"Transaction failed: {ex.Message}");
-            }
-        }
-
-        private decimal GetRate(CurrencyExchangeRatesResponse response, CurrencyType currencyType)
-        {
-            string currencyKey = currencyType.ToString();
-
-            if (response.Data.TryGetValue(currencyKey, out decimal rate))
-            {
-                return rate;
-            }
-
-            throw new Exception("Currency not found!");
-        }
-
-        private string GenerateVerificationCode()
-        {
-            Random random = new Random();
-            int verificationCode = random.Next(1000, 10000); // Generates a random number between 1000 and 9999
-            return verificationCode.ToString();
-        }
-
-
-        private async Task<Result<Dictionary<string, decimal>>> CalculateFeeAsync(decimal amount, CurrencyType fromCurrency, CurrencyType toCurrency)
-        {
-            var exchangeRateResult = await _currencyService.GetRatesForCurrencyAsync(fromCurrency);
-
-            if (!exchangeRateResult.IsSuccess)
-            {
-                return Result<Dictionary<string, decimal>>.Failure(exchangeRateResult.Error);
-            }
-            decimal exchangeRate;
-            // Get the exchange rate for the target currency
-            try
-            {
-                exchangeRate = exchangeRateResult.Value.Data[toCurrency.ToString()];
-            }
-            catch (Exception ex)
-            {
-                return Result<Dictionary<string, decimal>>.Failure(ex.Message);
-            }
-
-
-            // Calculate the amount in the target currency
-            decimal amountInTargetCurrency = amount * exchangeRate;
-
-            // Calculate the fee based on the target currency
-            decimal feePercentage = (int)toCurrency / 100m;
-            decimal feeAmount = amountInTargetCurrency * feePercentage;
-
-            Dictionary<string, decimal> result = new Dictionary<string, decimal>
-                {
-                    { "amountToWithdraw", amountInTargetCurrency - feeAmount },
-                    { "feeAmount", feeAmount }
-                };
-
-            return Result<Dictionary<string, decimal>>.Success(result);
         }
     }
 }

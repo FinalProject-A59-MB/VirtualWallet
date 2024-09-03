@@ -2,6 +2,7 @@
 using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
+using VirtualWallet.DATA.Repositories;
 using VirtualWallet.DATA.Repositories.Contracts;
 using VirtualWallet.DATA.Services.Contracts;
 
@@ -167,6 +168,21 @@ namespace VirtualWallet.DATA.Services
             await _emailService.SendEmailAsync(userResult.Value.Email, "You were removed from a wallet.", $"You were removed from {walletResult.Value.Name}.");
 
             return Result.Success();
+        }
+
+        public async Task<Result<IEnumerable<WalletTransaction>>> GetWalletTransactionsAsync(WalletTransactionQueryParameters filterParameters, int userId)
+        {
+            var transactions = await _walletRepository.FilterByAsync(filterParameters, userId);
+
+            return transactions != null
+                ? Result<IEnumerable<WalletTransaction>>.Success(transactions)
+                : Result<IEnumerable<WalletTransaction>>.Failure("Transactions not found.");
+        }
+
+        public async Task<Result<int>> GetTotalWalletTransactionCountAsync(WalletTransactionQueryParameters filterParameters, int userId)
+        {
+            var totalCount = await _walletRepository.GetTotalCountAsync(filterParameters, userId);
+            return Result<int>.Success(totalCount);
         }
     }
 }

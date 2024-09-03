@@ -10,17 +10,14 @@ namespace VirtualWallet.WEB.Controllers
     [RequireAuthorization(minRequiredRoleLevel: 3)]
     public class CardTransactionsController : BaseController
     {
-        private readonly ICardTransactionService _cardTransactionService;
         private readonly ICardService _cardService;
         private readonly IViewModelMapper _viewModelMapper;
 
         public CardTransactionsController(
-            ICardTransactionService cardTransactionService,
             ICardService cardService,
             IViewModelMapper viewModelMapper
             )
         {
-            _cardTransactionService = cardTransactionService;
             _cardService = cardService;
             _viewModelMapper = viewModelMapper;
         }

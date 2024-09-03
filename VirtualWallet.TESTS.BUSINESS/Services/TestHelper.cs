@@ -190,8 +190,7 @@ namespace VirtualWallet.TESTS.BUSINESS.Services
             return new WalletTransaction
             {
                 Id = 1,
-                WithdrownAmount = 100m,
-                DepositedAmount = 100m,
+                Amount = 100m,
                 CreatedAt = DateTime.UtcNow,
                 Currency = CurrencyType.USD,
                 Status = TransactionStatus.Pending,
@@ -208,8 +207,7 @@ namespace VirtualWallet.TESTS.BUSINESS.Services
             return new WalletTransaction
             {
                 Id = 2,
-                WithdrownAmount = 200m,
-                DepositedAmount = 200m,
+                Amount = 200m,
                 CreatedAt = DateTime.UtcNow,
                 Currency = CurrencyType.USD,
                 Status = TransactionStatus.Pending,

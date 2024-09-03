@@ -31,4 +31,6 @@ public interface IViewModelMapper
     public UserVerificationViewModel ToUserVerificationViewModel(User u);
 
     public WalletTransactionViewModel ToWalletTransactionViewModel(WalletTransaction transaction);
+
+    public WalletTransaction ToWalletTransaction(WalletTransactionViewModel transaction);
 }

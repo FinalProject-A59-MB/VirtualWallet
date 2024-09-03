@@ -96,7 +96,7 @@
                         <th scope="col">Date</th>
                         <th scope="col">Sender</th>
                         <th scope="col">Recipient</th>
-                        <th scope="col">Amount</th>
+                        <th scope="col">Amount*</th>
                         <th scope="col">Direction</th>
                     </tr>
                 </thead>
@@ -109,7 +109,7 @@
                                 <td>@transaction.CreatedAt.ToString()</td>
                                 <td>@transaction.Sender</td>
                                 <td>@transaction.Recipient</td>
-                                <td>@transaction.Currency @transaction.Amount</td>
+                                <td>@transaction.CurrencySent @transaction.AmountSent</td>
                             </tr>
                         }
                     }
@@ -121,6 +121,7 @@
                     }
                 </tbody>
             </table>
+            <p> * The ammount is based on the currency of the destianation wallet of the user (hover over the currency to see the outgoing ammount and currency) </p>
         </div>
 
         <!-- Pagination for Wallet Transactions -->

@@ -82,8 +82,14 @@ public class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<WalletTransaction>()
             .HasOne(wt => wt.Sender)
-            .WithMany(u => u.WalletTransactions)
+            .WithMany(w => w.SentTransactions)
             .HasForeignKey(wt => wt.SenderId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<WalletTransaction>()
+            .HasOne(wt => wt.Recipient)
+            .WithMany(u => u.ReceivedTransactions)
+            .HasForeignKey(wt => wt.RecipientId)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<CardTransaction>()
@@ -132,7 +138,11 @@ public class ApplicationDbContext : DbContext
             .HasColumnType("decimal(18,2)");
 
         modelBuilder.Entity<WalletTransaction>()
-            .Property(wt => wt.DepositedAmount)
+            .Property(wt => wt.AmountReceived)
+            .HasColumnType("decimal(18,2)");
+
+        modelBuilder.Entity<WalletTransaction>()
+            .Property(wt => wt.AmountSent)
             .HasColumnType("decimal(18,2)");
 
         base.OnModelCreating(modelBuilder);

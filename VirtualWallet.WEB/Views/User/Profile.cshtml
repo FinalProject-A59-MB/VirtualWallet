@@ -182,7 +182,7 @@
                             <h4 class="mb-3">Actions</h4>
                             @if (viewProfileAsUser)
                             {
-                                <a href="@Url.Action("Index", "WalletTransaction", new { recipientId = Model.Id })" class="btn btn-primary btn mb-2 me-2">Send Money</a>
+                                <a href="@Url.Action("SendTo", "WalletTransactions", new { recipientId = Model.Id})" class="btn btn-primary btn mb-2 me-2">Send Money</a>
                                 @if (@areFriends)
                                 {
                                     <a href="@Url.Action("RequestDeposit", "WalletTransaction", new { senderId = Model.Id })" class="btn btn-primary btn mb-2 me-2">Request Money</a>
@@ -207,10 +207,10 @@
                             {
                                 <div class="d-flex justify-content-center gap-1">
                                     <div>
-                                        <button class="btn btn-outline-light btn mb-2 me-2" type="button" data-bs-toggle="collapse" data-bs-target="#changeEmailForm" aria-expanded="true" aria-controls="changeEmailForm">
+                                        <button class="btn btn-light btn mb-2 me-2" type="button" data-bs-toggle="collapse" data-bs-target="#changeEmailForm" aria-expanded="true" aria-controls="changeEmailForm">
                                             Change Email
                                         </button>
-                                        <button class="btn btn-outline-light btn mb-2 me-2" type="button" data-bs-toggle="collapse" data-bs-target="#changePasswordForm" aria-expanded="false" aria-controls="changePasswordForm">
+                                        <button class="btn btn-light btn mb-2 me-2" type="button" data-bs-toggle="collapse" data-bs-target="#changePasswordForm" aria-expanded="false" aria-controls="changePasswordForm">
                                             Change Password
                                         </button>
                                     </div>

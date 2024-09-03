@@ -424,9 +424,6 @@ namespace VirtualWallet.DATA.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("PublicId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
@@ -448,14 +445,20 @@ namespace VirtualWallet.DATA.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<decimal>("AmountReceived")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("AmountSent")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Currency")
+                    b.Property<int>("CurrencyReceived")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("DepositedAmount")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("CurrencySent")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("FeeAmount")
                         .HasColumnType("decimal(18,2)");
@@ -473,14 +476,16 @@ namespace VirtualWallet.DATA.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("WithdrownAmount")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int?>("WalletId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RecipientId");
 
                     b.HasIndex("SenderId");
+
+                    b.HasIndex("WalletId");
 
                     b.ToTable("WalletTransactions");
                 });
@@ -645,16 +650,20 @@ namespace VirtualWallet.DATA.Migrations
             modelBuilder.Entity("VirtualWallet.DATA.Models.WalletTransaction", b =>
                 {
                     b.HasOne("VirtualWallet.DATA.Models.Wallet", "Recipient")
-                        .WithMany()
+                        .WithMany("ReceivedTransactions")
                         .HasForeignKey("RecipientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("VirtualWallet.DATA.Models.Wallet", "Sender")
-                        .WithMany("WalletTransactions")
+                        .WithMany("SentTransactions")
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("VirtualWallet.DATA.Models.Wallet", null)
+                        .WithMany("WalletTransactions")
+                        .HasForeignKey("WalletId");
 
                     b.Navigation("Recipient");
 
@@ -685,6 +694,10 @@ namespace VirtualWallet.DATA.Migrations
             modelBuilder.Entity("VirtualWallet.DATA.Models.Wallet", b =>
                 {
                     b.Navigation("CardTransactions");
+
+                    b.Navigation("ReceivedTransactions");
+
+                    b.Navigation("SentTransactions");
 
                     b.Navigation("User")
                         .IsRequired();

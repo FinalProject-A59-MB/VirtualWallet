@@ -286,7 +286,8 @@ public class DtoMapper : IDtoMapper
         return new WalletTransactionDto
         {
             Id = transaction.Id,
-            Amount = transaction.DepositedAmount,
+            AmountSent = transaction.AmountSent,
+            AmountReceived = transaction.AmountReceived,
             CreatedAt = transaction.CreatedAt,
             Status = transaction.Status.ToString(),
             SenderId = transaction.SenderId,

@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using VirtualWallet.BUSINESS.Helpers;
 using VirtualWallet.BUSINESS.Resources;
 using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
+using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Repositories.Contracts;
 using VirtualWallet.DATA.Services.Contracts;
 
@@ -13,53 +15,162 @@ namespace VirtualWallet.DATA.Services
         private readonly IWalletTransactionRepository _walletTransactionRepository;
         private readonly IWalletRepository _walletRepository;
         private readonly ITransactionHandlingService _transactionHandlingService;
+        private readonly IEmailService _emailService;
+        private readonly ICurrencyService _currencyService;
 
-        public WalletTransactionService(IWalletTransactionRepository walletTransactionRepository, 
+        public WalletTransactionService(
+            IWalletTransactionRepository walletTransactionRepository,
             IWalletRepository walletRepository,
-            ITransactionHandlingService transactionHandlingService)
+            ITransactionHandlingService transactionHandlingService,
+            IEmailService emailService,
+            ICurrencyService currencyService)
         {
             _walletTransactionRepository = walletTransactionRepository;
             _walletRepository = walletRepository;
             _transactionHandlingService = transactionHandlingService;
+            _emailService = emailService;
+            _currencyService = currencyService;
         }
 
         //Step1
-        public async Task<Result<int>> DepositStep1Async(int senderWalletId, int recipientWalletId, decimal amount)
+        public async Task<Result<WalletTransaction>> VerifySendAmountAsync(int senderWalletId, User recepient, decimal amount)
         {
+            //make checks if the transaction can be handled
+            //1. does the sender have a wallet?
             var senderWallet = await _walletRepository.GetWalletByIdAsync(senderWalletId);
 
             if (senderWallet == null)
-                return Result<int>.Failure(ErrorMessages.WalletNotFound);
+                return Result<WalletTransaction>.Failure(ErrorMessages.WalletNotFound);
+            //2. check if there is enough money in the sender wallet
+            if (senderWallet.Balance < amount)
+            {
+                return Result<WalletTransaction>.Failure("Not enough funds in the wallet to complete the transaction.");
+            }
 
-            var recipientWallet = await _walletRepository.GetWalletByIdAsync(recipientWalletId);
+            //3. check if recepient has wallets
+            var recipientWallets = await _walletRepository.GetWalletsByUserIdAsync(recepient.Id);
 
-            if (senderWallet == null)
-                return Result<int>.Failure(ErrorMessages.WalletNotFound);
+            if (recipientWallets == null)
+                return Result<WalletTransaction>.Failure("User has no wallets");
 
-            if (amount <= 0)
-                return Result<int>.Failure(ErrorMessages.InvalidDepositAmount);
+            //4. try to select a wallet with the correct currency
+            var recipientWallet = recipientWallets.Where(w => w.Currency == senderWallet.Currency).FirstOrDefault();
 
-            return await _transactionHandlingService.ProcessWalletToWalletTransactionStep1Async(senderWallet, recipientWallet, amount);
+            //5. try to select main wallet if there is no match
+            if (recipientWallet == null)
+            {
+                //5.1 if there is no main wallet select the first avaiable wallet
+                if (recepient.MainWallet == null)
+                {
+                    recipientWallet = recipientWallets.FirstOrDefault();
+                }
+                else
+                {
+                    recipientWallet = recepient.MainWallet;
+                }
+            }
+            //get sent and received ammounts
+            var sentAmount = await _currencyService.ConvertCurrencyAsync(amount, senderWallet.Currency, recipientWallet.Currency);
+            if (!sentAmount.IsSuccess)
+            {
+                return Result<WalletTransaction>.Failure(sentAmount.Error);
+            }
+
+            //generate code
+            var verificationCode = VerificationCode.Generate();
+
+            //generate transaction 
+            WalletTransaction transaction = new WalletTransaction
+            {
+                AmountSent = sentAmount.Value,
+                AmountReceived = amount,
+                Recipient = recipientWallet,
+                Sender = senderWallet,
+                VerificationCode = verificationCode,
+                CreatedAt = DateTime.UtcNow,
+                Status = TransactionStatus.Pending,
+                CurrencySent = senderWallet.Currency,
+                CurrencyReceived = recipientWallet.Currency,
+            };
+
+            //add tranasaction to repository
+            await _walletTransactionRepository.AddWalletTransactionAsync(transaction);
+            //send verification code
+            //var emailResult = await _emailService.SendPaymentVerificationEmailAsync(senderWallet.User,transaction.VerificationCode);
+            //if (!emailResult.IsSuccess)
+            //{
+            //    return Result<WalletTransaction>.Failure(emailResult.Error);
+            //}
+
+            return Result<WalletTransaction>.Success(transaction);
+
         }
 
         //Step2
-        public async Task<Result<int>> DepositStep2Async(int senderWalletId, int recipientWalletId, int transactionId)
+        public async Task<Result<WalletTransaction>> ProcessSendAmountAsync(WalletTransaction transaction)
+        {
+            var sender = await _walletRepository.GetWalletByIdAsync(transaction.SenderId);
+            var receiver = await _walletRepository.GetWalletByIdAsync(transaction.RecipientId);
+            transaction.Sender = sender;
+            transaction.Recipient = receiver;
+            var completedTransacctions = await _transactionHandlingService.ProcessWalletToWalletTransactionAsync(transaction);
+            if (!completedTransacctions.IsSuccess)
+            {
+                return Result<WalletTransaction>.Failure(completedTransacctions.Error);
+            }
+
+            //set status completed
+
+            // send notification to recipient (optional)
+
+            return Result<WalletTransaction>.Success(completedTransacctions.Value);
+        }
+
+        public async Task<Result<WalletTransaction>> ProcessSendAmountInternalAsync(int senderWalletId, int recepientWalletId, decimal amount)
         {
             var senderWallet = await _walletRepository.GetWalletByIdAsync(senderWalletId);
+            var receiverWallet = await _walletRepository.GetWalletByIdAsync(recepientWalletId);
 
-            if (senderWallet == null)
-                return Result<int>.Failure(ErrorMessages.WalletNotFound);
+            //get sent and received ammounts
+            var sentAmount = await _currencyService.ConvertCurrencyAsync(amount, senderWallet.Currency, receiverWallet.Currency);
+            if (!sentAmount.IsSuccess)
+            {
+                return Result<WalletTransaction>.Failure(sentAmount.Error);
+            }
 
-            var recipientWallet = await _walletRepository.GetWalletByIdAsync(recipientWalletId);
+            //generate code
+            var verificationCode = VerificationCode.Generate();
 
-            if (senderWallet == null)
-                return Result<int>.Failure(ErrorMessages.WalletNotFound);
+            //generate transaction 
+            WalletTransaction transaction = new WalletTransaction
+            {
+                AmountSent = sentAmount.Value,
+                AmountReceived = amount,
+                Recipient = receiverWallet,
+                Sender = senderWallet,
+                VerificationCode = verificationCode,
+                CreatedAt = DateTime.UtcNow,
+                Status = TransactionStatus.Completed,
+                CurrencySent = receiverWallet.Currency,
+                CurrencyReceived = senderWallet.Currency,
+            };
+            await _walletTransactionRepository.AddWalletTransactionAsync(transaction);
+            //var completedTransacctions = await _transactionHandlingService.ProcessWalletToWalletTransactionAsync(transaction);
+            //if (!completedTransacctions.IsSuccess)
+            //{
+            //    return Result<WalletTransaction>.Failure(completedTransacctions.Error);
+            //}
+            //add tranasaction to repository
 
-            WalletTransaction? transactionResult = await _walletTransactionRepository.GetTransactionByIdAsync(transactionId);
 
-            //TODO CHECK WALLETTRASCATION RESULT
+            return Result<WalletTransaction>.Success(transaction);
 
-            return await _transactionHandlingService.ProcessWalletToWalletTransactionStep2Async(senderWallet, recipientWallet, transactionResult);
+        }
+
+        public async Task<Result> UpdateTransaction(WalletTransaction transaction)
+        {
+            await _walletTransactionRepository.UpdateWalletTransactionAsync(transaction);
+            return Result<WalletTransaction>.Success(transaction);
         }
 
         public async Task<Result<WalletTransaction>> GetTransactionByIdAsync(int id)

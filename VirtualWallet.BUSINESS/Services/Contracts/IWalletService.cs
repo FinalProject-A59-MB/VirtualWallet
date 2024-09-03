@@ -15,5 +15,11 @@ namespace VirtualWallet.DATA.Services.Contracts
         Task<Result<int>> GetWalletIdByUserDetailsAsync(string details);
         Task<Result> AddUserToJointWalletAsync(int walletId, string username);
         Task<Result> RemoveUserFromJointWalletAsync(int walletId, string username);
+
+        Task<Result<IEnumerable<WalletTransaction>>> GetWalletTransactionsAsync(WalletTransactionQueryParameters filterParameters, int userId);
+        Task<Result<int>> GetTotalWalletTransactionCountAsync(WalletTransactionQueryParameters filterParameters, int userId);
+
+
+
     }
 }

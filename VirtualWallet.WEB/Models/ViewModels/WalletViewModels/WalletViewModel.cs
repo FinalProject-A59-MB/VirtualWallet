@@ -4,6 +4,7 @@ namespace VirtualWallet.WEB.Models.ViewModels.WalletViewModels
 {
     public class WalletViewModel
     {
+        public int UserId { get; set; }
         public int Id { get; set; }
         public string Name { get; set; }
         public WalletType WalletType { get; set; }

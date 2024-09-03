@@ -1,4 +1,7 @@
-﻿using System.Net.Http.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.BUSINESS.Services.Responses;
@@ -51,6 +54,34 @@ namespace VirtualWallet.BUSINESS.Services
             {
                 return Result<CurrencyExchangeRatesResponse>.Failure($"An error occurred: {ex.Message}");
             }
+        }
+
+        public async Task<Result<decimal>> ConvertCurrencyAsync(decimal amount, CurrencyType senderCurrency, CurrencyType destinationCurrency)
+        {
+            if (senderCurrency == destinationCurrency)
+            {
+                return Result<decimal>.Success(amount);
+            }
+
+            var ratesResult = await GetRatesForCurrencyAsync(senderCurrency);
+
+            if (!ratesResult.IsSuccess)
+            {
+                return Result<decimal>.Failure(ratesResult.Error);
+            }
+
+            var rates = ratesResult.Value;
+
+            string destinationCurrencyCode = destinationCurrency.ToString();
+
+            if (!rates.Data.TryGetValue(destinationCurrencyCode, out decimal exchangeRate))
+            {
+                return Result<decimal>.Failure("Unsupported or unavailable destination currency.");
+            }
+
+            decimal convertedAmount = amount * exchangeRate;
+
+            return Result<decimal>.Success(convertedAmount);
         }
     }
 }

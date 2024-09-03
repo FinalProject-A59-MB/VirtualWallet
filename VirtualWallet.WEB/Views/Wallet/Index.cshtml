@@ -1,103 +1,175 @@
 ﻿@using VirtualWallet.DATA.Models
 @model WalletViewModel
-@section Scripts {
-    <script src="~/js/wallet.js"></script>
-}
 
 
-<div class="container my-5">
 
-    <div class="card bg-dark-3 text-white h-100 shadow-sm animate__animated animate__fadeInUp">
-        <div class="card-body d-flex flex-column justify-content-between">
+<div class="transaction-area area-padding fix position-relative">
+    <div class="transaction-overlay"></div>
+    <div class="d-table w-100 h-100">
+        <div class="d-table-cell align-middle">
+            <div class="container w-75">
+                <div class="row justify-content-center">
+                    <div class="col-md-10 col-sm-12 col-xs-12">
+                        <div class="transaction-form bg-dark-1 p-5 rounded shadow-lg animate__animated animate__fadeIn">
+                            <!-- Wallet Header Section -->
+                            <div class="bg-gradient p-4 rounded mb-5">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2 text-center">
+                                        <i class="bi bi-wallet2 display-2 text-warning"></i>
+                                    </div>
+                                    <div class="col-md-10">
+                                        <form id="edit-wallet-form" asp-action="UpdateWallet" method="post">
+                                            <input type="hidden" asp-for="Id" />
 
-            <div class="mb-4">
-                <div class="d-flex align-items-center mb-3">
-                    <i class="bi bi-wallet2 display-4 text-info me-3"></i>
-                    <h1>@Model.Name</h1>
-                </div>
-                <p class="card-text">Wallet Type: <span class="fw-bold">@Model.WalletType</span></p>
-                <p class="card-text">Currency: <span class="fw-bold">@Model.Currency</span></p>
-                <p class="card-text">Balance: <span class="fw-bold">@Model.Balance</span></p>
-            </div>
+                                            <h2 class="text-warning mb-1">
+                                                <span id="wallet-name">@Model.Name</span>
+                                                <input type="text" id="wallet-name-input" name="Name" class="form-control bg-dark-2 text-white border-0" maxlength="20" value="@Model.Name" style="display: none;" />
+                                            </h2>
+                                        </form>
+                                        <div class="d-flex justify-content-between">
+                                            <p class="mb-1"><strong>Wallet Type:</strong> <span class="fw-bold text-white">@Model.WalletType</span></p>
+                                            <p class="mb-1"><strong>Currency:</strong> <span class="fw-bold text-white">@Model.Currency</span></p>
+                                            <p class="mb-1"><strong>Balance:</strong> <span class="fw-bold text-white">@Model.Balance</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-            <div>
-                <a asp-action="Update" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
-                <button class="btn btn-danger delete-wallet ml-3" data-id="@Model.Id">Delete</button>
-            </div>
+                            <!-- Action Buttons -->
+                            <div class="d-flex justify-content-center mb-5">
+                                <button id="edit-wallet-button" class="btn btn-warning me-3">
+                                    <i class="fas fa-edit"></i> Edit Wallet
+                                </button>
+                                <button id="save-wallet-button" class="btn btn-success me-3" style="display: none;">
+                                    <i class="fas fa-save"></i> Save
+                                </button>
+                                <button id="cancel-wallet-button" class="btn btn-secondary me-3" style="display: none;">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                                <button class="btn btn-danger delete-wallet" data-id="@Model.Id">
+                                    <i class="fas fa-trash-alt"></i> Delete Wallet
+                                </button>
+                            </div>
 
-            @if (Model.WalletType == WalletType.Joint)
-            {
-                <div class="table table-responsive mt-5">
-                    <h2 class="text-light text-center mb-3">Joint Users</h2>
-                    <table class="table table-striped text-light">
-                        <thead class="text-center">
-                            <tr>
-                                <th>Username</th>
-                                <th>Role</th>
-                                <th>Joined Date</th>
-                                <th>
-                                    @if (ViewBag.IsUserWalletAdmin)
-                                    {
-                                        <a class="btn btn-success" asp-action="AddUser" asp-controller="Wallet" asp-route-id="@Model.Id">Add User</a>
-                                    }
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var userWallet in Model.JointUsers)
+                            <!-- Joint Users Section -->
+                            @if (Model.WalletType == WalletType.Joint)
                             {
-                                <tr class="text-light">
-                                    <td>@userWallet.Username</td>
-                                    <td>@userWallet.Role</td>
-                                    <td>@userWallet.JoinedDate</td>
-                                    <td>
-                                        @if (ViewBag.IsUserWalletAdmin)
-                                        {
-                                            <a href="javascript:void(0);" class="btn btn-danger" 
-                                            onclick="removeUser('@Model.Id', '@userWallet.Username')">Remove User</a>
-                                        }
-                                    </td>
-                                </tr>
+                                <div class="table-responsive mt-5">
+                                    <h2 class="text-warning text-center mb-3">Joint Users</h2>
+                                    <table class="table table-dark table-hover table-bordered text-center">
+                                        <thead>
+                                            <tr>
+                                                <th>Username</th>
+                                                <th>Role</th>
+                                                <th>Joined Date</th>
+                                                <th>
+                                                    @if (ViewBag.IsUserWalletAdmin)
+                                                    {
+                                                        <a class="btn btn-success" asp-action="AddUser" asp-controller="Wallet" asp-route-id="@Model.Id">Add User</a>
+                                                    }
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var userWallet in Model.JointUsers)
+                                            {
+                                                <tr>
+                                                    <td>@userWallet.Username</td>
+                                                    <td>@userWallet.Role</td>
+                                                    <td>@userWallet.JoinedDate</td>
+                                                    <td>
+                                                        @if (ViewBag.IsUserWalletAdmin)
+                                                        {
+                                                            <a href="javascript:void(0);" class="btn btn-danger"
+                                                               onclick="removeUser('@Model.Id', '@userWallet.Username')">Remove User</a>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
                             }
-                        </tbody>
-                    </table>
+
+                            <!-- Transactions History Section -->
+                            <div class="table-responsive mt-5">
+                                <h2 class="text-warning text-center mb-3">Transactions History</h2>
+                                <table class="table table-dark table-hover table-bordered text-center">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Amount</th>
+                                            <th>Currency</th>
+                                            <th>Status</th>
+                                            <th>Sender</th>
+                                            <th>Receiver</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model.WalletTransactions.Any())
+                                        {
+                                            @foreach (var transaction in Model.WalletTransactions)
+                                            {
+                                                <tr>
+                                                    <td>@transaction.CreatedAt</td>
+                                                    <td>@transaction.AmountSent</td>
+                                                    <td>@transaction.CurrencySent</td>
+                                                    <td>@transaction.Status</td>
+                                                    <td>@transaction.Sender</td>
+                                                    <td>@transaction.Recipient</td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="6" class="text-center">No transactions found.</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="text-center mt-5">
+                                <a href="@Url.Action("Index", "Wallet")" class="btn btn-secondary w-50 py-2">
+                                    <i class="fas fa-arrow-left"></i> Back to Wallets
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            }
-
-            <div class="table table-responsive mt-5">
-                <h2 class="text-light text-center mb-3">Transactions history</h2>
-                <table class="table table-striped text-light">
-                    <thead class="text-center">
-                        <tr>
-                            <th>Date</th>
-                            <th>Amount</th>
-                            <th>Currency</th>
-                            <th>Status</th>
-                            <th>Sender</th>
-                            <th>Receiver</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var transaction in Model.WalletTransactions)
-                        {
-                            <tr class="text-light">
-                                <td>@transaction.CreatedAt</td>
-                                <td>@transaction.Amount</td>
-                                <td>@transaction.Currency</td>
-                                <td>@transaction.Status</td>
-                                <td>@transaction.Sender</td>
-                                <td>@transaction.Recipient</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
             </div>
-
-
         </div>
     </div>
-
-
-
-
 </div>
+
+    <script src="~/js/wallet.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const editButton = document.getElementById('edit-wallet-button');
+            const saveButton = document.getElementById('save-wallet-button');
+            const cancelButton = document.getElementById('cancel-wallet-button');
+            const walletNameElement = document.getElementById('wallet-name');
+            const walletNameInput = document.getElementById('wallet-name-input');
+
+            editButton.addEventListener('click', function () {
+                walletNameElement.style.display = 'none';
+                walletNameInput.style.display = 'inline-block';
+                editButton.style.display = 'none';
+                saveButton.style.display = 'inline-block';
+                cancelButton.style.display = 'inline-block';
+            });
+
+            saveButton.addEventListener('click', function () {
+                document.getElementById('edit-wallet-form').submit();
+            });
+
+            cancelButton.addEventListener('click', function () {
+                walletNameElement.style.display = 'inline-block';
+                walletNameInput.style.display = 'none';
+                editButton.style.display = 'inline-block';
+                saveButton.style.display = 'none';
+                cancelButton.style.display = 'none';
+            });
+        });
+    </script>

@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function () {
         "discover": "linear-gradient(10deg, #4a3525, #d69a76)",
         "jcb": "linear-gradient(10deg, #06364d, #6ab8d9)",
         "maestro": "linear-gradient(10deg, #541010, #c98181)",
-        "mastercard": "linear-gradient(10deg, #542711, #915b41)",
+        "mastercard": "linear-gradient(10deg, #542711, #b5795c)",
     };
 
     document.querySelectorAll(".issuer-logo").forEach(function (img) {
@@ -156,3 +156,54 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
+$(document).ready(function () {
+    $('#btn-search-user').on('click', function () {
+        var searchTerm = $('#input-to').val();
+        if (searchTerm) {
+            $.ajax({
+                url: '/User/SearchUsers',
+                data: { searchTerm: searchTerm },
+                success: function (data) {
+                    $('#search-results').html(data);
+                },
+                error: function () {
+                    alert('An error occurred while searching for users. Please try again.');
+                }
+            });
+        } else {
+            alert('Please enter a search term.');
+        }
+    });
+});
+
+
+// wallet internal transaction logic
+
+function updateDropdowns(changedDropdownId, otherDropdownId) {
+    var selectedWalletId = document.getElementById(changedDropdownId).value;
+    var otherDropdown = document.getElementById(otherDropdownId);
+    var options = otherDropdown.querySelectorAll('option');
+
+    options.forEach(function (option) {
+        option.style.display = 'block';
+    });
+
+    if (selectedWalletId) {
+        options.forEach(function (option) {
+            if (option.value === selectedWalletId) {
+                option.style.display = 'none';
+            }
+        });
+    }
+}
+
+document.getElementById('input-from').addEventListener('change', function () {
+    updateDropdowns('input-from', 'input-to');
+});
+
+document.getElementById('input-to').addEventListener('change', function () {
+    updateDropdowns('input-to', 'input-from');
+});
+
+
+// wallet title edit

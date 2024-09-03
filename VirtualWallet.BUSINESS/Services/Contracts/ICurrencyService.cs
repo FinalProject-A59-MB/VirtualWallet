@@ -6,6 +6,8 @@ namespace VirtualWallet.BUSINESS.Services.Contracts
 {
     public interface ICurrencyService
     {
-        public Task<Result<CurrencyExchangeRatesResponse>> GetRatesForCurrencyAsync(CurrencyType baseCurrency);
+        Task<Result<CurrencyExchangeRatesResponse>> GetRatesForCurrencyAsync(CurrencyType baseCurrency);
+
+        Task<Result<decimal>> ConvertCurrencyAsync(decimal amount, CurrencyType senderCurrency, CurrencyType destinationCurrency);
     }
 }

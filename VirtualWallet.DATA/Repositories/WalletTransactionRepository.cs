@@ -15,13 +15,11 @@ namespace VirtualWallet.DATA.Repositories
 
         private IQueryable<WalletTransaction> GetWalletTransactionsWithDetails()
         {
-            return _dbContext.WalletTransactions
-                .Include(t => t.Sender)
-                .Include(t => t.Recipient)
-                .Include(t => t.Sender.User)
-                .ThenInclude(u => u.UserProfile)
-                .Include(t => t.Recipient.User)
-                .ThenInclude(u => u.UserProfile);
+            return _dbContext.WalletTransactions.
+                Include(t => t.Recipient).
+                ThenInclude(u => u.User).
+                Include(t => t.Sender).
+                ThenInclude(u => u.User);
         }
 
 
@@ -40,11 +38,26 @@ namespace VirtualWallet.DATA.Repositories
             return await GetWalletTransactionsWithDetails().FirstOrDefaultAsync(t => t.Id == id);
         }
 
-        public async Task<int> AddWalletTransactionAsync(WalletTransaction walletTransaction)
+        public async Task AddWalletTransactionAsync(WalletTransaction walletTransaction)
         {
-            var entity = _dbContext.WalletTransactions.Add(walletTransaction);
+            _dbContext.WalletTransactions.Add(walletTransaction);
             await _dbContext.SaveChangesAsync();
-            return entity.Entity.Id;
+        }
+        public async Task UpdateWalletTransactionAsync(WalletTransaction walletTransaction)
+        {
+            var existingTransaction = await _dbContext.WalletTransactions.FindAsync(walletTransaction.Id);
+
+            if (existingTransaction != null)
+            {
+                _dbContext.Entry(existingTransaction).CurrentValues.SetValues(walletTransaction);
+                await _dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                _dbContext.WalletTransactions.Attach(walletTransaction);
+                _dbContext.Entry(walletTransaction).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
+            }
         }
 
         public async Task<IEnumerable<WalletTransaction>> GetAllWalletTransactionsAsync()
@@ -92,7 +105,7 @@ namespace VirtualWallet.DATA.Repositories
                 switch (parameters.SortBy)
                 {
                     case "Amount":
-                        query = sortOrder ? query.OrderBy(t => t.DepositedAmount) : query.OrderByDescending(t => t.DepositedAmount);
+                        query = sortOrder ? query.OrderBy(t => t.AmountSent) : query.OrderByDescending(t => t.AmountSent);
                         break;
                     case "CreatedAt":
                     default:

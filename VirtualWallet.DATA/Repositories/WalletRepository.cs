@@ -18,6 +18,24 @@ namespace VirtualWallet.DATA.Repositories
             _userRepository = userRepository;
         }
 
+        private IQueryable<Wallet> GetWalletsWithDetails()
+        {
+            return _dbContext.Wallets.
+                Include(w=>w.User).
+                ThenInclude(u=>u.UserProfile).
+                Include(w=>w.UserWallets).
+                Include(w=>w.WalletTransactions).
+                Include(w=>w.CardTransactions);
+        }
+
+        private IQueryable<WalletTransaction> GetWalletTransactionsWithDetails()
+        {
+            return _dbContext.WalletTransactions.
+                Include(wt => wt.Recipient).
+                ThenInclude(r => r.User).
+                Include(wt => wt.Sender).
+                ThenInclude(s => s.User);
+        }
 
         public async Task<int> AddWalletAsync(Wallet wallet)
         {
@@ -27,35 +45,10 @@ namespace VirtualWallet.DATA.Repositories
             return newWallet.Entity.Id;
         }
 
-        public async Task<Wallet> GetWalletByIdAsync(int id)
+
+        public async Task<Wallet?> GetWalletByIdAsync(int id)
         {
-            var wallet = await _dbContext.Wallets
-                .Include(x => x.User)
-                .Include(x => x.UserWallets)
-                .ThenInclude(x => x.User)
-                .FirstOrDefaultAsync(w => w.Id == id);
-
-            var listOfSentTransactions = await _dbContext.WalletTransactions
-                .Include(x => x.Sender)
-                .Include(x => x.Recipient)
-                .Where(x => x.SenderId == id)
-                .ToListAsync();
-
-            var listOfRecievedTransactions = await _dbContext.WalletTransactions
-                .Include(x => x.Sender)
-                .Include(x => x.Recipient)
-                .Where(x => x.RecipientId == id && x.Status == TransactionStatus.Completed)
-                .ToListAsync();
-
-            if (wallet != null)
-            {
-                var allTransactions = listOfSentTransactions;
-                allTransactions.AddRange(listOfRecievedTransactions);
-
-                allTransactions.OrderByDescending(x => x.CreatedAt);
-
-                wallet.WalletTransactions = allTransactions;
-            }
+            var wallet = await GetWalletsWithDetails().FirstOrDefaultAsync(c => c.Id == id);
 
             return wallet;
         }
@@ -95,11 +88,21 @@ namespace VirtualWallet.DATA.Repositories
 
         public async Task UpdateWalletAsync(Wallet wallet)
         {
-            var walletToUpdate = await GetWalletByIdAsync(wallet.Id);
+            var existingWallet = await _dbContext.Wallets.FindAsync(wallet.Id);
 
-            walletToUpdate.Name = wallet.Name;
-            await _dbContext.SaveChangesAsync();
+            if (existingWallet != null)
+            {
+                _dbContext.Entry(existingWallet).CurrentValues.SetValues(wallet);
+                await _dbContext.SaveChangesAsync();
+            }
+            else
+            {
+                _dbContext.Wallets.Attach(wallet);
+                _dbContext.Entry(wallet).State = EntityState.Modified;
+                await _dbContext.SaveChangesAsync();
+            }
         }
+
 
         public async Task<Wallet> GetWalletByUserDetailsAsync(string details)
         {
@@ -139,103 +142,97 @@ namespace VirtualWallet.DATA.Repositories
             await _dbContext.SaveChangesAsync();
         }
 
-        //    public async Task<ICollection<WalletTransaction>> FilterByAsync(WalletTransactionQueryParameters filterParameters, int? userId = null)
-        //    {
-        //        var transactions = _dbContext.WalletTransactions.AsQueryable();
+        public async Task<ICollection<WalletTransaction>> FilterByAsync(WalletTransactionQueryParameters filterParameters, int? userId = null)
+        {
+            var transactions = GetWalletTransactionsWithDetails();
+            if (userId.HasValue)
+            {
+                transactions = transactions.Where(t => t.SenderId == userId.Value || t.RecipientId == userId.Value);
+            }
 
-        //        if (userId.HasValue)
-        //        {
-        //            transactions = transactions.Where(t => t.SenderId == userId.Value || t.RecipientId == userId.Value);
-        //        }
+            if (filterParameters.WalletId.HasValue)
+            {
+                transactions = transactions.Where(t => t.SenderId >= filterParameters.WalletId);
+            }
 
-        //        if (filterParameters.WalletId.HasValue)
-        //        {
-        //            transactions = transactions.Where(t => t.WalletId == filterParameters.WalletId.Value);
-        //        }
-        //        if (filterParameters.MinAmount.HasValue)
-        //        {
-        //            transactions = transactions.Where(t => t.Amount >= filterParameters.MinAmount.Value);
-        //        }
-        //        if (filterParameters.MaxAmount.HasValue)
-        //        {
-        //            transactions = transactions.Where(t => t.Amount <= filterParameters.MaxAmount.Value);
-        //        }
-        //        if (filterParameters.CreatedAfter.HasValue)
-        //        {
-        //            transactions = transactions.Where(t => t.CreatedAt >= filterParameters.CreatedAfter.Value);
-        //        }
-        //        if (filterParameters.CreatedBefore.HasValue)
-        //        {
-        //            transactions = transactions.Where(t => t.CreatedAt <= filterParameters.CreatedBefore.Value);
-        //        }
-        //        if (filterParameters.TransactionType.HasValue)
-        //        {
-        //            transactions = transactions.Where(t => t.TransactionType == filterParameters.TransactionType.Value);
-        //        }
-        //        if (filterParameters.Status.HasValue)
-        //        {
-        //            transactions = transactions.Where(t => t.Status == filterParameters.Status.Value);
-        //        }
+            if (filterParameters.WalletId.HasValue)
+            {
+                transactions = transactions.Where(t => t.RecipientId >= filterParameters.WalletId);
+            }
 
-        //        var sortPropertyMapping = new Dictionary<string, Expression<Func<WalletTransaction, object>>>()
-        //{
-        //    { "CreatedAt", t => t.CreatedAt },
-        //    { "Amount", t => t.Amount }
-        //};
+            if (filterParameters.Amount.HasValue)
+            {
+                transactions = transactions.Where(t => t.AmountSent >= filterParameters.Amount.Value);
+            }
+            if (filterParameters.CreatedAfter.HasValue)
+            {
+                transactions = transactions.Where(t => t.CreatedAt >= filterParameters.CreatedAfter.Value);
+            }
+            if (filterParameters.CreatedBefore.HasValue)
+            {
+                transactions = transactions.Where(t => t.CreatedAt <= filterParameters.CreatedBefore.Value);
+            }
+            if (filterParameters.Status.HasValue)
+            {
+                transactions = transactions.Where(t => t.Status == filterParameters.Status.Value);
+            }
 
-        //        if (!string.IsNullOrEmpty(filterParameters.SortBy) && sortPropertyMapping.ContainsKey(filterParameters.SortBy))
-        //        {
-        //            transactions = filterParameters.SortOrder.ToLower() == "asc"
-        //                ? transactions.OrderBy(sortPropertyMapping[filterParameters.SortBy])
-        //                : transactions.OrderByDescending(sortPropertyMapping[filterParameters.SortBy]);
-        //        }
+            var sortPropertyMapping = new Dictionary<string, Expression<Func<WalletTransaction, object>>>()
+        {
+            { "CreatedAt", t => t.CreatedAt },
+            { "Amount", t => t.AmountSent }
+        };
 
-        //        var skip = (filterParameters.PageNumber - 1) * filterParameters.PageSize;
+            if (!string.IsNullOrEmpty(filterParameters.SortBy) && sortPropertyMapping.ContainsKey(filterParameters.SortBy))
+            {
+                transactions = filterParameters.SortOrder.ToLower() == "asc"
+                    ? transactions.OrderBy(sortPropertyMapping[filterParameters.SortBy])
+                    : transactions.OrderByDescending(sortPropertyMapping[filterParameters.SortBy]);
+            }
 
-        //        return await transactions.Skip(skip).Take(filterParameters.PageSize).ToListAsync();
-        //    }
+            var skip = (filterParameters.PageNumber - 1) * filterParameters.PageSize;
 
-        //    public async Task<int> GetTotalCountAsync(WalletTransactionQueryParameters filterParameters, int? userId = null)
-        //    {
-        //        var transactions = _context.WalletTransactions.AsQueryable();
+            return await transactions.Skip(skip).Take(filterParameters.PageSize).ToListAsync();
+        }
 
-        //        if (userId.HasValue)
-        //        {
-        //            transactions = transactions.Where(t => t.SenderId == userId.Value || t.RecipientId == userId.Value);
-        //        }
+        public async Task<int> GetTotalCountAsync(WalletTransactionQueryParameters filterParameters, int? userId = null)
+        {
+            var transactions = GetWalletTransactionsWithDetails();
 
-        //        if (filterParameters.WalletId.HasValue)
-        //        {
-        //            transactions = transactions.Where(t => t.WalletId == filterParameters.WalletId.Value);
-        //        }
-        //        if (filterParameters.MinAmount.HasValue)
-        //        {
-        //            transactions = transactions.Where(t => t.Amount >= filterParameters.MinAmount.Value);
-        //        }
-        //        if (filterParameters.MaxAmount.HasValue)
-        //        {
-        //            transactions = transactions.Where(t => t.Amount <= filterParameters.MaxAmount.Value);
-        //        }
-        //        if (filterParameters.CreatedAfter.HasValue)
-        //        {
-        //            transactions = transactions.Where(t => t.CreatedAt >= filterParameters.CreatedAfter.Value);
-        //        }
-        //        if (filterParameters.CreatedBefore.HasValue)
-        //        {
-        //            transactions = transactions.Where(t => t.CreatedAt <= filterParameters.CreatedBefore.Value);
-        //        }
-        //        if (filterParameters.TransactionType.HasValue)
-        //        {
-        //            transactions = transactions.Where(t => t.TransactionType == filterParameters.TransactionType.Value);
-        //        }
-        //        if (filterParameters.Status.HasValue)
-        //        {
-        //            transactions = transactions.Where(t => t.Status == filterParameters.Status.Value);
-        //        }
+            if (userId.HasValue)
+            {
+                transactions = transactions.Where(t => t.SenderId == userId.Value || t.RecipientId == userId.Value);
+            }
 
-        //        return await transactions.CountAsync();
-        //    }
+            if (filterParameters.SenderId.HasValue)
+            {
+                transactions = transactions.Where(t => t.SenderId >= filterParameters.SenderId);
+            }
 
-        //}
+            if (filterParameters.RecipientId.HasValue)
+            {
+                transactions = transactions.Where(t => t.RecipientId >= filterParameters.RecipientId);
+            }
+
+            if (filterParameters.Amount.HasValue)
+            {
+                transactions = transactions.Where(t => t.AmountSent >= filterParameters.Amount.Value);
+            }
+            if (filterParameters.CreatedAfter.HasValue)
+            {
+                transactions = transactions.Where(t => t.CreatedAt >= filterParameters.CreatedAfter.Value);
+            }
+            if (filterParameters.CreatedBefore.HasValue)
+            {
+                transactions = transactions.Where(t => t.CreatedAt <= filterParameters.CreatedBefore.Value);
+            }
+            if (filterParameters.Status.HasValue)
+            {
+                transactions = transactions.Where(t => t.Status == filterParameters.Status.Value);
+            }
+
+            return await transactions.CountAsync();
+        }
+
     }
 }

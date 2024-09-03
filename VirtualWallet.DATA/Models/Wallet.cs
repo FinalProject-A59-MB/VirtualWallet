@@ -13,6 +13,8 @@ namespace VirtualWallet.DATA.Models
         public CurrencyType Currency { get; set; }
         public ICollection<UserWallet> UserWallets { get; set; }
         public ICollection<WalletTransaction> WalletTransactions { get; set; }
+        public ICollection<WalletTransaction> SentTransactions { get; set; } = new List<WalletTransaction>();
+        public ICollection<WalletTransaction> ReceivedTransactions { get; set; } = new List<WalletTransaction>();
         public ICollection<CardTransaction> CardTransactions { get; set; }
     }
 }

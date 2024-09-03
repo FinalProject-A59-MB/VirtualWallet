@@ -3,8 +3,9 @@
     public class WalletTransactionDto
     {
         public int Id { get; set; }
-        public decimal Amount { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public decimal AmountSent { get; set; }
+        public decimal AmountReceived { get; set; }
+        public DateTime? CreatedAt { get; set; }
         public string Status { get; set; }
         public int SenderId { get; set; }
         public string SenderName { get; set; }

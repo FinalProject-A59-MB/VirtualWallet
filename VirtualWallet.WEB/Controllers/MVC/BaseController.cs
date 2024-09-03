@@ -31,6 +31,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 ViewBag.IsAuthenticated = true;
                 ViewBag.Wallets = CurrentUser.Wallets;
                 ViewBag.Cards = CurrentUser.Cards;
+                ViewBag.Contacts = CurrentUser.Contacts;
             }
             else
             {

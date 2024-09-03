@@ -94,7 +94,7 @@ public class SmtpEmailService : IEmailService
         string emailTemplate = await File.ReadAllTextAsync(templatePath);
 
         string emailContent = emailTemplate.Replace("{{Username}}", user.Username)
-                                           .Replace("{{VerificationCode}}", verificationCode);
+                                           .Replace("{{Generate}}", verificationCode);
 
         await SendEmailAsync(user.Email, "Payment Code", emailContent);
 

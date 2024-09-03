@@ -20,6 +20,8 @@ namespace VirtualWallet.DATA.Models
         public ICollection<UserWallet> UserWallets { get; set; } = new List<UserWallet>();
         public ICollection<UserContact> Contacts { get; set; } = new List<UserContact>();
         public ICollection<RecurringPayment> RecurringPayments { get; set; } = new List<RecurringPayment>();
+
+
         public int? MainWalletId { get; set; }
         public Wallet? MainWallet { get; set; }
         public int? BlockedRecordId { get; set; }

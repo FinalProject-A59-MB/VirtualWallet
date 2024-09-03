@@ -35,8 +35,10 @@
                                     Money Transfers
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="moneyTransfersDropdown">
-                                    <li><a class="dropdown-item" href="@Url.Action("Index", "WalletTransaction")"><i class="bi bi-box-arrow-up-right me-2"></i>Send Money</a></li>
-                                    <li><a class="dropdown-item" href="@Url.Action("RequestDeposit", "WalletTransaction")"><i class="bi bi-box-arrow-down-left me-2"></i>Request Money</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("RequestDeposit", "WalletTransactions")"><i class="bi bi-currency-exchange me-2"></i>Internal transfer</a></li>
+
+                                    <li><a class="dropdown-item" href="@Url.Action("SearchUsers", "WalletTransactions")"><i class="bi bi-box-arrow-up-right me-2"></i>Send Money</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("RequestDeposit", "WalletTransactions")"><i class="bi bi-box-arrow-down-left me-2"></i>Request Money</a></li>
                                 </ul>
                             </li>
 
@@ -55,7 +57,7 @@
                                     Transaction History
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="transactionHistoryDropdown">
-                                    <li><a class="dropdown-item" href="@Url.Action("WalletTransactions", "History")"><i class="bi bi-currency-exchange me-2"></i>Wallet Transactions</a></li>
+                                    <li><a class="dropdown-item" href="@Url.Action("Index", "WalletTransactions")"><i class="bi bi-currency-exchange me-2"></i>Wallet Transactions</a></li>
                                     <li><a class="dropdown-item" href="@Url.Action("Index", "CardTransactions")"><i class="bi bi-bank2 me-2"></i>Card Transactions</a></li>
                                 </ul>
                             </li>
@@ -137,12 +139,12 @@
                     </li>
                 }
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="@Url.Action("Index", "WalletTransaction")">
+                    <a class="nav-link text-white" href="@Url.Action("SearchUsers", "WalletTransactions")">
                         <i class="bi bi-box-arrow-up-right me-2"></i> Send Money
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="@Url.Action("RequestDeposit", "WalletTransaction")">
+                    <a class="nav-link text-white" href="@Url.Action("RequestDeposit", "WalletTransactions")">
                         <i class="bi bi-box-arrow-down-left me-2"></i> Request Money
                     </a>
                 </li>
@@ -172,7 +174,7 @@
                     </a>
                 </li>
                 <li class="nav-item mb-3">
-                    <a class="nav-link text-white" href="@Url.Action("WalletTransactions", "Wallet")">
+                    <a class="nav-link text-white" href="@Url.Action("Index", "WalletTransactions")">
                         <i class="bi bi-currency-exchange me-2"></i> Wallet Transactions
                     </a>
                 </li>
