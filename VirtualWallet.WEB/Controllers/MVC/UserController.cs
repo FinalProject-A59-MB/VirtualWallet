@@ -353,9 +353,13 @@ namespace ForumProject.Controllers.MVC
         public async Task<IActionResult> VerifyUser(int userId)
         {
             Result<User> user = await _userService.GetUserByIdAsync(userId);
-            if (user != null)
+            if (user.IsSuccess)
             {
                 user.Value.VerificationStatus = UserVerificationStatus.Verified;
+                if (user.Value.Role==UserRole.EmailVerifiedUser)
+                {
+                    user.Value.Role = UserRole.VerifiedUser;
+                }
                 await _userService.UpdateUserAsync(user.Value);
             }
 

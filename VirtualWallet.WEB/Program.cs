@@ -165,7 +165,7 @@ app.UseCookiePolicy(new CookiePolicyOptions
 
 
 // troubleshooting
-app.UseDeveloperExceptionPage();
+//app.UseDeveloperExceptionPage();
 
 app.UseSwagger();
 app.UseSwaggerUI(options =>

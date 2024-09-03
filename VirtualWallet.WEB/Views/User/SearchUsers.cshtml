@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "User Search";
+    var IsAdmin = ViewBag.UserRole == "Admin";
 }
 
 <div class="container my-4 bg-dark-1 p-5 rounded-3 shadow animate__animated animate__fadeIn">
@@ -31,12 +32,20 @@
                             <td class="text-center">@user.Username</td>
                             <td>@user.Email</td>
                             <td>@user.VerificationStatus</td>
-                            <td class="d-flex justify-content-center gap-2">
-                                <a href="@Url.Action("Profile", "User", new { id = user.Id })" class="btn btn-outline-info btn-sm">View Profile</a>
-                                <form asp-action="DeleteUser" method="post" class="d-inline">
-                                    <input type="hidden" name="userId" value="@user.Id" />
-                                    <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
-                                </form>
+                            <td class="d-flex justify-content-center gap-3" style="width: 300px;">
+                                <a href="@Url.Action("Profile", "User", new { id = user.Id })" class="btn btn-outline-info">View Profile</a>
+                                @if (IsAdmin)
+                                {
+                                    @if (user.Role == UserRole.Blocked.ToString())
+                                    {
+                                        <a href="@Url.Action("UnblockUser", "User", new { userId = user.Id })" class="btn btn-warning btn">Unban User</a>
+                                    }
+                                    else
+                                    {
+                                        <a href="@Url.Action("BlockUser", "User", new { userId = user.Id })" class="btn btn-danger btn">Ban User</a>
+                                    }
+                                }
+
                             </td>
                         </tr>
                     }

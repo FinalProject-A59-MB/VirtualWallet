@@ -152,7 +152,7 @@ namespace VirtualWallet.DATA.Repositories
             var transactions = GetWalletTransactionsWithDetails();
             if (userId.HasValue)
             {
-                transactions = transactions.Where(t => t.SenderId == userId.Value || t.RecipientId == userId.Value);
+                transactions = transactions.Where(t => t.Sender.User.Id == userId.Value || t.Recipient.User.Id == userId.Value);
             }
 
             if (filterParameters.WalletId.HasValue)

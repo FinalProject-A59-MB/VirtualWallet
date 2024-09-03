@@ -120,7 +120,7 @@
                     }
                 </tbody>
             </table>
-            <p> * The ammount is based on the currency of the destianation wallet of the user (hover over the currency to see the outgoing ammount and currency) </p>
+            <p> * The ammount is based on the currency of the destianation wallet of the user. </p>
         </div>
 
         <!-- Pagination for Wallet Transactions -->
@@ -167,7 +167,7 @@
                                     }
                                 }
                                 <td>@transaction.Wallet.Name (@transaction.Wallet.Currency)</td>
-                                <td>@transaction.Card.CardNumber</td>
+                                <td>@transaction.Card.CardNumber (@transaction.Card.Currency)</td>
                                 <td>@transaction.CreatedAt.ToString("MMM dd, yyyy")</td>
                                 <td>@currency @transaction.Amount</td>
                                 <td>@transaction.Type</td>

@@ -15,11 +15,25 @@ namespace VirtualWallet.DATA.Repositories
 
         private IQueryable<WalletTransaction> GetWalletTransactionsWithDetails()
         {
-            return _dbContext.WalletTransactions.
-                Include(t => t.Recipient).
-                ThenInclude(u => u.User).
-                Include(t => t.Sender).
-                ThenInclude(u => u.User);
+            return _dbContext.WalletTransactions
+                    .Include(t => t.Recipient)
+        .ThenInclude(w => w.User)
+    .Include(t => t.Sender)
+        .ThenInclude(w => w.User);
+
+        }
+        public async Task<List<WalletTransaction>> GetWalletTransactionsAsync()
+        {
+            // Build the query with eager loading
+            var query = GetWalletTransactionsWithDetails();
+
+            // Output the SQL query to the console
+            var sqlQuery = query.ToQueryString();
+            Console.WriteLine(sqlQuery);
+
+            // Execute the query
+            var transactions = await query.ToListAsync();
+            return transactions;
         }
 
 

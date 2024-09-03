@@ -17,13 +17,15 @@ namespace VirtualWallet.DATA.Services
         private readonly ITransactionHandlingService _transactionHandlingService;
         private readonly ICurrencyService _currencyService;
         private readonly IEmailService _emailService;
+        private readonly IUserService _userService;
 
         public WalletTransactionService(
             IWalletTransactionRepository walletTransactionRepository,
             IWalletRepository walletRepository,
             ITransactionHandlingService transactionHandlingService,
             ICurrencyService currencyService,
-            IEmailService emailService
+            IEmailService emailService,
+            IUserService userService
 )
         {
             _walletTransactionRepository = walletTransactionRepository;
@@ -31,6 +33,7 @@ namespace VirtualWallet.DATA.Services
             _transactionHandlingService = transactionHandlingService;
             _currencyService = currencyService;
             _emailService = emailService;
+            _userService = userService;
         }
 
         public async Task<Result<WalletTransaction>> VerifySendAmountAsync(int senderWalletId, User recepient, decimal amount)
@@ -197,6 +200,14 @@ namespace VirtualWallet.DATA.Services
             query = query.Skip(skip).Take(parameters.PageSize);
 
             var transactions = await query.ToListAsync();
+
+            foreach (var transaction in transactions)
+            {
+                var recepientUser = await _userService.GetUserByIdAsync(transaction.Recipient.UserId);
+                var senderUser = await _userService.GetUserByIdAsync(transaction.Recipient.UserId);
+                transaction.Recipient.User = recepientUser.Value;
+                transaction.Sender.User = senderUser.Value;
+            }
 
             return transactions.Any()
                 ? Result<IEnumerable<WalletTransaction>>.Success(transactions)

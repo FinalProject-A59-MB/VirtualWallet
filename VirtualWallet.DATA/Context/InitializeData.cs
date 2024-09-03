@@ -201,10 +201,91 @@ namespace VirtualWallet.DATA.Context
                 context.SaveChanges();
             }
 
+            if (context.Wallets.Any() && context.Cards.Any() && !context.CardTransactions.Any())
+            {
+                var wallets = context.Wallets.ToList();
+                var cards = context.Cards.ToList();
 
+                
+                var walletTransactions = new List<WalletTransaction>();
+
+                for (int i = 0; i < 50; i++) 
+                {
+                    var senderWallet = wallets[_random.Next(wallets.Count)];
+                    var recipientWallet = wallets.Where(w => w.UserId != senderWallet.UserId).OrderBy(_ => _random.Next()).FirstOrDefault();
+
+                    if (recipientWallet != null)
+                    {
+                        var amountSent = (decimal)(_random.NextDouble() * (500 - 10) + 10);
+                        var amountReceived = amountSent;
+                        var fee = amountSent * 0.02m;
+                        if (recipientWallet.Currency == senderWallet.Currency)
+                        {
+                            fee = 0.00m;
+                        }
+                        
+
+                        walletTransactions.Add(new WalletTransaction
+                        {
+                            AmountSent = amountSent,
+                            AmountReceived = amountReceived - fee,
+                            FeeAmount = fee,
+                            CreatedAt = DateTime.UtcNow.AddDays(-_random.Next(0, 365)),
+                            CurrencySent = senderWallet.Currency,
+                            CurrencyReceived = recipientWallet.Currency,
+                            Status = TransactionStatus.Completed,
+                            SenderId = senderWallet.Id,
+                            RecipientId = recipientWallet.Id,
+                            VerificationCode = VerificationCode.Generate()
+                        });
+                    }
+                }
+
+                context.WalletTransactions.AddRange(walletTransactions);
+
+                
+                var cardTransactions = new List<CardTransaction>();
+
+                for (int i = 0; i < 100; i++)
+                {
+                    var card = cards[_random.Next(cards.Count)];
+                    var wallet = wallets.FirstOrDefault(w => w.UserId == card.User.Id);
+
+                    if (wallet != null)
+                    {
+                        var amount = (decimal)(_random.NextDouble() * (300 - 20) + 20);
+                        var fee = 0.00m;
+                        var transactionType = (TransactionType)_random.Next(0, 2);
+                        if (card.Currency != wallet.Currency && transactionType== TransactionType.Withdrawal)
+                        {
+                            fee = amount * 0.025m;
+                            
+                        }
+
+                        cardTransactions.Add(new CardTransaction
+                        {
+                            Amount = amount,
+                            CreatedAt = DateTime.UtcNow.AddDays(-_random.Next(0, 365)),
+                            Currency = card.Currency,
+                            Status = TransactionStatus.Completed,
+                            UserId = card.User.Id,
+                            WalletId = wallet.Id,
+                            CardId = card.Id,
+                            TransactionType = transactionType,
+                            Fee = fee
+                        });
+                    }
+                }
+
+                context.CardTransactions.AddRange(cardTransactions);
+                context.SaveChanges();
+
+
+            }
 
 
         }
+
 
         private static string GenerateUsername(string firstName, string lastName, DateTime dateOfBirth, int num)
         {
@@ -228,10 +309,17 @@ namespace VirtualWallet.DATA.Context
 
             return randomCurrency;
         }
+
+        private class VerificationCode
+        {
+            public static string Generate()
+            {
+                Random random = new Random();
+                int verificationCode = random.Next(1000, 10000);
+                return verificationCode.ToString();
+            }
+        }
+
     }
-
-
-
-
 }
 

@@ -34,6 +34,7 @@ namespace VirtualWallet.TESTS.BUSINESS.Services.WalletTransactionServiceTests
                 _walletRepositoryMock.Object,
                 _transactionHandlingServiceMock.Object,
                 _currencyService.Object,
+                null,
                 null);
         }
 

@@ -174,6 +174,13 @@ namespace VirtualWallet.DATA.Services
         {
             var transactions = await _walletRepository.FilterByAsync(filterParameters, userId);
 
+            foreach (var transaction in transactions)
+            {
+                var recepientUser = await _userService.GetUserByIdAsync(transaction.Recipient.UserId);
+                var senderUser = await _userService.GetUserByIdAsync(transaction.Recipient.UserId);
+                transaction.Recipient.User = recepientUser.Value;
+                transaction.Sender.User = senderUser.Value;
+            }
             return transactions != null
                 ? Result<IEnumerable<WalletTransaction>>.Success(transactions)
                 : Result<IEnumerable<WalletTransaction>>.Failure("Transactions not found.");

@@ -354,17 +354,17 @@ namespace VirtualWallet.DATA.Services
 
             if (!string.IsNullOrEmpty(parameters.Username))
             {
-                query = query.Where(u => u.Username.Contains(parameters.Username));
+                query = query.Where(u => u.Username.ToLower().Contains(parameters.Username.ToLower()));
             }
 
             if (!string.IsNullOrEmpty(parameters.Email))
             {
-                query = query.Where(u => u.Email.Contains(parameters.Email));
+                query = query.Where(u => u.Email.ToLower().Contains(parameters.Email.ToLower()));
             }
 
             if (!string.IsNullOrEmpty(parameters.PhoneNumber))
             {
-                query = query.Where(u => u.UserProfile.PhoneNumber.Contains(parameters.PhoneNumber));
+                query = query.Where(u => u.UserProfile.PhoneNumber.ToLower().Contains(parameters.PhoneNumber.ToLower()));
             }
 
             if (parameters.VerificationStatus != 0)
@@ -386,6 +386,7 @@ namespace VirtualWallet.DATA.Services
                 ? Result<IEnumerable<User>>.Success(users)
                 : Result<IEnumerable<User>>.Failure("No users found.");
         }
+
 
 
         public async Task<Result<int>> GetTotalUserCountAsync(UserQueryParameters parameters)
