@@ -45,10 +45,6 @@ body {
     color: #cfcfcf !important;
 }
 
-/*.btn-outline-success {
-    background-color: #0f3511 !important;
-}*/
-
 .nav-link {
     color: white;
 }
@@ -90,4 +86,19 @@ ul, ol {
         padding-left: 10vw;
         padding-right: 10vw;
     }
+}
+
+
+.highlight-on-hover:hover {
+    background-color: #f8f9fa; /* Light grey, or any other color */
+    transition: background-color 0.3s ease;
+    color: #1a1a1a !important;
+}
+
+hr {
+    color: #585656;
+    background-color: currentColor;
+    opacity: 0.55;
+    width:100%;
+    margin:0;
 }

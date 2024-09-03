@@ -38,7 +38,6 @@
                                     <li><a class="dropdown-item" href="@Url.Action("DepositInternally", "WalletTransactions")"><i class="bi bi-currency-exchange me-2"></i>Internal transfer</a></li>
 
                                     <li><a class="dropdown-item" href="@Url.Action("SearchUsers", "WalletTransactions")"><i class="bi bi-box-arrow-up-right me-2"></i>Send Money</a></li>
-                                    <li><a class="dropdown-item" href="@Url.Action("RequestDeposit", "WalletTransactions")"><i class="bi bi-box-arrow-down-left me-2"></i>Request Money</a></li>
                                 </ul>
                             </li>
 
@@ -117,84 +116,96 @@
                     </form>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="@Url.Action("Profile", "User" , new { id = ViewBag.UserId})">
+                    <a class="nav-link text-white highlight-on-hover" href="@Url.Action("Profile", "User" , new { id = ViewBag.UserId})">
                         <i class="bi bi-person me-2"></i> Profile
                     </a>
                 </li>
+                <hr class="hr-custom">
+
                 @if (ViewBag.UserRole == "Admin")
                 {
 
-                    <li class="nav-item mt-4">
-                        <a class="nav-link text-white" href="@Url.Action("AdminPanel", "User")">
+                    <li class="nav-item">
+                        <a class="nav-link text-white highlight-on-hover" href="@Url.Action("AdminPanel", "User")">
                             <i class="bi bi-person-circle"></i> Admin panel
                         </a>
                     </li>
                 }
                 @if (ViewBag.UserRole == "Staff" || ViewBag.UserRole == "Admin")
                 {
-                    <li class="nav-item mb-4">
-                        <a class="nav-link text-white" href="@Url.Action("UnverifiedUsers", "User" , new { id = ViewBag.UserId})">
+                    <li class="nav-item">
+                        <a class="nav-link text-white highlight-on-hover" href="@Url.Action("UnverifiedUsers", "User" , new { id = ViewBag.UserId})">
                             <i class="bi bi-people"></i> Manage Users
                         </a>
                     </li>
+                    <hr class="hr-custom">
+
                 }
-                <li class="nav-item">
-                    <a class="nav-link text-white" href="@Url.Action("SearchUsers", "WalletTransactions")">
+
+                <li class="nav-item ">
+                    <a class="nav-link text-white highlight-on-hover" href="@Url.Action("SearchUsers", "WalletTransactions")">
                         <i class="bi bi-box-arrow-up-right me-2"></i> Send Money
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="@Url.Action("RequestDeposit", "WalletTransactions")">
-                        <i class="bi bi-box-arrow-down-left me-2"></i> Request Money
+                    <a class="nav-link text-white highlight-on-hover" href=@Url.Action("DepositInternally", "WalletTransactions")">
+                        <i class="bi bi-currency-exchange me-2"></i>Internal transfer</a>
                     </a>
                 </li>
+                <hr class="hr-custom"> 
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="@Url.Action("Deposit", "Card")">
+                    <a class="nav-link text-white highlight-on-hover" href="@Url.Action("Deposit", "Card")">
                         <i class="bi bi-arrow-down-circle me-2"></i> Deposit to Wallet
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="@Url.Action("Withdraw", "Card")">
+                    <a class="nav-link text-white highlight-on-hover" href="@Url.Action("Withdraw", "Card")">
                         <i class="bi bi-arrow-up-circle me-2"></i> Withdraw from Wallet
                     </a>
                 </li>
+                <hr class="hr-custom">
+
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="@Url.Action("Wallets", "User")">
+                    <a class="nav-link text-white highlight-on-hover" href="@Url.Action("Wallets", "User")">
                         <i class="bi bi-wallet2 me-2"></i> Wallets
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="@Url.Action("Cards", "User")">
+                    <a class="nav-link text-white highlight-on-hover" href="@Url.Action("Cards", "User")">
                         <i class="bi bi-credit-card-2-front me-2"></i> Cards
                     </a>
                 </li>
+                <hr class="hr-custom">
+
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="@Url.Action("Index","CardTransactions")">
+                    <a class="nav-link text-white highlight-on-hover" href="@Url.Action("Index", "CardTransactions")">
                         <i class="bi bi-bank2 me-2"></i> Card Transactions
                     </a>
                 </li>
-                <li class="nav-item mb-3">
-                    <a class="nav-link text-white" href="@Url.Action("Index", "WalletTransactions")">
+                <li class="nav-item">
+                    <a class="nav-link text-white highlight-on-hover" href="@Url.Action("Index", "WalletTransactions")">
                         <i class="bi bi-currency-exchange me-2"></i> Wallet Transactions
                     </a>
                 </li>
+                <hr class="hr-custom">
+
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="@Url.Action("About", "Home")">
+                    <a class="nav-link text-white highlight-on-hover" href="@Url.Action("About", "Home")">
                         <i class="bi bi-info-square"></i> About
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="@Url.Action("FAQ", "Home")">
+                    <a class="nav-link text-white highlight-on-hover" href="@Url.Action("FAQ", "Home")">
                         <i class="bi bi-question-square"></i> FAQ
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white" href="@Url.Action("ContactUs", "Home")">
+                    <a class="nav-link text-white highlight-on-hover" href="@Url.Action("ContactUs", "Home")">
                         <i class="bi bi-building-add"></i> Contact Us
                     </a>
                 </li>
                 <li class="nav-item mb-5">
-                    <a class="nav-link text-white" href="@Url.Action("Privacy", "Home")">
+                    <a class="nav-link text-white highlight-on-hover" href="@Url.Action("Privacy", "Home")">
                         <i class="bi bi-list-ol"></i> ToS
                     </a>
                 </li>

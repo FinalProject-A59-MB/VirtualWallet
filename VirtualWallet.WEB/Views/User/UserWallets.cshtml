@@ -3,7 +3,7 @@
 <div class="how-it-works-area py-5 bg-dark-1 text-light">
     <div class="container">
         <h1 class="text-center mb-5">Select transaction option</h1>
-        <div class="row">
+        <div class="d-flex justify-content-center gap-5">
             <a asp-action="DepositInternally" asp-controller="WalletTransactions" class="col-md-4">
                 <div class="feature-box text-center p-3 rounded bg-dark-2 shadow">
                     <div class="feature-icon mb-2 animate__animated animate__fadeInUp">
@@ -12,22 +12,12 @@
                     <h5 class="mb-2">Internal transfer</h5>
                 </div>
             </a>
-
             <a asp-action="SearchUsers" asp-controller="WalletTransactions" class="col-md-4">
                 <div class="feature-box text-center p-3 rounded bg-dark-2 shadow">
                     <div class="feature-icon mb-2 animate__animated animate__fadeInUp">
                         <i class="bi bi-box-arrow-up-right display-4 text-primary"></i>
                     </div>
                     <h5 class="mb-2">Send Money</h5>
-                </div>
-            </a>
-
-            <a asp-action="RequestDeposit" asp-controller="WalletTransactions" class="col-md-4">
-                <div class="feature-box text-center p-3 rounded bg-dark-2 shadow">
-                    <div class="feature-icon mb-2 animate__animated animate__fadeInUp">
-                        <i class="bi bi-box-arrow-down-left display-4 text-primary"></i>
-                    </div>
-                    <h5 class="mb-2">Request Money</h5>
                 </div>
             </a>
         </div>
