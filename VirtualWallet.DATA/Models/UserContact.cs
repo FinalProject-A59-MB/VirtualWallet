@@ -16,6 +16,7 @@ namespace VirtualWallet.DATA.Models
         public int SenderId { get; set; }
         public User Sender { get; set; }
         public string? Description { get; set; }
+        public ICollection<WalletTransaction> MoneyRequests { get; set; }
     }
 
 }

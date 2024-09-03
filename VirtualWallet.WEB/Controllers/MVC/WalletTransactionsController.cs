@@ -210,9 +210,67 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 TempData["InfoMessage"] = "Currently you do not have any active contacts. You need to add people to your contact list before you can be able to request funds.";
                 return RedirectToAction("Profile", "User");
             }
+            var model = new RequestMoneyViewModel { 
+                Contacts = CurrentUser.Contacts,
+                SenderId = CurrentUser.Id
+            };
 
-            return View();
+            return View(model);
         }
+
+        [HttpGet]
+        public IActionResult RequestConfirm(RequestMoneyViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.Contacts = CurrentUser.Contacts.Where(c => c.Status == FriendRequestStatus.Accepted).ToList();
+                return View(model);
+            }
+
+            var activeContacts = CurrentUser.Contacts.FirstOrDefault(c => c.Status == FriendRequestStatus.Accepted);
+            if (activeContacts == null)
+            {
+                TempData["InfoMessage"] = "Currently you do not have any active contacts. You need to add people to your contact list before you can be able to request funds.";
+                return RedirectToAction("Profile", "User");
+            }
+
+            model.Contacts = CurrentUser.Contacts.Where(c => c.Status == FriendRequestStatus.Accepted).ToList();
+
+            return View("RequestConfirm", model);
+        }
+
+        [HttpPost]
+        public IActionResult RequestSend(RequestMoneyViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.Contacts = CurrentUser.Contacts.Where(c => c.Status == FriendRequestStatus.Accepted).ToList();
+                return View("RequestConfirm", model);
+            }
+
+            //// Process the request
+            //var transaction = new WalletTransactionRequest
+            //{
+            //    SenderId = model.SenderId,
+            //    AmountSent = model.Amount,
+            //    Description = model.Description,
+            //    Status = TransactionStatus.Pending,
+            //    CreatedAt = DateTime.UtcNow
+            //};
+
+            //var result = _walletTransactionService.CreateTransaction(transaction);
+
+            //if (!result.IsSuccess)
+            //{
+            //    TempData["ErrorMessage"] = "There was an error processing your request. Please try again.";
+            //    return RedirectToAction("RequestDeposit");
+            //}
+
+            TempData["SuccessMessage"] = "Your request has been successfully sent.";
+            return RedirectToAction("Index", "WalletTransactions");
+        }
+
+
 
 
         [HttpGet]

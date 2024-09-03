@@ -79,7 +79,6 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(uc => uc.ContactId)
             .OnDelete(DeleteBehavior.Restrict);
 
-
         modelBuilder.Entity<WalletTransaction>()
             .HasOne(wt => wt.Sender)
             .WithMany(w => w.SentTransactions)
