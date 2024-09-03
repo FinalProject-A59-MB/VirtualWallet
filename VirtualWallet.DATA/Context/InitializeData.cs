@@ -192,9 +192,17 @@ namespace VirtualWallet.DATA.Context
 
 
                 }
-
+                var realCards2 = new List<RealCard>
+                    {
+                        new RealCard { CardHolderName = "Fred Kunze", CardNumber = "5430204966607530", Issuer = "mastercard", ExpirationDate = DateTime.ParseExact("12/27", "MM/yy", null), Cvv = "198", Balance = 10000, CardType = CardType.Debit, Currency = CurrencyType.EUR, PaymentProcessorToken = "f1a2b3c4d5e6f7g822i0j1k2l3m4n5o6" },
+                        new RealCard { CardHolderName = "Mildred Corwin", CardNumber = "5444839212087963", Issuer = "mastercard", ExpirationDate = DateTime.ParseExact("02/27", "MM/yy", null), Cvv = "057", Balance = 10000, CardType = CardType.Debit, Currency = CurrencyType.EUR, PaymentProcessorToken = "f1a2b3c4d5e6f733h9i0j1k2l3m4n5o6" },
+                    };
+                context.RealCards.AddRange(realCards2);
                 context.SaveChanges();
             }
+
+
+
 
         }
 

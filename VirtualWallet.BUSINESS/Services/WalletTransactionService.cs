@@ -21,7 +21,8 @@ namespace VirtualWallet.DATA.Services
             IWalletTransactionRepository walletTransactionRepository,
             IWalletRepository walletRepository,
             ITransactionHandlingService transactionHandlingService,
-            ICurrencyService currencyService)
+            ICurrencyService currencyService
+)
         {
             _walletTransactionRepository = walletTransactionRepository;
             _walletRepository = walletRepository;
@@ -42,7 +43,7 @@ namespace VirtualWallet.DATA.Services
 
             var recipientWallets = await _walletRepository.GetWalletsByUserIdAsync(recepient.Id);
 
-            if (recipientWallets.Count()==0)
+            if (recipientWallets.Count() == 0)
                 return Result<WalletTransaction>.Failure("User has no active wallets and cannot receive funds.");
 
             var recipientWallet = recipientWallets.Where(w => w.Currency == senderWallet.Currency).FirstOrDefault();
@@ -58,7 +59,7 @@ namespace VirtualWallet.DATA.Services
                     recipientWallet = recepient.MainWallet;
                 }
 
-                
+
             }
             recipientWallet.User = recepient;
 

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using VirtualWallet.BUSINESS.Results;
+using VirtualWallet.BUSINESS.Services;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Repositories.Contracts;
@@ -18,6 +19,7 @@ namespace VirtualWallet.TESTS.BUSINESS.Services.WalletTransactionServiceTests
         private Mock<IWalletTransactionRepository> _walletTransactionRepositoryMock;
         private Mock<IWalletRepository> _walletRepositoryMock;
         private Mock<ITransactionHandlingService> _transactionHandlingServiceMock;
+        private Mock<ICurrencyService> _currencyService;    
         private WalletTransactionService _walletTransactionService;
 
         [TestInitialize]
@@ -26,12 +28,12 @@ namespace VirtualWallet.TESTS.BUSINESS.Services.WalletTransactionServiceTests
             _walletTransactionRepositoryMock = new Mock<IWalletTransactionRepository>();
             _walletRepositoryMock = new Mock<IWalletRepository>();
             _transactionHandlingServiceMock = new Mock<ITransactionHandlingService>();
+            _currencyService = new Mock<ICurrencyService>();
             _walletTransactionService = new WalletTransactionService(
                 _walletTransactionRepositoryMock.Object,
                 _walletRepositoryMock.Object,
                 _transactionHandlingServiceMock.Object,
-                null,  // Assuming null for optional dependencies like IEmailService
-                null); // Assuming null for optional dependencies like ICurrencyService
+                _currencyService.Object);
         }
 
         [TestMethod]

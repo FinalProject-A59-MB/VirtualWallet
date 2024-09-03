@@ -50,7 +50,7 @@ namespace VirtualWallet.BUSINESS.Services
                 return Result.Failure("Invalid user or card information.");
             }
 
-            var cardResult = _cardRepository.GetCardByTokenAsync(card.PaymentProcessorToken);
+            var cardResult = await _cardRepository.GetCardByTokenAsync(card.PaymentProcessorToken);
             if (cardResult != null)
             {
                 return Result.Failure("This card is already added to our system.");
