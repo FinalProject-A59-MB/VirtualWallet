@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.DATA.Models;
+using VirtualWallet.DATA.Models.Enums;
 using VirtualWallet.DATA.Services.Contracts;
 using VirtualWallet.WEB.Models.DTOs.WalletDTOs;
+using VirtualWallet.WEB.Models.ViewModels.CardViewModels;
 
 namespace VirtualWallet.WEB.Controllers.MVC
 {
@@ -83,27 +85,12 @@ namespace VirtualWallet.WEB.Controllers.MVC
             return RedirectToAction("Index","Wallet", new { id = id });
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Update(WalletRequestDto wallet)
-        //{
-        //    int userId = 0;
 
-        //    wallet.UserId = userId;
-
-        //    var result = await _walletService.UpdateWalletAsync(_dtoMapper.ToWalletRequestDto(wallet));
-
-        //    if (!result.IsSuccess)
-        //    {
-        //        TempData["ErrorMessage"] = result.Error;
-        //    }
-
-        //    return RedirectToAction("Index", new { id = wallet.Id });
-        //}
-
-        [HttpDelete]
-        public async Task<IActionResult> Delete(int id)
+        [HttpGet]
+        public async Task<IActionResult> ConfirmDelete(int id)
         {
-            var result = await _walletService.RemoveWalletAsync(id);
+            var result = await _walletService.GetWalletByIdAsync(id);
+
 
             if (!result.IsSuccess)
             {
@@ -111,8 +98,40 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 return RedirectToAction("Index", new { id = id });
             }
 
+            if (result.Value.Balance>0)
+            {
+                TempData["ErrorMessage"] = "Your wallet still havs funds, please withdra all the funds before you can proceed.";
+                var model = new CardTransactionViewModel();
+                model.ActionTitle = "Withdraw Money";
+                model.FormAction = "WithdrawFromWallet";
+                model.Type = TransactionType.Withdrawal;
+                return RedirectToAction("Withdraw", "Card", model);
+            }
+
+            var vm = _viewModelMapper.ToWalletViewModel(result.Value);
+            return View(vm);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            // Attempt to delete the wallet
+            var result = await _walletService.RemoveWalletAsync(id);
+
+            // Check if the deletion was successful
+            if (!result.IsSuccess)
+            {
+                TempData["ErrorMessage"] = result.Error;
+                return RedirectToAction("ConfirmDelete", new { id = id });
+            }
+
+            // Redirect to the user's wallet list after successful deletion
+            TempData["SuccessMessage"] = "Wallet deleted successfully.";
             return RedirectToAction("Wallets", "User");
         }
+
+
 
         [HttpGet]
         public async Task<int> GetWalletIdByUserDetails(string details)

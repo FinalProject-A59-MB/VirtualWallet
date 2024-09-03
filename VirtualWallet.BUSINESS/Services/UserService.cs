@@ -91,6 +91,12 @@ namespace VirtualWallet.DATA.Services
             return Result<IEnumerable<User>>.Success(users);
         }
 
+        public async Task<Result<IEnumerable<User>>> GetUserContacts(int userid)
+        {
+            IEnumerable<User> users = await _userRepository.GetUserContactsAsync(userid);
+            return Result<IEnumerable<User>>.Success(users);
+        }
+
         public async Task<Result<User>> GetUserByIdAsync(int userId)
         {
             User user = await _userRepository.GetUserByIdAsync(userId);

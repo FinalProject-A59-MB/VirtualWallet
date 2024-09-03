@@ -120,6 +120,7 @@ public class ApplicationDbContext : DbContext
             .HasForeignKey(uw => uw.WalletId)
             .OnDelete(DeleteBehavior.Restrict);
 
+
         // Precision and Scale for Decimal
         modelBuilder.Entity<CardTransaction>()
             .Property(ct => ct.Amount)

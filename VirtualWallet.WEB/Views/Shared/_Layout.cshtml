@@ -12,7 +12,7 @@
     <link rel="icon" href="~/favicon.ico" type="image/x-icon" asp-append-version="true" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-dark-3">
+<body class="bg-dark">
     <header>
         <!-- Main Navigation -->
         <nav class="navbar navbar-expand-sm navbar-light border-bottom box-shadow bg-dark-2">
@@ -119,8 +119,10 @@
                     <a class="nav-link text-white highlight-on-hover" href="@Url.Action("Profile", "User" , new { id = ViewBag.UserId})">
                         <i class="bi bi-person me-2"></i> Profile
                     </a>
+                    <hr class="hr-custom">
+
                 </li>
-                <hr class="hr-custom">
+                
 
                 @if (ViewBag.UserRole == "Admin")
                 {
@@ -137,8 +139,9 @@
                         <a class="nav-link text-white highlight-on-hover" href="@Url.Action("UnverifiedUsers", "User" , new { id = ViewBag.UserId})">
                             <i class="bi bi-people"></i> Manage Users
                         </a>
+                        <hr class="hr-custom">
                     </li>
-                    <hr class="hr-custom">
+                    
 
                 }
 
@@ -146,13 +149,15 @@
                     <a class="nav-link text-white highlight-on-hover" href="@Url.Action("SearchUsers", "WalletTransactions")">
                         <i class="bi bi-box-arrow-up-right me-2"></i> Send Money
                     </a>
+
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-white highlight-on-hover" href=@Url.Action("DepositInternally", "WalletTransactions")">
-                        <i class="bi bi-currency-exchange me-2"></i>Internal transfer</a>
+                    <a class="nav-link text-white highlight-on-hover" href="@Url.Action("DepositInternally", "WalletTransactions")">
+                        <i class="bi bi-currency-exchange me-2"></i>Internal transfer
                     </a>
+                    <hr class="hr-custom">
                 </li>
-                <hr class="hr-custom"> 
+
                 <li class="nav-item">
                     <a class="nav-link text-white highlight-on-hover" href="@Url.Action("Deposit", "Card")">
                         <i class="bi bi-arrow-down-circle me-2"></i> Deposit to Wallet
@@ -162,8 +167,9 @@
                     <a class="nav-link text-white highlight-on-hover" href="@Url.Action("Withdraw", "Card")">
                         <i class="bi bi-arrow-up-circle me-2"></i> Withdraw from Wallet
                     </a>
+                    <hr class="hr-custom">
                 </li>
-                <hr class="hr-custom">
+
 
                 <li class="nav-item">
                     <a class="nav-link text-white highlight-on-hover" href="@Url.Action("Wallets", "User")">
@@ -174,8 +180,9 @@
                     <a class="nav-link text-white highlight-on-hover" href="@Url.Action("Cards", "User")">
                         <i class="bi bi-credit-card-2-front me-2"></i> Cards
                     </a>
+                    <hr class="hr-custom">
                 </li>
-                <hr class="hr-custom">
+
 
                 <li class="nav-item">
                     <a class="nav-link text-white highlight-on-hover" href="@Url.Action("Index", "CardTransactions")">
@@ -186,8 +193,9 @@
                     <a class="nav-link text-white highlight-on-hover" href="@Url.Action("Index", "WalletTransactions")">
                         <i class="bi bi-currency-exchange me-2"></i> Wallet Transactions
                     </a>
+                    <hr class="hr-custom">
                 </li>
-                <hr class="hr-custom">
+
 
                 <li class="nav-item">
                     <a class="nav-link text-white highlight-on-hover" href="@Url.Action("About", "Home")">
@@ -208,9 +216,8 @@
                     <a class="nav-link text-white highlight-on-hover" href="@Url.Action("Privacy", "Home")">
                         <i class="bi bi-list-ol"></i> ToS
                     </a>
+
                 </li>
-
-
 
                 <li class="nav-item d-flex justify-content-center">
                     <form asp-controller="Authentication" asp-action="Logout" method="post" class="w-100">
@@ -223,7 +230,7 @@
     </div>
 
     <div class="bg-dark">
-        <main role="main" class="pt-3 pb-3">
+        <main role="main" class="">
             <!-- Start Error Modal -->
             @if (TempData["ErrorMessage"] != null && !string.IsNullOrEmpty(TempData["ErrorMessage"].ToString()))
             {
@@ -289,31 +296,7 @@
 
     </div>
 
-    <footer class="footer bg-dark-2 text-light  border-top">
-        <div class="container d-flex justify-content-between align-items-center">
-            <div class="d-flex flex-column">
-                <div class="mb-2 d-flex justify-content-between" style="gap: 20px;">
-                    &copy; 2024 VaulTora
-                    <a asp-controller="Home" asp-action="Privacy" class="text-decoration-none">Terms of Service</a>
-                    <a asp-controller="Home" asp-action="swagger" class="text-decoration-none">API</a>
-                </div>
 
-            </div>
-            <div class="d-flex align-items-center">
-                <a href="https://www.facebook.com" target="_blank" class="text-light me-3">
-                    <i class="bi bi-facebook" style="font-size: 1.5rem;"></i>
-                </a>
-                <a href="https://www.twitter.com" target="_blank" class="text-light me-3">
-                    <i class="bi bi-twitter" style="font-size: 1.5rem;"></i>
-                </a>
-                <a href="https://www.linkedin.com" target="_blank" class="text-light me-3">
-                    <i class="bi bi-linkedin" style="font-size: 1.5rem;"></i>
-                </a>
-
-            </div>
-        </div>
-
-    </footer>
 
 
     <script type="text/javascript">
@@ -328,4 +311,28 @@
     @await RenderSectionAsync("Scripts", required: false)
 
 </body>
+<footer class="footer bg-dark-2 text-light border-top">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div class="d-flex flex-column">
+            <div class="mb-2 d-flex justify-content-between" style="gap: 20px;">
+                &copy; 2024 VaulTora
+                <a href="@Url.Action("Privacy", "Home")">Terms of Service</a>
+                <a href="@Url.Action("swagger", "api")">API</a>
+            </div>
+
+        </div>
+        <div class="d-flex align-items-center">
+            <a href="https://www.facebook.com" target="_blank" class="text-light me-3">
+                <i class="bi bi-facebook" style="font-size: 1.5rem;"></i>
+            </a>
+            <a href="https://www.twitter.com" target="_blank" class="text-light me-3">
+                <i class="bi bi-twitter" style="font-size: 1.5rem;"></i>
+            </a>
+            <a href="https://www.linkedin.com" target="_blank" class="text-light me-3">
+                <i class="bi bi-linkedin" style="font-size: 1.5rem;"></i>
+            </a>
+
+        </div>
+    </div>
+</footer>
 </html>

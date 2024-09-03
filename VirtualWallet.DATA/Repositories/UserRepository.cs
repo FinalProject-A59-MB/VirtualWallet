@@ -31,6 +31,16 @@ namespace VirtualWallet.DATA.Repositories
             return await GetUsersWithDetails().ToListAsync();
         }
 
+        public async Task<IEnumerable<User>> GetUserContactsByIdAsync(int userId)
+        {
+            var userWithContacts = await GetUsersWithDetails()
+                .Where(u => u.Id == userId)
+                .Select(u => u.Contacts.Select(uc => uc.Contact))
+                .FirstOrDefaultAsync();
+
+            return userWithContacts ?? Enumerable.Empty<User>();
+        }
+
         public async Task<User?> GetUserByIdAsync(int id)
         {
             return await GetUsersWithDetails()
@@ -130,10 +140,11 @@ namespace VirtualWallet.DATA.Repositories
 
         public async Task<List<User>> GetUserContactsAsync(int userId)
         {
-            return await _context.UserContacts
-                .Where(uc => uc.UserId == userId)
-                .Select(uc => uc.Contact)
-                .ToListAsync();
+            var contacts = await GetUsersWithDetails()
+                .Where(u => u.Id == userId)
+                .SelectMany(u => u.Contacts.Select(uc => uc.Contact)).Include(u=>u.UserProfile).ToListAsync();
+
+            return contacts;
         }
 
         public async Task<UserContact> GetUserContactAsync(int userId, int contactId)

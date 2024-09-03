@@ -6,7 +6,7 @@
     int pageNumber = ViewBag.PageNumber;
     int totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
     var wallet1 = ViewBag.FilterParameters?.WalletId;
-    // Populate the routeValues object with current filter parameters
+
     var routeValues = new
     {
         WalletId = ViewBag.FilterParameters?.WalletId,

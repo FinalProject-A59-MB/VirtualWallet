@@ -8,7 +8,7 @@
     dynamic amount = decimal.Round(Model.Amount, 2, MidpointRounding.AwayFromZero);
 }
 
-<div class="transaction-area area-padding fix position-relative">
+<div class="transaction-area area-padding fix position-relative mt-5">
     <div class="transaction-overlay"></div>
     <div class="d-table w-100 h-100">
         <div class="d-table-cell align-middle">
@@ -35,12 +35,14 @@
 
                             <div class="mb-3 p-1 border rounded bg-dark-2 w-100">
                                 <h5 class="text-muted">Source Wallet:</h5>
-                                <h3 class="fw-bold text-white">@Model.Wallet.Name (@Model.Wallet.Currency)</h3>
+                                <h3 class="fw-bold text-white">@Model.Wallet.Name</h3>
+                                <h4 class="fw-bold text-white">(@Model.Wallet.Currency @Model.Wallet.Balance)</h4>
                             </div>
 
                             <div class="mb-3 p-1 border rounded bg-dark-2 w-100">
                                 <h5 class="text-muted">Destination Card:</h5>
-                                <h3 class="fw-bold text-white">@Model.Card.CardNumber (@Model.Card.Currency)</h3>
+                                <h3 class="fw-bold text-white">@Model.Card.CardNumber</h3>
+                                <h4 class="fw-bold text-white">(@Model.Card.Currency)</h4>
                             </div>
 
                             <div class="mb-3 p-1 border rounded bg-dark-2 w-100">

@@ -71,7 +71,7 @@
                 </tbody>
             </table>
         </div>
-        
+
         <!-- Pagination for User List -->
         <nav aria-label="User pagination" class="mt-4">
             @PaginationHelper.GeneratePaginationLinks(Url, userTotalPages, userCurrentPage, "AdminPanel", new { section = "users" })
@@ -97,7 +97,6 @@
                         <th scope="col">Sender</th>
                         <th scope="col">Recipient</th>
                         <th scope="col">Amount*</th>
-                        <th scope="col">Direction</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -107,8 +106,8 @@
                         {
                             <tr class="text-center text-xl-center">
                                 <td>@transaction.CreatedAt.ToString()</td>
-                                <td>@transaction.Sender</td>
-                                <td>@transaction.Recipient</td>
+                                <td>@transaction.Sender.User.Username</td>
+                                <td>@transaction.Recipient.User.Username</td>
                                 <td>@transaction.CurrencySent @transaction.AmountSent</td>
                             </tr>
                         }
@@ -136,7 +135,7 @@
         <form method="get" asp-action="AdminPanel" class="d-flex justify-content-center mb-4">
             <input type="text" name="CardNumber" class="form-control me-2 w-50" placeholder="Search by Card" value="@ViewContext.HttpContext.Request.Query["CardNumber"]" />
             <input type="text" name="Wallet" class="form-control me-2 w-50" placeholder="Wallet" value="@ViewContext.HttpContext.Request.Query["Wallet"]" />
-            <input type="date" name="CreatedAfter" class="form-control me-2 w-50" placeholder="From Date" value="@ViewContext.HttpContext.Request.Query["CreatedAfter"]" />
+            <input type="date" name="CreatedAfter" class="form-control me-2 w-50" placeholder="From 22222222222Date" value="@ViewContext.HttpContext.Request.Query["CreatedAfter"]" />
             <input type="date" name="CreatedBefore" class="form-control me-2 w-50" placeholder="To Date" value="@ViewContext.HttpContext.Request.Query["CreatedBefore"]" />
             <button type="submit" class="btn btn-outline-success">Search</button>
         </form>

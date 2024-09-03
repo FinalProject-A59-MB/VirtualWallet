@@ -6,6 +6,8 @@ namespace VirtualWallet.DATA.Repositories.Contracts
     {
         public Task<IEnumerable<User>> GetAllUsers();
 
+        Task<IEnumerable<User>> GetUserContactsByIdAsync(int userId);
+
         public Task<User?> GetUserByIdAsync(int id);
 
         public Task<User?> GetUserByEmailAsync(string email);
@@ -28,7 +30,7 @@ namespace VirtualWallet.DATA.Repositories.Contracts
         public Task AddBlockedRecordAsync(BlockedRecord blockedRecord);
 
         public Task<IEnumerable<BlockedRecord>> GetBlockedRecordsAsync(int userId);
-        public Task AddContactAsync(UserContact userContact);  
+        public Task AddContactAsync(UserContact userContact);
         public Task<List<User>> GetUserContactsAsync(int userId);
         public Task UpdateContactAsync(UserContact userContact);
 
