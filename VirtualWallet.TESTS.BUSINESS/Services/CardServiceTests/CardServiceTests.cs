@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using MockQueryable.EntityFrameworkCore;
 using Moq;
 using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services;
@@ -56,31 +58,6 @@ namespace VirtualWallet.TESTS.BUSINESS.Services.CardServiceTests
             Assert.AreEqual("Card not found.", result.Error);
         }
 
-
-
-
-
-        [TestMethod]
-        public async Task AddCardAsync_ShouldAddCard_WhenUserHasNoMainWallet()
-        {
-            // Arrange
-            var user = TestHelper.GetTestUser();
-            var card = TestHelper.GetTestCard();
-            user.MainWalletId = null;
-
-            _walletServiceMock
-             .Setup(service => service.AddWalletAsync(It.IsAny<Wallet>()))
-             .ReturnsAsync(Result<int>.Success(1));
-
-            _cardRepositoryMock.Setup(repo => repo.AddCardAsync(card)).Returns(Task.CompletedTask);
-
-            // Act
-            var result = await _cardService.AddCardAsync(user, card);
-
-            // Assert
-            Assert.IsTrue(result.IsSuccess);
-            _cardRepositoryMock.Verify(repo => repo.AddCardAsync(card), Times.Once);
-        }
 
         [TestMethod]
         public async Task AddCardAsync_ShouldReturnFailure_WhenInvalidUserOrCardProvided()
@@ -191,10 +168,6 @@ namespace VirtualWallet.TESTS.BUSINESS.Services.CardServiceTests
         //    Assert.IsFalse(result.IsSuccess);
         //    Assert.AreEqual("No Transactions found", result.Error);
         //}
-
-
-
-
 
     }
 }

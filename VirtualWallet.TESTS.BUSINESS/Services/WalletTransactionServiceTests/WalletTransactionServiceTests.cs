@@ -4,13 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using VirtualWallet.BUSINESS.Resources;
 using VirtualWallet.BUSINESS.Results;
 using VirtualWallet.BUSINESS.Services.Contracts;
 using VirtualWallet.DATA.Models;
 using VirtualWallet.DATA.Repositories.Contracts;
 using VirtualWallet.DATA.Services;
-using VirtualWallet.DATA.Services.Contracts;
 
 namespace VirtualWallet.TESTS.BUSINESS.Services.WalletTransactionServiceTests
 {
@@ -31,18 +29,20 @@ namespace VirtualWallet.TESTS.BUSINESS.Services.WalletTransactionServiceTests
             _walletTransactionService = new WalletTransactionService(
                 _walletTransactionRepositoryMock.Object,
                 _walletRepositoryMock.Object,
-                _transactionHandlingServiceMock.Object);
+                _transactionHandlingServiceMock.Object,
+                null,  // Assuming null for optional dependencies like IEmailService
+                null); // Assuming null for optional dependencies like ICurrencyService
         }
 
         [TestMethod]
-        public async Task DepositStep1Async_Should_ReturnFailure_When_SenderWalletNotFound()
+        public async Task VerifySendAmountAsync_Should_ReturnFailure_When_SenderWalletNotFound()
         {
             // Arrange
             _walletRepositoryMock.Setup(repo => repo.GetWalletByIdAsync(It.IsAny<int>()))
                 .ReturnsAsync((Wallet)null);
 
             // Act
-            var result = await _walletTransactionService.DepositStep1Async(1, 2, 100);
+            var result = await _walletTransactionService.VerifySendAmountAsync(1, new User(), 100);
 
             // Assert
             Assert.IsFalse(result.IsSuccess);
@@ -50,129 +50,95 @@ namespace VirtualWallet.TESTS.BUSINESS.Services.WalletTransactionServiceTests
         }
 
         [TestMethod]
-        public async Task DepositStep1Async_Should_ReturnFailure_When_RecipientWalletNotFound()
+        public async Task VerifySendAmountAsync_Should_ReturnFailure_When_NotEnoughFunds()
         {
             // Arrange
-            var senderWallet = new Wallet { Id = 1 };
+            var senderWallet = new Wallet { Id = 1, Balance = 50 };
             _walletRepositoryMock.Setup(repo => repo.GetWalletByIdAsync(It.IsAny<int>()))
                 .ReturnsAsync(senderWallet);
 
-            _walletRepositoryMock.Setup(repo => repo.GetWalletByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync((Wallet)null);
-
             // Act
-            var result = await _walletTransactionService.DepositStep1Async(1, 2, 100);
+            var result = await _walletTransactionService.VerifySendAmountAsync(1, new User(), 100);
 
             // Assert
             Assert.IsFalse(result.IsSuccess);
-            Assert.AreEqual("Wallet not found.", result.Error);
+            Assert.AreEqual("Not enough funds in the wallet to complete the transaction.", result.Error);
         }
 
         [TestMethod]
-        public async Task DepositStep1Async_Should_ReturnFailure_When_AmountIsInvalid()
+        public async Task VerifySendAmountAsync_Should_ReturnSuccess_When_Valid()
         {
             // Arrange
-            var senderWallet = new Wallet { Id = 1 };
-            var recipientWallet = new Wallet { Id = 2 };
-            _walletRepositoryMock.Setup(repo => repo.GetWalletByIdAsync(It.IsAny<int>()))
+            var senderWallet = new Wallet
+            {
+                Id = 1,
+                Balance = 200,
+                Currency = DATA.Models.Enums.CurrencyType.USD
+            };
+
+            var recipientWallet = new Wallet
+            {
+                Id = 2,
+                Currency = DATA.Models.Enums.CurrencyType.USD
+            };
+
+            var recipientUser = new User
+            {
+                Id = 2,
+                MainWallet = recipientWallet
+            };
+
+            // Setup mocks
+            _walletRepositoryMock.Setup(repo => repo.GetWalletByIdAsync(senderWallet.Id))
                 .ReturnsAsync(senderWallet);
 
-            _walletRepositoryMock.Setup(repo => repo.GetWalletByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync(recipientWallet);
+            _walletRepositoryMock.Setup(repo => repo.GetWalletsByUserIdAsync(recipientUser.Id))
+                .ReturnsAsync(new List<Wallet> { recipientWallet });
+
+            _walletTransactionRepositoryMock.Setup(repo => repo.AddWalletTransactionAsync(It.IsAny<WalletTransaction>()))
+                .Returns(Task.CompletedTask);
 
             // Act
-            var result = await _walletTransactionService.DepositStep1Async(1, 2, -100);
-
-            // Assert
-            Assert.IsFalse(result.IsSuccess);
-            Assert.AreEqual("The deposit amount must be greater than zero.", result.Error);
-        }
-
-        [TestMethod]
-        public async Task DepositStep1Async_Should_ReturnSuccess_When_Valid()
-        {
-            // Arrange
-            var senderWallet = new Wallet { Id = 1 };
-            var recipientWallet = new Wallet { Id = 2 };
-            _walletRepositoryMock.Setup(repo => repo.GetWalletByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync(senderWallet);
-
-            _walletRepositoryMock.Setup(repo => repo.GetWalletByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync(recipientWallet);
-
-            _transactionHandlingServiceMock.Setup(service => service.ProcessWalletToWalletTransactionStep1Async(
-                    It.IsAny<Wallet>(), It.IsAny<Wallet>(), It.IsAny<decimal>()))
-                .ReturnsAsync(Result<int>.Success(1));
-
-            // Act
-            var result = await _walletTransactionService.DepositStep1Async(1, 2, 100);
+            var result = await _walletTransactionService.VerifySendAmountAsync(senderWallet.Id, recipientUser, 100);
 
             // Assert
             Assert.IsTrue(result.IsSuccess);
-            Assert.AreEqual(1, result.Value);
         }
 
+
+
+
+
         [TestMethod]
-        public async Task DepositStep2Async_Should_ReturnFailure_When_SenderWalletNotFound()
+        public async Task ProcessSendAmountAsync_Should_ReturnFailure_When_ProcessingFails()
         {
             // Arrange
-            _walletRepositoryMock.Setup(repo => repo.GetWalletByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync((Wallet)null);
+            var transaction = new WalletTransaction { Id = 1, SenderId = 1, RecipientId = 2 };
+            _transactionHandlingServiceMock.Setup(service => service.ProcessWalletToWalletTransactionAsync(It.IsAny<WalletTransaction>()))
+                .ReturnsAsync(Result<WalletTransaction>.Failure("Processing failed."));
 
             // Act
-            var result = await _walletTransactionService.DepositStep2Async(1, 2, 1);
+            var result = await _walletTransactionService.ProcessSendAmountAsync(transaction);
 
             // Assert
             Assert.IsFalse(result.IsSuccess);
-            Assert.AreEqual("Wallet not found.", result.Error);
+            Assert.AreEqual("Processing failed.", result.Error);
         }
 
         [TestMethod]
-        public async Task DepositStep2Async_Should_ReturnFailure_When_RecipientWalletNotFound()
+        public async Task ProcessSendAmountAsync_Should_ReturnSuccess_When_Valid()
         {
             // Arrange
-            var senderWallet = new Wallet { Id = 1 };
-            _walletRepositoryMock.Setup(repo => repo.GetWalletByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync(senderWallet);
-
-            _walletRepositoryMock.Setup(repo => repo.GetWalletByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync((Wallet)null);
+            var transaction = new WalletTransaction { Id = 1, SenderId = 1, RecipientId = 2 };
+            _transactionHandlingServiceMock.Setup(service => service.ProcessWalletToWalletTransactionAsync(It.IsAny<WalletTransaction>()))
+                .ReturnsAsync(Result<WalletTransaction>.Success(transaction));
 
             // Act
-            var result = await _walletTransactionService.DepositStep2Async(1, 2, 1);
-
-            // Assert
-            Assert.IsFalse(result.IsSuccess);
-            Assert.AreEqual("Wallet not found.", result.Error);
-        }
-
-
-        [TestMethod]
-        public async Task DepositStep2Async_Should_ReturnSuccess_When_Valid()
-        {
-            // Arrange
-            var senderWallet = new Wallet { Id = 1 };
-            var recipientWallet = new Wallet { Id = 2 };
-            var transaction = new WalletTransaction { Id = 1 };
-            _walletRepositoryMock.Setup(repo => repo.GetWalletByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync(senderWallet);
-
-            _walletRepositoryMock.Setup(repo => repo.GetWalletByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync(recipientWallet);
-
-            _walletTransactionRepositoryMock.Setup(repo => repo.GetTransactionByIdAsync(It.IsAny<int>()))
-                .ReturnsAsync(transaction);
-
-            _transactionHandlingServiceMock.Setup(service => service.ProcessWalletToWalletTransactionStep2Async(
-                    It.IsAny<Wallet>(), It.IsAny<Wallet>(), It.IsAny<WalletTransaction>()))
-                .ReturnsAsync(Result<int>.Success(1));
-
-            // Act
-            var result = await _walletTransactionService.DepositStep2Async(1, 2, 1);
+            var result = await _walletTransactionService.ProcessSendAmountAsync(transaction);
 
             // Assert
             Assert.IsTrue(result.IsSuccess);
-            Assert.AreEqual(1, result.Value);
+            Assert.AreEqual(transaction, result.Value);
         }
 
         [TestMethod]
@@ -276,7 +242,6 @@ namespace VirtualWallet.TESTS.BUSINESS.Services.WalletTransactionServiceTests
             CollectionAssert.AreEqual(transactions, result.Value.ToList());
         }
 
-
         [TestMethod]
         public async Task GetTotalCountAsync_Should_ReturnFailure_When_NoTransactionsFound()
         {
@@ -298,5 +263,3 @@ namespace VirtualWallet.TESTS.BUSINESS.Services.WalletTransactionServiceTests
         }
     }
 }
-
-

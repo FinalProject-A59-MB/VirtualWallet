@@ -190,9 +190,12 @@ namespace VirtualWallet.TESTS.BUSINESS.Services
             return new WalletTransaction
             {
                 Id = 1,
-                Amount = 100m,
+                AmountSent = 100m,
+                AmountReceived = 98m,
+                FeeAmount = 2m,
                 CreatedAt = DateTime.UtcNow,
-                Currency = CurrencyType.USD,
+                CurrencySent = CurrencyType.USD,
+                CurrencyReceived = CurrencyType.USD,
                 Status = TransactionStatus.Pending,
                 SenderId = 1,
                 Sender = GetTestWallet(),
@@ -207,9 +210,12 @@ namespace VirtualWallet.TESTS.BUSINESS.Services
             return new WalletTransaction
             {
                 Id = 2,
-                Amount = 200m,
+                AmountSent = 200m,
+                AmountReceived = 196m,
+                FeeAmount = 4m,
                 CreatedAt = DateTime.UtcNow,
-                Currency = CurrencyType.USD,
+                CurrencySent = CurrencyType.USD,
+                CurrencyReceived = CurrencyType.USD,
                 Status = TransactionStatus.Pending,
                 SenderId = 2,
                 Sender = GetTestWallet2(),
