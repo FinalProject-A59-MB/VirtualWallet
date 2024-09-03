@@ -70,15 +70,6 @@ namespace VirtualWallet.DATA.Services
             };
             await _userRepository.AddUserProfileAsync(userProfile);
 
-            await _walletRepository.AddWalletAsync(new Wallet()
-            {
-                Name = "Main wallet",
-                WalletType = WalletType.Main,
-                Currency = CurrencyType.BGN,
-                UserId = userToRegister.Id,
-                Balance = 0,
-            });
-
             userToRegister.UserProfile = userProfile;
 
             return Result<User>.Success(userToRegister);

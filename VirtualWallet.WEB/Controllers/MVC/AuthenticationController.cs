@@ -148,12 +148,12 @@ namespace ForumProject.Controllers.MVC
             string token = _authService.GenerateToken(registerResult.Value);
             string verificationLink = Url.Action("VerifyEmail", "Authentication", new { token = token }, Request.Scheme);
 
-            var result = await _emailService.SendVerificationEmailAsync(registerResult.Value, verificationLink);
-            if (result.IsSuccess)
-            {
-                TempData["SuccessMessage"] = "A verification link has been sent to your email. Please use it to verify your account to gain full access.";
+            //var result = await _emailService.SendVerificationEmailAsync(registerResult.Value, verificationLink);
+            //if (result.IsSuccess)
+            //{
+            //    TempData["SuccessMessage"] = "A verification link has been sent to your email. Please use it to verify your account to gain full access.";
 
-            }
+            //}
 
             HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
 
