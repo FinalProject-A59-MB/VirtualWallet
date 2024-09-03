@@ -185,7 +185,6 @@
                                 <a href="@Url.Action("SendTo", "WalletTransactions", new { recipientId = Model.Id})" class="btn btn-primary btn mb-2 me-2">Send Money</a>
                                 @if (@areFriends)
                                 {
-                                    <a href="@Url.Action("RequestDeposit", "WalletTransaction", new { senderId = Model.Id })" class="btn btn-primary btn mb-2 me-2">Request Money</a>
                                 }
                                 @if (!areFriends)
                                 {
@@ -327,7 +326,6 @@
                                                     </span>
                                                     
 
-                                                    <!-- Edit Mode (Hidden by Default) -->
                                                     
                                                 </div>
                                             </td>
@@ -349,10 +347,7 @@
                                                         <input type="hidden" name="contactId" value="@contact.ContactId" />
                                                         <button type="submit" class="btn btn-outline-success btn-sm">+ Send Money</button>
                                                     </form>
-                                                    <form asp-controller="Wallet" asp-action="ReceiveMoney" method="post" class="d-inline">
-                                                        <input type="hidden" name="contactId" value="@contact.ContactId" />
-                                                        <button type="submit" class="btn btn-outline-warning btn-sm">- Request Money</button>
-                                                    </form>
+
                                                 }
                                             </td>
                                         </tr>

@@ -199,7 +199,7 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 return View("CardTransactionFormPartial", model);
             }
         }
-        [RequireAuthorization(minRequiredRoleLevel: 3)]
+        [RequireAuthorization(minRequiredRoleLevel: 1)]
 
         [HttpGet]
         public IActionResult Withdraw()

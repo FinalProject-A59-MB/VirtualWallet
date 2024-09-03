@@ -33,7 +33,8 @@ namespace VirtualWallet.TESTS.BUSINESS.Services.WalletTransactionServiceTests
                 _walletTransactionRepositoryMock.Object,
                 _walletRepositoryMock.Object,
                 _transactionHandlingServiceMock.Object,
-                _currencyService.Object);
+                _currencyService.Object,
+                null);
         }
 
         [TestMethod]

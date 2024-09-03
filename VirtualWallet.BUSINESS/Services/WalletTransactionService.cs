@@ -16,18 +16,21 @@ namespace VirtualWallet.DATA.Services
         private readonly IWalletRepository _walletRepository;
         private readonly ITransactionHandlingService _transactionHandlingService;
         private readonly ICurrencyService _currencyService;
+        private readonly IEmailService _emailService;
 
         public WalletTransactionService(
             IWalletTransactionRepository walletTransactionRepository,
             IWalletRepository walletRepository,
             ITransactionHandlingService transactionHandlingService,
-            ICurrencyService currencyService
+            ICurrencyService currencyService,
+            IEmailService emailService
 )
         {
             _walletTransactionRepository = walletTransactionRepository;
             _walletRepository = walletRepository;
             _transactionHandlingService = transactionHandlingService;
             _currencyService = currencyService;
+            _emailService = emailService;
         }
 
         public async Task<Result<WalletTransaction>> VerifySendAmountAsync(int senderWalletId, User recepient, decimal amount)
@@ -86,11 +89,11 @@ namespace VirtualWallet.DATA.Services
 
             await _walletTransactionRepository.AddWalletTransactionAsync(transaction);
             //send verification code
-            //var emailResult = await _emailService.SendPaymentVerificationEmailAsync(senderWallet.User,transaction.VerificationCode);
-            //if (!emailResult.IsSuccess)
-            //{
-            //    return Result<WalletTransaction>.Failure(emailResult.Error);
-            //}
+            var emailResult = await _emailService.SendPaymentVerificationEmailAsync(senderWallet.User, transaction.VerificationCode);
+            if (!emailResult.IsSuccess)
+            {
+                return Result<WalletTransaction>.Failure(emailResult.Error);
+            }
 
             return Result<WalletTransaction>.Success(transaction);
 
@@ -141,12 +144,12 @@ namespace VirtualWallet.DATA.Services
                 CurrencyReceived = senderWallet.Currency,
             };
             await _walletTransactionRepository.AddWalletTransactionAsync(transaction);
-            //var completedTransacctions = await _transactionHandlingService.ProcessWalletToWalletTransactionAsync(transaction);
-            //if (!completedTransacctions.IsSuccess)
-            //{
-            //    return Result<WalletTransaction>.Failure(completedTransacctions.Error);
-            //}
-            //add tranasaction to repository
+            var completedTransacctions = await _transactionHandlingService.ProcessWalletToWalletTransactionAsync(transaction);
+            if (!completedTransacctions.IsSuccess)
+            {
+                return Result<WalletTransaction>.Failure(completedTransacctions.Error);
+            }
+
 
 
             return Result<WalletTransaction>.Success(transaction);
