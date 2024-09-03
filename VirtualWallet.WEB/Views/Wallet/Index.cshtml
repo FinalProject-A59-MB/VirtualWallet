@@ -3,14 +3,14 @@
 
 
 
-<div class="transaction-area area-padding fix position-relative">
+<div class="transaction-area area-padding fix position-relative mt-5">
     <div class="transaction-overlay"></div>
     <div class="d-table w-100 h-100">
         <div class="d-table-cell align-middle">
             <div class="container w-75">
                 <div class="row justify-content-center">
                     <div class="col-md-10 col-sm-12 col-xs-12">
-                        <div class="transaction-form bg-dark-1 p-5 rounded shadow-lg animate__animated animate__fadeIn">
+                        <div class="transaction-form bg-dark-1 p-5 rounded animate__animated animate__fadeIn">
                             <!-- Wallet Header Section -->
                             <div class="bg-gradient p-4 rounded mb-5">
                                 <div class="row align-items-center">
@@ -46,9 +46,11 @@
                                 <button id="cancel-wallet-button" class="btn btn-secondary me-3" style="display: none;">
                                     <i class="fas fa-times"></i> Cancel
                                 </button>
-                                <button class="btn btn-danger delete-wallet" data-id="@Model.Id">
-                                    <i class="fas fa-trash-alt"></i> Delete Wallet
-                                </button>
+                                <a href="@Url.Action("ConfirmDelete", "Wallet", new { id = Model.Id })" class="btn btn-danger text-center" style="display: inline-block; text-decoration: none;">
+                                    <i class="fas fa-trash-alt"></i>Delete
+                                </a>
+
+
                             </div>
 
                             <!-- Joint Users Section -->
@@ -131,7 +133,7 @@
                             </div>
 
                             <div class="text-center mt-5">
-                                <a href="@Url.Action("Index", "Wallet")" class="btn btn-secondary w-50 py-2">
+                                <a href="@Url.Action("Wallets", "User")" class="btn btn-secondary w-50 py-2">
                                     <i class="fas fa-arrow-left"></i> Back to Wallets
                                 </a>
                             </div>

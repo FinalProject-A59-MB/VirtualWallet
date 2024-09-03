@@ -21,11 +21,11 @@ namespace VirtualWallet.DATA.Repositories
         private IQueryable<Wallet> GetWalletsWithDetails()
         {
             return _dbContext.Wallets.
-                Include(w=>w.User).
-                ThenInclude(u=>u.UserProfile).
-                Include(w=>w.UserWallets).
-                Include(w=>w.WalletTransactions).
-                Include(w=>w.CardTransactions);
+                Include(w => w.User).
+                ThenInclude(u => u.UserProfile).
+                Include(w => w.UserWallets).
+                Include(w => w.WalletTransactions).
+                Include(w => w.CardTransactions);
         }
 
         private IQueryable<WalletTransaction> GetWalletTransactionsWithDetails()
@@ -48,7 +48,12 @@ namespace VirtualWallet.DATA.Repositories
 
         public async Task<Wallet?> GetWalletByIdAsync(int id)
         {
-            var wallet = await GetWalletsWithDetails().FirstOrDefaultAsync(c => c.Id == id);
+            var wallet = await GetWalletsWithDetails().Include(w => w.User).
+                Include(w => w.User).
+                ThenInclude(u => u.UserProfile).
+                Include(w => w.UserWallets).
+                Include(w => w.WalletTransactions).
+                Include(w => w.CardTransactions).FirstOrDefaultAsync(c => c.Id == id);
 
             return wallet;
         }

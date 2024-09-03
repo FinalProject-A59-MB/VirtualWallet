@@ -218,7 +218,6 @@ namespace VirtualWallet.WEB.Controllers.MVC
 
             return View("CardTransactionFormPartial", model);
         }
-        [RequireAuthorization(minRequiredRoleLevel: 3)]
 
         [HttpPost]
         public async Task<IActionResult> ConfirmWithdraw(CardTransactionViewModel model)
@@ -250,7 +249,6 @@ namespace VirtualWallet.WEB.Controllers.MVC
             return View("ConfirmWithdraw", model);
         }
 
-        [RequireAuthorization(minRequiredRoleLevel: 3)]
 
         [HttpPost]
         public async Task<IActionResult> WithdrawFromWallet(CardTransactionViewModel model)

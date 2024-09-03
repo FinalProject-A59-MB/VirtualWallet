@@ -69,6 +69,7 @@ namespace VirtualWallet.DATA.Services
                     recipientWallet = recepient.MainWallet;
                 }
             }
+            recipientWallet.User = recepient;
             //get sent and received ammounts
             var sentAmount = await _currencyService.ConvertCurrencyAsync(amount, senderWallet.Currency, recipientWallet.Currency);
             if (!sentAmount.IsSuccess)
@@ -78,6 +79,8 @@ namespace VirtualWallet.DATA.Services
 
             //generate code
             var verificationCode = VerificationCode.Generate();
+
+
 
             //generate transaction 
             WalletTransaction transaction = new WalletTransaction

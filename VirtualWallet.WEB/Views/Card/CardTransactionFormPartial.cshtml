@@ -1,6 +1,6 @@
 ﻿@model CardTransactionViewModel
 
-<div class="transaction-area area-padding fix position-relative">
+<div class="transaction-area area-padding fix position-relative mt-5">
     <div class="transaction-overlay"></div>
     <div class="d-table w-100 h-100">
         <div class="d-table-cell align-middle">
@@ -34,7 +34,7 @@
                                     <select name="WalletId" id="wallet" class="form-select bg-dark-2 text-white border-0 shadow-sm" required>
                                         @foreach (var wallet in ViewBag.Wallets)
                                         {
-                                            <option value="@wallet.Id">@wallet.Name (@wallet.Currency)</option>
+                                            <option value="@wallet.Id">@wallet.Name (@wallet.Currency @wallet.Balance)</option>
                                         }
                                     </select>
                                 </div>

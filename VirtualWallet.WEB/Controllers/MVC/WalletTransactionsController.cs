@@ -143,7 +143,12 @@ namespace VirtualWallet.WEB.Controllers.MVC
 
             if (string.IsNullOrEmpty(searchTerm))
             {
-                return View(Enumerable.Empty<UserViewModel>());
+                var friends = await _userService.GetUserContacts(CurrentUser.Id);
+
+                IEnumerable<UserViewModel> friendViewModels = friends.Value
+                    .Select(_viewModelMapper.ToUserViewModel);
+
+                return View(friendViewModels);
             }
 
             Result<IEnumerable<User>> result = await _userService.SearchUsersAsync(searchTerm);
@@ -154,11 +159,12 @@ namespace VirtualWallet.WEB.Controllers.MVC
                 return View(Enumerable.Empty<UserViewModel>());
             }
 
-            IEnumerable<UserViewModel> userViewModels = result.Value.Where(u => u.Id != CurrentUser.Id).Select(_viewModelMapper.ToUserViewModel);
+            IEnumerable<UserViewModel> userViewModels = result.Value
+                .Where(u => u.Id != CurrentUser.Id)
+                .Select(_viewModelMapper.ToUserViewModel);
 
             return View(userViewModels);
         }
-
 
 
 
@@ -201,77 +207,6 @@ namespace VirtualWallet.WEB.Controllers.MVC
             return RedirectToAction("TransactionConfirmation", "WalletTransactions");
         }
 
-        [HttpGet]
-        public IActionResult RequestDeposit()
-        {
-            var activeContacts = CurrentUser.Contacts.FirstOrDefault(c=>c.Status== FriendRequestStatus.Accepted);
-            if (activeContacts==null)
-            {
-                TempData["InfoMessage"] = "Currently you do not have any active contacts. You need to add people to your contact list before you can be able to request funds.";
-                return RedirectToAction("Profile", "User");
-            }
-            var model = new RequestMoneyViewModel { 
-                Contacts = CurrentUser.Contacts,
-                SenderId = CurrentUser.Id
-            };
-
-            return View(model);
-        }
-
-        [HttpGet]
-        public IActionResult RequestConfirm(RequestMoneyViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                model.Contacts = CurrentUser.Contacts.Where(c => c.Status == FriendRequestStatus.Accepted).ToList();
-                return View(model);
-            }
-
-            var activeContacts = CurrentUser.Contacts.FirstOrDefault(c => c.Status == FriendRequestStatus.Accepted);
-            if (activeContacts == null)
-            {
-                TempData["InfoMessage"] = "Currently you do not have any active contacts. You need to add people to your contact list before you can be able to request funds.";
-                return RedirectToAction("Profile", "User");
-            }
-
-            model.Contacts = CurrentUser.Contacts.Where(c => c.Status == FriendRequestStatus.Accepted).ToList();
-
-            return View("RequestConfirm", model);
-        }
-
-        [HttpPost]
-        public IActionResult RequestSend(RequestMoneyViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                model.Contacts = CurrentUser.Contacts.Where(c => c.Status == FriendRequestStatus.Accepted).ToList();
-                return View("RequestConfirm", model);
-            }
-
-            //// Process the request
-            //var transaction = new WalletTransactionRequest
-            //{
-            //    SenderId = model.SenderId,
-            //    AmountSent = model.Amount,
-            //    Description = model.Description,
-            //    Status = TransactionStatus.Pending,
-            //    CreatedAt = DateTime.UtcNow
-            //};
-
-            //var result = _walletTransactionService.CreateTransaction(transaction);
-
-            //if (!result.IsSuccess)
-            //{
-            //    TempData["ErrorMessage"] = "There was an error processing your request. Please try again.";
-            //    return RedirectToAction("RequestDeposit");
-            //}
-
-            TempData["SuccessMessage"] = "Your request has been successfully sent.";
-            return RedirectToAction("Index", "WalletTransactions");
-        }
-
-
-
 
         [HttpGet]
         public async Task<IActionResult> DepositConfirm(SendMoneyViewModel model)
@@ -306,42 +241,6 @@ namespace VirtualWallet.WEB.Controllers.MVC
 
             TempData["SuccessMessage"] = "The transaction was a success.";
             return RedirectToAction("Wallets", "User");
-        }
-
-        [HttpPost]
-        public async Task<int> RequestDeposit(int senderWalletId, decimal amount, string description)
-        {
-            throw new NotSupportedException();
-            //var myMainWalletIdResult = await _walletService.GetWalletIdByUserDetailsAsync(CurrentUser.Username);
-
-            //var result = await _walletTransactionService.DepositStep1Async(senderWalletId, myMainWalletIdResult.Value, amount);
-
-            //if (!result.IsSuccess)
-            //{
-            //    TempData["ErrorMessage"] = result.Error;
-            //}
-
-            //var senderWalletResult = await _walletService.GetWalletByIdAsync(senderWalletId);
-
-            //if (!senderWalletResult.IsSuccess)
-            //{
-            //    TempData["ErrorMessage"] = result.Error;
-            //}
-
-            //var senderEmail = senderWalletResult.Value?.User?.Email;
-
-
-            //if (string.IsNullOrEmpty(senderEmail))
-            //{
-            //    TempData["ErrorMessage"] = "Incorrect user information.";
-            //}
-
-            //string transactionUrl = Url.Action("VerifyPayment", "WalletTransaction", new { id = result.Value }, Request.Scheme);
-            //string anchorTag = $"<a href=\"{transactionUrl}\">View Transaction</a>";
-
-            //await _emailService.SendEmailAsync(senderEmail, $"{CurrentUser.Username} is requesting payment", $"{CurrentUser.Username} sent you a payment request for {amount} BGN with a description: {description}. Please confirm the payment at {anchorTag}");
-
-            //return result.Value;
         }
 
 
