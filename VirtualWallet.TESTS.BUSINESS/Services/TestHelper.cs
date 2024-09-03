@@ -242,5 +242,15 @@ namespace VirtualWallet.TESTS.BUSINESS.Services
             };
         }
 
+        public static UserWallet GetTestUserWallet()
+        {
+            return new UserWallet
+            {
+                UserId = 1,
+                WalletId = 1,
+                Role = UserWalletRole.Member,
+                JoinedDate = DateTime.UtcNow,
+            };
+        }
     }
 }
