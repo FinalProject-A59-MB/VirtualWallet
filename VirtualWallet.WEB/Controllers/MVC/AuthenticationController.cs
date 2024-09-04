@@ -115,7 +115,12 @@ namespace ForumProject.Controllers.MVC
             HttpContext.Response.Cookies.Append("jwt", token, new CookieOptions { HttpOnly = true });
 
             string verificationLink = Url.Action("VerifyEmail", "Authentication", new { token = token }, Request.Scheme);
-            await _emailService.SendVerificationEmailAsync(registerResult.Value, verificationLink);
+            var emailSent = await _emailService.SendVerificationEmailAsync(registerResult.Value, verificationLink);
+            if (emailSent.IsSuccess)
+            {
+                TempData["SuccessMessage"] = "A verification link has been sent to your email. Please use it to verify your account to gain full access.";
+
+            }
 
             return RedirectToAction("Index", "Home");
         }
