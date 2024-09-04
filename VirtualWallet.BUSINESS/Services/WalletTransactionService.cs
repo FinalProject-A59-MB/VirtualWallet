@@ -89,7 +89,7 @@ namespace VirtualWallet.DATA.Services
                 CurrencySent = senderWallet.Currency,
                 CurrencyReceived = recipientWallet.Currency,
             };
-            var senderUser = await _userService.GetUserByIdAsync(senderWallet.Id);
+            var senderUser = await _userService.GetUserByIdAsync(senderWallet.UserId);
             senderWallet.User = senderUser.Value;
             await _walletTransactionRepository.AddWalletTransactionAsync(transaction);
             //send verification code
